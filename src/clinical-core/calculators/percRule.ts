@@ -21,7 +21,7 @@ export const percRuleCalculator: CalculatorDefinition = {
   name: 'Regla PERC (Pulmonary Embolism Rule-out Criteria)',
   shortName: 'PERC Rule',
   primarySpecialty: 'urgencias',
-  secondarySpecialties: ['medicina-interna'],
+  secondarySpecialties: ['neumologia', 'medicina-interna'],
   subcategory: 'diagnostico',
   keywords: ['perc', 'tep', 'embolia pulmonar', 'exclusion', 'dimero d'],
   description:

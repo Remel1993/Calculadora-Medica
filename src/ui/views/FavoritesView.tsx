@@ -1,6 +1,9 @@
 import { Star } from 'lucide-react';
 import React from 'react';
-import { CALCULATOR_BY_ID } from '../../clinical-core/registries/catalog.ts';
+import {
+  CALCULATOR_BY_ID,
+  compareCalculatorsAlphabetically,
+} from '../../clinical-core/registries/catalog.ts';
 import { CalculatorCard } from '../components/CalculatorCard.tsx';
 
 interface FavoritesViewProps {
@@ -18,21 +21,22 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
 }) => {
   const items = favorites
     .map((id) => CALCULATOR_BY_ID[id])
-    .filter((item): item is NonNullable<typeof item> => Boolean(item));
+    .filter((item): item is NonNullable<typeof item> => Boolean(item))
+    .sort(compareCalculatorsAlphabetically);
 
   return (
-    <div className="space-y-6">
+    <div className="w-full min-w-0 space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+        <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl dark:text-slate-100">
           Calculadoras favoritas
         </h1>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+        <p className="mt-1 text-xs leading-relaxed text-slate-600 sm:text-sm dark:text-slate-300">
           Acceso directo guardado localmente en tu dispositivo.
         </p>
       </div>
 
       {items.length > 0 ? (
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid min-w-0 gap-2.5 sm:gap-3 md:grid-cols-2">
           {items.map((calc) => (
             <CalculatorCard
               key={calc.id}

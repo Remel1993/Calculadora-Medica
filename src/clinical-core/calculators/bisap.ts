@@ -32,8 +32,8 @@ export const bisapCalculator: CalculatorDefinition = {
   id: 'bisap',
   name: 'BISAP Score (Pancreatitis Aguda al Ingreso)',
   shortName: 'BISAP',
-  primarySpecialty: 'cirugia-general',
-  secondarySpecialties: ['urgencias', 'medicina-interna'],
+  primarySpecialty: 'gastroenterologia',
+  secondarySpecialties: ['urgencias', 'cirugia-general'],
   subcategory: 'gravedad',
   keywords: ['bisap', 'pancreatitis', 'sirs', 'derrame pleural', 'bun', 'mortalidad'],
   description:

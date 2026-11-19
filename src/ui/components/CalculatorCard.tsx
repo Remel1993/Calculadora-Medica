@@ -20,30 +20,30 @@ export const CalculatorCard: React.FC<CalculatorCardProps> = ({
   const subcategoryLabel = SUBCATEGORY_LABELS[calculator.subcategory];
 
   return (
-    <div className="group flex items-stretch justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4 transition-colors hover:border-sky-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-sky-700">
+    <div className="group flex w-full min-w-0 items-stretch justify-between gap-2 rounded-xl border border-slate-200 bg-white p-3.5 transition-colors hover:border-sky-300 sm:gap-3 sm:p-4 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-sky-700">
       <button
         type="button"
         onClick={() => onSelect(calculator.id)}
-        className="flex min-w-0 flex-1 flex-col items-start text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+        className="flex w-full min-w-0 flex-1 flex-col items-start text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
       >
-        <div className="flex w-full items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-          <span className="font-medium text-sky-700 dark:text-sky-400">
+        <div className="flex w-full min-w-0 items-center gap-1.5 text-[11px] text-slate-500 sm:gap-2 sm:text-xs dark:text-slate-400">
+          <span className="shrink-0 font-medium text-sky-700 dark:text-sky-400">
             {primarySpec.name}
           </span>
-          <span aria-hidden="true">·</span>
-          <span className="truncate">{subcategoryLabel}</span>
+          <span aria-hidden="true" className="shrink-0">·</span>
+          <span className="min-w-0 truncate">{subcategoryLabel}</span>
         </div>
 
-        <h3 className="mt-1.5 text-base font-semibold leading-snug text-slate-900 group-hover:text-sky-700 dark:text-slate-100 dark:group-hover:text-sky-400">
+        <h3 className="mt-1 w-full break-words text-sm font-semibold leading-snug text-slate-900 group-hover:text-sky-700 sm:mt-1.5 sm:text-base dark:text-slate-100 dark:group-hover:text-sky-400">
           {calculator.name}
         </h3>
 
-        <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+        <p className="mt-1 w-full line-clamp-2 break-words text-xs leading-relaxed text-slate-600 sm:text-sm dark:text-slate-300">
           {calculator.description}
         </p>
 
-        <div className="mt-3 flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
-          <span>{calculator.validatedPopulation}</span>
+        <div className="mt-2 w-full min-w-0 text-[11px] font-medium text-slate-500 sm:mt-3 sm:text-xs dark:text-slate-400">
+          <span className="line-clamp-2 break-words">{calculator.validatedPopulation}</span>
         </div>
       </button>
 

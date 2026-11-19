@@ -2,52 +2,104 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { abcd2Calculator } from '../calculators/abcd2.ts';
+import { absoluteNeutrophilCountCalculator } from '../calculators/absoluteNeutrophilCount.ts';
+import { acidBaseCompensationCalculator } from '../calculators/acidBaseCompensation.ts';
+import { acuteDiarrheaPlanCalculator } from '../calculators/acuteDiarrheaPlan.ts';
 import { airScoreCalculator } from '../calculators/airScore.ts';
 import { alvaradoCalculator } from '../calculators/alvarado.ts';
+import { anaphylaxisAdrenalineCalculator } from '../calculators/anaphylaxisAdrenaline.ts';
 import { anionGapCalculator } from '../calculators/anionGap.ts';
+import { ankleBrachialIndexCalculator } from '../calculators/ankleBrachialIndex.ts';
 import { apacheIiCalculator } from '../calculators/apacheIi.ts';
 import { apgarCalculator } from '../calculators/apgar.ts';
 import { asaStatusCalculator } from '../calculators/asaStatus.ts';
+import { asthmaActCalculator } from '../calculators/asthmaAct.ts';
+import { asthmaCrisisAdultCalculator } from '../calculators/asthmaCrisisAdult.ts';
+import { asthmaPulmonaryScoreCalculator } from '../calculators/asthmaPulmonaryScore.ts';
+import { auditCalculator } from '../calculators/audit.ts';
 import { bisapCalculator } from '../calculators/bisap.ts';
 import { bishopCalculator } from '../calculators/bishop.ts';
+import { bradenScaleCalculator } from '../calculators/bradenScale.ts';
+import { bristolScaleCalculator } from '../calculators/bristolScale.ts';
 import { bsaMostellerCalculator } from '../calculators/bsaMosteller.ts';
+import { burnsWallaceParklandCalculator } from '../calculators/burnsWallaceParkland.ts';
 import { calciumCorrectionCalculator } from '../calculators/calciumCorrection.ts';
 import { capriniCalculator } from '../calculators/caprini.ts';
+import { capurroNeonatalCalculator } from '../calculators/capurroNeonatal.ts';
 import { centorMcisaacCalculator } from '../calculators/centorMcisaac.ts';
+import { cervicalTraumaCalculator } from '../calculators/cervicalTrauma.ts';
 import { cha2ds2VascCalculator } from '../calculators/cha2ds2Vasc.ts';
+import { childPughCalculator } from '../calculators/childPugh.ts';
+import { cincinnatiFastCalculator } from '../calculators/cincinnatiFast.ts';
+import { ciwaArCalculator } from '../calculators/ciwaAr.ts';
 import { ckdEpi2021Calculator } from '../calculators/ckdEpi2021.ts';
 import { cockcroftGaultCalculator } from '../calculators/cockcroftGault.ts';
+import { copdGoldCalculator } from '../calculators/copdGold.ts';
 import { curb65Calculator } from '../calculators/curb65.ts';
 import { dengueOmsCalculator } from '../calculators/dengueOms.ts';
+import { diabeticFootScalesCalculator } from '../calculators/diabeticFootScales.ts';
+import { dn4PainCalculator } from '../calculators/dn4Pain.ts';
+import { edinburghEpdsCalculator } from '../calculators/edinburghEpds.ts';
+import { epworthCalculator } from '../calculators/epworth.ts';
+import { fallRiskCalculator } from '../calculators/fallRisk.ts';
 import { fenaFeureaCalculator } from '../calculators/fenaFeurea.ts';
+import { fib4Calculator } from '../calculators/fib4.ts';
+import { findriscCalculator } from '../calculators/findrisc.ts';
 import { fisherModificadaCalculator } from '../calculators/fisherModificada.ts';
 import { fourScoreCalculator } from '../calculators/fourScore.ts';
 import { framinghamCvdCalculator } from '../calculators/framinghamCvd.ts';
 import { freeWaterDeficitCalculator } from '../calculators/freeWaterDeficit.ts';
+import { gad7Calculator } from '../calculators/gad7.ts';
+import { ganzoniIronDeficitCalculator } from '../calculators/ganzoniIronDeficit.ts';
 import { gestationalAgeCalculator } from '../calculators/gestationalAge.ts';
 import { glasgowCalculator } from '../calculators/glasgow.ts';
+import { glasgowBlatchfordCalculator } from '../calculators/glasgowBlatchford.ts';
 import { glasgowPediatricCalculator } from '../calculators/glasgowPediatric.ts';
 import { graceScoreCalculator } from '../calculators/graceScore.ts';
+import { hamiltonAnxietyCalculator } from '../calculators/hamiltonAnxiety.ts';
 import { hasBledCalculator } from '../calculators/hasBled.ts';
+import { hba1cEagCalculator } from '../calculators/hba1cEag.ts';
 import { heartScoreCalculator } from '../calculators/heartScore.ts';
 import { hollidaySegarCalculator } from '../calculators/hollidaySegar.ts';
 import { homaIrBCalculator } from '../calculators/homaIrB.ts';
 import { huntHessCalculator } from '../calculators/huntHess.ts';
+import { hyperglycemicCrisesCalculator } from '../calculators/hyperglycemicCrises.ts';
+import { hypertensionClassificationCalculator } from '../calculators/hypertensionClassification.ts';
 import { ichScoreCalculator } from '../calculators/ichScore.ts';
+import { idealAdjustedWeightCalculator } from '../calculators/idealAdjustedWeight.ts';
 import { imcCalculator } from '../calculators/imc.ts';
 import { infusionCalculator } from '../calculators/infusionCalculator.ts';
+import { inpatientBasalBolusCalculator } from '../calculators/inpatientBasalBolus.ts';
 import { insulinProtocolCalculator } from '../calculators/insulinProtocol.ts';
+import { ipssProstateCalculator } from '../calculators/ipssProstate.ts';
 import { kdigoAkiCalculator } from '../calculators/kdigoAki.ts';
+import { kdigoCkdCalculator } from '../calculators/kdigoCkd.ts';
+import { killipKimballCalculator } from '../calculators/killipKimball.ts';
+import { ldlNonHdlCalculator } from '../calculators/ldlNonHdl.ts';
+import { lrinecScoreCalculator } from '../calculators/lrinecScore.ts';
+import { maddreyDfCalculator } from '../calculators/maddreyDf.ts';
+import { mallampatiCalculator } from '../calculators/mallampati.ts';
 import { mapPamCalculator } from '../calculators/mapPam.ts';
+import { meldNaCalculator } from '../calculators/meldNa.ts';
+import { mentzerIndexCalculator } from '../calculators/mentzerIndex.ts';
+import { metabolicSyndromeCalculator } from '../calculators/metabolicSyndrome.ts';
+import { miniCogCalculator } from '../calculators/miniCog.ts';
+import { minorHeadTraumaCalculator } from '../calculators/minorHeadTrauma.ts';
+import { mocaTestCalculator } from '../calculators/mocaTest.ts';
+import { moriskyGreenCalculator } from '../calculators/moriskyGreen.ts';
+import { neonatalJaundiceKramerCalculator } from '../calculators/neonatalJaundiceKramer.ts';
 import { news2Calculator } from '../calculators/news2.ts';
 import { nihssCalculator } from '../calculators/nihss.ts';
 import { nyhaCalculator } from '../calculators/nyha.ts';
 import { obstetricMgso4Calculator } from '../calculators/obstetricMgso4.ts';
 import { obstetricShockIndexCalculator } from '../calculators/obstetricShockIndex.ts';
+import { ottawaAnkleKneeCalculator } from '../calculators/ottawaAnkleKnee.ts';
+import { oxygenationPafiSafiAaCalculator } from '../calculators/oxygenationPafiSafiAa.ts';
 import { pediatricDehydrationCalculator } from '../calculators/pediatricDehydration.ts';
 import { pediatricDosingCalculator } from '../calculators/pediatricDosing.ts';
 import { percRuleCalculator } from '../calculators/percRule.ts';
 import { pewsBrightonCalculator } from '../calculators/pewsBrighton.ts';
+import { phq9Calculator } from '../calculators/phq9.ts';
 import { plasmaOsmolarityCalculator } from '../calculators/plasmaOsmolarity.ts';
 import { psiPortCalculator } from '../calculators/psiPort.ts';
 import { psofaCalculator } from '../calculators/psofa.ts';
@@ -55,18 +107,33 @@ import { qsofaCalculator } from '../calculators/qsofa.ts';
 import { qtcCalculator } from '../calculators/qtc.ts';
 import { ransonCalculator } from '../calculators/ranson.ts';
 import { ripasaCalculator } from '../calculators/ripasa.ts';
+import { rockallCalculator } from '../calculators/rockall.ts';
+import { sadPersonsCalculator } from '../calculators/sadPersons.ts';
+import { sanFranciscoSyncopeCalculator } from '../calculators/sanFranciscoSyncope.ts';
 import { shockIndexCalculator } from '../calculators/shockIndex.ts';
 import { silvermanAndersenCalculator } from '../calculators/silvermanAndersen.ts';
+import { smokingFagerstromCalculator } from '../calculators/smokingFagerstrom.ts';
 import { sodiumCorrectionCalculator } from '../calculators/sodiumCorrection.ts';
 import { sofaCalculator } from '../calculators/sofa.ts';
+import { stopBangCalculator } from '../calculators/stopBang.ts';
+import { tannerStagesCalculator } from '../calculators/tannerStages.ts';
 import { timiRiskCalculator } from '../calculators/timiRisk.ts';
+import { tokyoGuidelinesCalculator } from '../calculators/tokyoGuidelines.ts';
+import { twistScoreCalculator } from '../calculators/twistScore.ts';
 import { wellsTepCalculator } from '../calculators/wellsTep.ts';
 import { wellsTvpCalculator } from '../calculators/wellsTvp.ts';
+import { westleyCroupCalculator } from '../calculators/westleyCroup.ts';
+import { whoGrowthCalculator } from '../calculators/whoGrowth.ts';
+import { woodDownesFerresCalculator } from '../calculators/woodDownesFerres.ts';
 import {
   createInitialInputs,
   roundClinical,
   validateCalculatorInputs,
 } from '../math/precision.ts';
+import {
+  evaluateWhoIndicator,
+  getWhoReferenceTableRows,
+} from '../math/whoLms.ts';
 import {
   CALCULATOR_CATALOG,
   getCalculatorsBySpecialty,
@@ -1241,8 +1308,703 @@ test('Bishop, Apgar, Silverman-Andersen, Obstetric Shock Index, and MgSO4 Zuspan
   assert.equal(mgso4.secondaryResults?.[0].formattedValue, '300 mL/h');
 });
 
-test('Catalog: 61 deduplicated tools, cross-specialty tagging, and accent-insensitive search', () => {
-  assert.equal(CALCULATOR_CATALOG.length, 61);
+test('STOP-BANG, Epworth (ESS), Mallampati, and Hamilton Anxiety (HAM-A)', () => {
+  // STOP-BANG: 2 STOP + male = 3 -> upgraded to high risk per Chung 2016
+  const sbUpgraded = stopBangCalculator.calculate({
+    snoring: true,
+    tired: true,
+    observed: false,
+    pressure: false,
+    bmi35: false,
+    age50: false,
+    neck40: false,
+    male: true,
+  });
+  assert.equal(sbUpgraded.primaryResult.value, 3);
+  assert.equal(sbUpgraded.severity, 'high');
+
+  // Epworth: 8 * 2 = 16 -> severe excessive daytime sleepiness
+  const essHigh = epworthCalculator.calculate({
+    sittingReading: '2',
+    watchingTv: '2',
+    publicInactive: '2',
+    carPassenger: '2',
+    lyingAfternoon: '2',
+    sittingTalking: '2',
+    afterLunch: '2',
+    carTraffic: '2',
+  });
+  assert.equal(essHigh.primaryResult.value, 16);
+  assert.equal(essHigh.severity, 'critical');
+
+  // Mallampati Class IV
+  const mal4 = mallampatiCalculator.calculate({ mallampatiClass: '4' });
+  assert.equal(mal4.primaryResult.formattedValue, 'Clase IV');
+  assert.equal(mal4.severity, 'critical');
+
+  // Hamilton Anxiety: psychic = 14, somatic = 14 -> total 28 (high)
+  const hama = hamiltonAnxietyCalculator.calculate({
+    anxiousMood: '2',
+    tension: '2',
+    fears: '2',
+    insomnia: '2',
+    intellectual: '2',
+    depressedMood: '2',
+    somaticMuscular: '2',
+    somaticSensory: '2',
+    cardiovascular: '2',
+    respiratory: '2',
+    gastrointestinal: '2',
+    genitourinary: '2',
+    autonomic: '2',
+    behavior: '2',
+  });
+  assert.equal(hama.primaryResult.value, 28);
+  assert.equal(hama.severity, 'high');
+  assert.equal(hama.secondaryResults?.[0].formattedValue, '14 / 28');
+  assert.equal(hama.secondaryResults?.[1].formattedValue, '14 / 28');
+});
+
+test('Asthma scales: ACT, Pulmonary Score (with GEMA SpO2 override), and Adult Crisis (GINA)', () => {
+  const actUncontrolled = asthmaActCalculator.calculate({
+    activity: '3',
+    dyspnea: '3',
+    nocturnal: '3',
+    rescue: '3',
+    selfRating: '3',
+  });
+  assert.equal(actUncontrolled.primaryResult.value, 15);
+  assert.equal(actUncontrolled.severity, 'high');
+
+  // Pulmonary Score 2 (Leve) overridden to Grave by SpO2 < 91%
+  const psOverride = asthmaPulmonaryScoreCalculator.calculate({
+    ageGroup: 'lt6',
+    rrLt6: '1',
+    rrGe6: '0',
+    wheezing: '1',
+    accessory: '0',
+    spo2Band: 'lt91',
+  });
+  assert.equal(psOverride.primaryResult.value, 2);
+  assert.equal(psOverride.severity, 'critical');
+
+  // Adult Asthma Crisis: severe feature -> Grave
+  const adultSevere = asthmaCrisisAdultCalculator.calculate({
+    alteredMental: false,
+    speech: 'words',
+    respRate: 'gt30',
+    heartRate: '100_120',
+    spo2: '90_95',
+    pef: 'gt50',
+  });
+  assert.equal(adultSevere.primaryResult.formattedValue, 'Grave');
+  assert.equal(adultSevere.severity, 'high');
+});
+
+test('Mental Health & Addictions (Group 1): PHQ-9, GAD-7, SAD PERSONS, AUDIT, CIWA-Ar, Mini-Cog', () => {
+  const phqAlert = phq9Calculator.calculate({
+    q1: '1', q2: '1', q3: '0', q4: '1', q5: '0', q6: '0', q7: '0', q8: '0', q9: '1',
+  });
+  assert.equal(phqAlert.primaryResult.value, 4);
+  assert.equal(phqAlert.severity, 'high');
+
+  const gadMod = gad7Calculator.calculate({
+    g1: '2', g2: '2', g3: '2', g4: '1', g5: '1', g6: '1', g7: '1',
+  });
+  assert.equal(gadMod.primaryResult.value, 10);
+  assert.equal(gadMod.severity, 'moderate');
+
+  const sadPlan = sadPersonsCalculator.calculate({
+    sex: true, age: false, depression: false, previousAttempt: false, ethanol: false,
+    rationalLoss: false, socialSupport: false, organizedPlan: true, noSpouse: false, sickness: false,
+  });
+  assert.equal(sadPlan.primaryResult.value, 2);
+  assert.equal(sadPlan.severity, 'high');
+
+  const auditRes = auditCalculator.calculate({
+    q1: '3', q2: '2', q3: '2', q4: '1', q5: '1', q6: '0', q7: '1', q8: '1', q9: '2', q10: '4',
+  });
+  assert.equal(auditRes.primaryResult.value, 17);
+  assert.equal(auditRes.severity, 'high');
+
+  const ciwaSevere = ciwaArCalculator.calculate({
+    nausea: '3', tremor: '4', sweats: '3', anxiety: '3', agitation: '3',
+    tactile: '1', auditory: '1', visual: '1', headache: '2', orientation: '0',
+  });
+  assert.equal(ciwaSevere.primaryResult.value, 21);
+  assert.equal(ciwaSevere.severity, 'critical');
+
+  const miniPos = miniCogCalculator.calculate({ wordRecall: '2', clockDraw: '0' });
+  assert.equal(miniPos.primaryResult.value, 2);
+  assert.equal(miniPos.severity, 'high');
+});
+
+test('Gastroenterology & Hepatology (Group 2): GBS, Rockall, FIB-4, Child-Pugh, MELD-Na, Maddrey, Bristol', () => {
+  const gbsLow = glasgowBlatchfordCalculator.calculate({
+    sex: 'male',
+    hemoglobin: { value: '14.2', unitId: 'g_dl' },
+    bun: { value: '14', unitId: 'bun_mg_dl' },
+    sbp: { value: '124', unitId: 'mmhg' },
+    hr: { value: '82', unitId: 'bpm' },
+    melena: false, syncope: false, liverDisease: false, heartFailure: false,
+  });
+  assert.equal(gbsLow.primaryResult.value, 0);
+  assert.equal(gbsLow.severity, 'low');
+
+  const rockallRes = rockallCalculator.calculate({
+    mode: 'complete', age: '1', shock: '2', comorbidity: '2', diagnosis: '1', stigmata: '2',
+  });
+  assert.equal(rockallRes.primaryResult.value, 8);
+  assert.equal(rockallRes.severity, 'critical');
+
+  // FIB-4 = (54 * 48) / (190 * sqrt(42)) = 2592 / 1231.34 = 2.11
+  const fib4Res = fib4Calculator.calculate({
+    age: { value: '54', unitId: 'years' },
+    ast: { value: '48', unitId: 'u_l' },
+    alt: { value: '42', unitId: 'u_l' },
+    platelets: { value: '190', unitId: '10e9_l' },
+  });
+  assert.equal(fib4Res.primaryResult.value, 2.11);
+  assert.equal(fib4Res.severity, 'moderate');
+
+  const cpRes = childPughCalculator.calculate({
+    bilirubin: { value: '2.5', unitId: 'mg_dl' },
+    albumin: { value: '3.0', unitId: 'g_dl' },
+    inr: { value: '1.8', unitId: 'inr' },
+    ascites: '2',
+    encephalopathy: '2',
+  });
+  assert.equal(cpRes.primaryResult.value, 10);
+  assert.equal(cpRes.severity, 'critical');
+
+  const meldRes = meldNaCalculator.calculate({
+    bilirubin: { value: '3.0', unitId: 'mg_dl' },
+    inr: { value: '1.8', unitId: 'inr' },
+    creatinine: { value: '1.5', unitId: 'mg_dl' },
+    sodium: { value: '128', unitId: 'meq_l' },
+    dialysis: false,
+  });
+  assert.ok(meldRes.primaryResult.value >= 20);
+
+  // Maddrey DF = 4.6 * (20 - 12) + 8 = 44.8
+  const maddreyRes = maddreyDfCalculator.calculate({
+    ptPatient: { value: '20', unitId: 'sec' },
+    ptControl: { value: '12', unitId: 'sec' },
+    bilirubin: { value: '8', unitId: 'mg_dl' },
+  });
+  assert.equal(maddreyRes.primaryResult.value, 44.8);
+  assert.equal(maddreyRes.severity, 'high');
+
+  const bristolRes = bristolScaleCalculator.calculate({ bristolType: '4' });
+  assert.equal(bristolRes.primaryResult.value, 4);
+  assert.equal(bristolRes.severity, 'normal');
+});
+
+test('Pulmonology & Oxygenation (Group 3): GOLD ABE, Smoking/Fagerstrom, PaFi/SaFi/A-a', () => {
+  const goldE = copdGoldCalculator.calculate({
+    exacerbations: 'high',
+    mmrc: '2',
+    catScore: { value: '18', unitId: 'pts' },
+    fev1Percent: { value: '45', unitId: 'pct' },
+  });
+  assert.equal(goldE.primaryResult.formattedValue, 'Grupo E');
+  assert.equal(goldE.severity, 'high');
+
+  const smokeRes = smokingFagerstromCalculator.calculate({
+    cigsPerDay: { value: '20', unitId: 'cigs' },
+    yearsSmoking: { value: '25', unitId: 'years' },
+    q1: '3', q2: '1', q3: '1', q4: '1', q5: '1', q6: '0',
+  });
+  assert.equal(smokeRes.primaryResult.value, 25);
+  assert.equal(smokeRes.severity, 'high');
+
+  // FiO2 0.21, Patm 760, PaCO2 40 -> PAO2 = 0.21*(713) - 50 = 99.7; PaO2=70 -> PaFi=333, A-a=29.7
+  const oxyRes = oxygenationPafiSafiAaCalculator.calculate({
+    pao2: { value: '70', unitId: 'mmhg' },
+    fio2: { value: '21', unitId: 'percent' },
+    paco2: { value: '40', unitId: 'mmhg' },
+    age: { value: '40', unitId: 'years' },
+    spo2: { value: '93', unitId: 'pct' },
+    patm: { value: '760', unitId: 'mmhg' },
+  });
+  assert.equal(oxyRes.primaryResult.value, 333);
+});
+
+test('Endocrinology & Nutrition (Group 4): FINDRISC, c-LDL Sampson/Friedewald, HbA1c/eAG, MetSyn, Devine/Mifflin', () => {
+  const findRes = findriscCalculator.calculate({
+    age: '3', bmi: '3', waist: '4', activity: '2', diet: '1', bpMeds: '2', highGlucose: '5', familyHx: '5',
+  });
+  assert.equal(findRes.primaryResult.value, 25);
+  assert.equal(findRes.severity, 'critical');
+
+  const ldlRes = ldlNonHdlCalculator.calculate({
+    tc: { value: '220', unitId: 'mg_dl' },
+    hdl: { value: '45', unitId: 'mg_dl' },
+    tg: { value: '150', unitId: 'mg_dl' },
+  });
+  // Friedewald = 220 - 45 - 30 = 145.0; Sampson close to 147
+  assert.ok(ldlRes.primaryResult.value > 140 && ldlRes.primaryResult.value < 155);
+
+  // ADAG: 28.7 * 7.0 - 46.7 = 154.2 -> 154 mg/dL
+  const a1cRes = hba1cEagCalculator.calculate({
+    mode: 'a1c_to_eag',
+    hba1c: { value: '7.0', unitId: 'pct' },
+    eag: { value: '', unitId: 'mg_dl' },
+  });
+  assert.equal(a1cRes.primaryResult.value, 154);
+
+  const metRes = metabolicSyndromeCalculator.calculate({
+    waist: true, triglycerides: true, lowHdl: false, bloodPressure: true, glucose: false,
+  });
+  assert.equal(metRes.primaryResult.value, 3);
+  assert.equal(metRes.severity, 'moderate');
+
+  const weightRes = idealAdjustedWeightCalculator.calculate({
+    sex: 'male',
+    height: { value: '175', unitId: 'cm' },
+    weight: { value: '110', unitId: 'kg' },
+    age: { value: '40', unitId: 'years' },
+    waist: { value: '105', unitId: 'cm' },
+  });
+  assert.ok(weightRes.primaryResult.value > 68 && weightRes.primaryResult.value < 73);
+});
+
+test('Trauma, Pain & Geriatrics (Group 5): Ottawa, CCTHR/PECARN, NEXUS/CCR, DN4, Braden, Morse/Downton', () => {
+  const ottNeg = ottawaAnkleKneeCalculator.calculate({
+    region: 'ankle_foot', anklePain: false, midfootPain: false, ankleUnableSteps: false,
+  });
+  assert.equal(ottNeg.primaryResult.formattedValue, 'Sin Rx');
+
+  const pecarnPos = minorHeadTraumaCalculator.calculate({
+    population: 'ped_lt2', pecarnLt2Ams: false, pecarnLt2PalpableFx: false,
+    pecarnLt2Hematoma: true, pecarnLt2Loc5: false, pecarnLt2Mech: false, pecarnLt2AbnormalParent: false,
+  });
+  assert.equal(pecarnPos.primaryResult.formattedValue, 'Observación vs TAC');
+  assert.equal(pecarnPos.severity, 'moderate');
+
+  const nexusClear = cervicalTraumaCalculator.calculate({
+    rule: 'nexus', nexusMidline: false, nexusNeuro: false, nexusAltered: false, nexusIntox: false, nexusDistracting: false,
+  });
+  assert.equal(nexusClear.primaryResult.formattedValue, 'Despeje clínico');
+
+  const dn4Pos = dn4PainCalculator.calculate({
+    q1: true, q2: false, q3: true, q4: true, q5: false, q6: false, q7: false, q8: true, q9: false, q10: false,
+  });
+  assert.equal(dn4Pos.primaryResult.value, 4);
+  assert.equal(dn4Pos.severity, 'moderate');
+
+  const bradenHigh = bradenScaleCalculator.calculate({
+    sensory: '2', moisture: '2', activity: '1', mobility: '2', nutrition: '2', friction: '1',
+  });
+  assert.equal(bradenHigh.primaryResult.value, 10);
+  assert.equal(bradenHigh.severity, 'high');
+
+  const morseHigh = fallRiskCalculator.calculate({
+    scale: 'morse', morseHistory: '25', morseSecondaryDx: '15', morseAid: '15', morseIv: '20', morseGait: '10', morseMental: '0',
+  });
+  assert.equal(morseHigh.primaryResult.value, 85);
+  assert.equal(morseHigh.severity, 'high');
+});
+
+test('Pediatrics & Neonatology (Group 6): Westley, Wood-Downes-Ferres, Kramer, WHO Growth, Capurro', () => {
+  const westleyMod = westleyCroupCalculator.calculate({
+    consciousness: '0', cyanosis: '0', stridor: '2', airEntry: '1', retractions: '2',
+  });
+  assert.equal(westleyMod.primaryResult.value, 5);
+  assert.equal(westleyMod.severity, 'moderate');
+
+  const wdfMod = woodDownesFerresCalculator.calculate({
+    wheezing: '2', retractions: '2', respRate: '2', heartRate: '1', ventilation: '0', cyanosis: '0',
+  });
+  assert.equal(wdfMod.primaryResult.value, 7);
+  assert.equal(wdfMod.severity, 'moderate');
+
+  const kramerEarly = neonatalJaundiceKramerCalculator.calculate({
+    kramerZone: '2', hoursOfLife: { value: '14', unitId: 'hours' }, gestationalAge: 'term38', neuroRisk: false,
+  });
+  assert.equal(kramerEarly.severity, 'critical');
+
+  const whoRes = whoGrowthCalculator.calculate({
+    ageMonths: { value: '36', unitId: 'months' },
+    sex: 'male',
+    weight: { value: '14.5', unitId: 'kg' },
+    height: { value: '96', unitId: 'cm' },
+    zIndicator: 'bmifa',
+    zScore: { value: '-2.5', unitId: 'z' },
+  });
+  assert.equal(whoRes.severity, 'high');
+
+  // Automatic WHO LMS calculation (36 months boy at P50 median: ~14.3 kg, ~96.1 cm)
+  const whoAuto = whoGrowthCalculator.calculate({
+    ageMonths: { value: '36', unitId: 'months' },
+    sex: 'male',
+    weight: { value: '14.3', unitId: 'kg' },
+    height: { value: '96.1', unitId: 'cm' },
+    headCircumference: { value: '49.5', unitId: 'cm' },
+    zIndicator: 'bmifa',
+    zScore: { value: '', unitId: 'z' },
+  });
+  assert.equal(whoAuto.severity, 'normal');
+  assert.ok(whoAuto.primaryResult.value !== null && whoAuto.primaryResult.value >= 40 && whoAuto.primaryResult.value <= 65);
+  assert.ok(whoAuto.secondaryResults && whoAuto.secondaryResults.length >= 4);
+
+  // Exact WHO LMS reference spot-check: newborn boy weight P50 = 3.3 kg, newborn girl weight P50 = 3.2 kg
+  const newbornBoy = evaluateWhoIndicator('wfa', 'male', 0, 3.3464);
+  assert.ok(newbornBoy && Math.abs(newbornBoy.zScore) < 0.05 && Math.round(newbornBoy.percentile) === 50);
+  const wfaRows = getWhoReferenceTableRows('wfa', 'female');
+  assert.equal(wfaRows[0].ageMonths, 0);
+  assert.equal(wfaRows[0].p50, 3.2);
+  const lhfaRows = getWhoReferenceTableRows('lhfa', 'male');
+  assert.equal(lhfaRows[lhfaRows.length - 1].ageMonths, 228);
+
+  // Capurro: 204 + (16+10+10+10+15) = 265 días = 37 sem 6 días
+  const capRes = capurroNeonatalCalculator.calculate({
+    earShape: '16', breastSize: '10', nipple: '10', skinTexture: '10', plantarCreases: '15',
+  });
+  assert.equal(capRes.primaryResult.formattedValue, '37 sem 6 d');
+});
+
+test('Hematology & Acid-Base (Group 7): Ganzoni, Mentzer, Winter/Acid-Base, ANC/RAN', () => {
+  // Ganzoni: 70 * (15 - 9) * 2.4 + 500 = 1008 + 500 = 1508 mg
+  const ganzRes = ganzoniIronDeficitCalculator.calculate({
+    weight: { value: '70', unitId: 'kg' },
+    hbActual: { value: '9', unitId: 'g_dl' },
+    hbTarget: { value: '15', unitId: 'g_dl' },
+    storesMode: 'standard',
+  });
+  assert.equal(ganzRes.primaryResult.value, 1508);
+
+  const mentzerThal = mentzerIndexCalculator.calculate({
+    mcv: { value: '64', unitId: 'fl' },
+    rbc: { value: '6.0', unitId: '10e6_ul' },
+  });
+  assert.ok(mentzerThal.primaryResult.value < 13);
+
+  // Winter: HCO3 = 10 -> expected PaCO2 = 1.5*10 + 8 = 23 ± 2 (21-25)
+  const winterRes = acidBaseCompensationCalculator.calculate({
+    ph: { value: '7.22', unitId: 'ph' },
+    paco2: { value: '23', unitId: 'mmhg' },
+    hco3: { value: '10', unitId: 'meq_l' },
+    respTiming: 'acute',
+  });
+  assert.equal(winterRes.primaryResult.value, 23);
+
+  // ANC: 2.0 * 1000 * (20 + 0) / 100 = 400 -> Neutropenia grave (< 500)
+  const ancRes = absoluteNeutrophilCountCalculator.calculate({
+    wbc: { value: '2.0', unitId: '10e3_ul' },
+    segsPercent: { value: '20', unitId: 'pct' },
+    bandsPercent: { value: '0', unitId: 'pct' },
+  });
+  assert.equal(ancRes.primaryResult.value, 400);
+  assert.equal(ancRes.severity, 'high');
+});
+
+test('Cardio, Vascular & Urology (Group 8): ABI/ITB, HTN ESH/ACC, San Francisco Syncope, IPSS, TWIST', () => {
+  const abiRes = ankleBrachialIndexCalculator.calculate({
+    brachialRight: { value: '140', unitId: 'mmhg' },
+    brachialLeft: { value: '132', unitId: 'mmhg' },
+    dorsalisPedis: { value: '84', unitId: 'mmhg' },
+    posteriorTibial: { value: '98', unitId: 'mmhg' },
+  });
+  assert.equal(abiRes.primaryResult.value, 0.7);
+
+  const htnRes = hypertensionClassificationCalculator.calculate({
+    sbp: { value: '134', unitId: 'mmhg' },
+    dbp: { value: '84', unitId: 'mmhg' },
+    targetOrganSymptoms: false,
+  });
+  assert.equal(htnRes.severity, 'low');
+
+  const sfPos = sanFranciscoSyncopeCalculator.calculate({
+    chf: false, hctLt30: false, abnormalEcg: true, shortnessOfBreath: false, sbpLt90: false,
+  });
+  assert.equal(sfPos.primaryResult.value, 1);
+  assert.equal(sfPos.severity, 'high');
+
+  const ipssMod = ipssProstateCalculator.calculate({
+    q1: '2', q2: '2', q3: '1', q4: '2', q5: '2', q6: '1', q7: '2', qol: '3',
+  });
+  assert.equal(ipssMod.primaryResult.value, 12);
+  assert.equal(ipssMod.severity, 'moderate');
+
+  const twistHigh = twistScoreCalculator.calculate({
+    swelling: true, hardTesticle: true, absentCremaster: true, nauseaVomiting: false, highRiding: true,
+  });
+  assert.equal(twistHigh.primaryResult.value, 6);
+  assert.equal(twistHigh.severity, 'critical');
+});
+
+test('Burns, Anaphylaxis & Soft Tissue (Group 9): Wallace/Parkland, Anaphylaxis/Adrenaline IM, LRINEC', () => {
+  // 70 kg, 18% + 9% = 27% TBSA -> 4 * 70 * 27 = 7560 mL
+  const burnRes = burnsWallaceParklandCalculator.calculate({
+    weight: { value: '70', unitId: 'kg' },
+    hoursElapsed: { value: '0', unitId: 'h' },
+    head: '0', antTrunk: '18', postTrunk: '0', rightArm: '9', leftArm: '0', rightLeg: '0', leftLeg: '0', perineum: '0',
+  });
+  assert.equal(burnRes.primaryResult.value, 7560);
+  assert.equal(burnRes.severity, 'high');
+
+  const anaphRes = anaphylaxisAdrenalineCalculator.calculate({
+    weight: { value: '60', unitId: 'kg' },
+    criterion1: true, criterion2: false, criterion3: false,
+  });
+  assert.equal(anaphRes.primaryResult.value, 0.5);
+  assert.equal(anaphRes.severity, 'critical');
+
+  const lrinecHigh = lrinecScoreCalculator.calculate({
+    crp: { value: '200', unitId: 'mg_l' },
+    wbc: { value: '26', unitId: '10e3_ul' },
+    hb: { value: '10.2', unitId: 'g_dl' },
+    sodium: { value: '130', unitId: 'meq_l' },
+    creatinine: { value: '1.9', unitId: 'mg_dl' },
+    glucose: { value: '210', unitId: 'mg_dl' },
+  });
+  assert.equal(lrinecHigh.primaryResult.value, 13);
+  assert.equal(lrinecHigh.severity, 'critical');
+});
+
+test('Specialized Clinical Scales (Group 10): EPDS, Tanner, Tokyo TG18, KDIGO CKD, Killip-Kimball, MoCA, Wagner/PEDIS/WIfI, Morisky-Green', () => {
+  // EPDS: low score with positive item 10 triggers critical safety alert
+  const epdsSelfHarm = edinburghEpdsCalculator.calculate({
+    q1: '0', q2: '0', q3: '0', q4: '0', q5: '0',
+    q6: '0', q7: '0', q8: '0', q9: '0', q10: '1',
+  });
+  assert.equal(epdsSelfHarm.primaryResult.value, 1);
+  assert.equal(epdsSelfHarm.severity, 'critical');
+
+  const epdsHigh = edinburghEpdsCalculator.calculate({
+    q1: '2', q2: '2', q3: '2', q4: '2', q5: '1',
+    q6: '2', q7: '1', q8: '2', q9: '1', q10: '0',
+  });
+  assert.equal(epdsHigh.primaryResult.value, 15);
+  assert.equal(epdsHigh.severity, 'high');
+
+  // Tanner: precocious puberty flag in 7-year-old girl with B2
+  const tannerPrecocious = tannerStagesCalculator.calculate({
+    sex: 'female',
+    age: { value: '7', unitId: 'years' },
+    breastStage: '2',
+    genitalStage: '1',
+    pubicHairStage: '1',
+  });
+  assert.equal(tannerPrecocious.primaryResult.formattedValue, 'B2 P1');
+  assert.equal(tannerPrecocious.severity, 'high');
+
+  // Tokyo TG18: Grade II Cholangitis (>=2/5 criteria) & Grade III Cholecystitis
+  const tokyoCholangitisII = tokyoGuidelinesCalculator.calculate({
+    syndrome: 'cholangitis',
+    cholanSystemic: true, cholanCholestasis: true, cholanImaging: true,
+    cholanWbc: true, cholanFever39: true, cholanAge75: false, cholanBili5: false, cholanAlbumin: false,
+    orgCv: false, orgNeuro: false, orgResp: false, orgRenal: false, orgHepatic: false, orgHema: false,
+  });
+  assert.equal(tokyoCholangitisII.primaryResult.value, 2);
+  assert.equal(tokyoCholangitisII.severity, 'high');
+
+  // KDIGO CKD: G3b + A2 (150 mg/g) -> Very High Risk (Red)
+  const ckdRes = kdigoCkdCalculator.calculate({
+    egfr: { value: '38', unitId: 'ml_min' },
+    albuminuriaMode: 'acr',
+    acr: { value: '150', unitId: 'mg_g' },
+    aCategory: 'A1',
+  });
+  assert.equal(ckdRes.primaryResult.formattedValue, 'G3b-A2');
+  assert.equal(ckdRes.severity, 'critical');
+
+  // Killip-Kimball Class IV
+  const killipRes = killipKimballCalculator.calculate({ killipClass: '4' });
+  assert.equal(killipRes.primaryResult.formattedValue, 'Clase IV');
+  assert.equal(killipRes.severity, 'critical');
+
+  // MoCA: raw 25 + 1 education bonus (<=12 yrs) = 26 (Normal)
+  const mocaRes = mocaTestCalculator.calculate({
+    visuospatial: { value: '4', unitId: 'pts' },
+    naming: { value: '3', unitId: 'pts' },
+    attention: { value: '5', unitId: 'pts' },
+    language: { value: '2', unitId: 'pts' },
+    abstraction: { value: '2', unitId: 'pts' },
+    recall: { value: '3', unitId: 'pts' },
+    orientation: { value: '6', unitId: 'pts' },
+    lowEducation: true,
+  });
+  assert.equal(mocaRes.primaryResult.value, 26);
+  assert.equal(mocaRes.severity, 'normal');
+
+  // Diabetic foot: W0-I3-fI0 (Stage 2 in Mills 2014) and W2-I2-fI2 (Stage 4)
+  const wifiRestPain = diabeticFootScalesCalculator.calculate({
+    scaleMode: 'wifi',
+    wagnerGrade: '1',
+    pedisPerfusion: '1',
+    pedisInfection: '1',
+    wifiWound: '0',
+    wifiIschemia: '3',
+    wifiInfection: '0',
+  });
+  assert.equal(wifiRestPain.primaryResult.value, 2);
+
+  const wifiSevere = diabeticFootScalesCalculator.calculate({
+    scaleMode: 'wifi',
+    wagnerGrade: '1',
+    pedisPerfusion: '1',
+    pedisInfection: '1',
+    wifiWound: '2',
+    wifiIschemia: '2',
+    wifiInfection: '2',
+  });
+  assert.equal(wifiSevere.primaryResult.value, 4);
+  assert.equal(wifiSevere.severity, 'critical');
+
+  // Morisky-Green: 4/4 compliant vs 3/4 non-compliant
+  const moriskyOk = moriskyGreenCalculator.calculate({
+    q1: 'adherent', q2: 'adherent', q3: 'adherent', q4: 'adherent',
+  });
+  assert.equal(moriskyOk.primaryResult.value, 4);
+  assert.equal(moriskyOk.severity, 'normal');
+
+  const moriskyFail = moriskyGreenCalculator.calculate({
+    q1: 'non_adherent', q2: 'adherent', q3: 'adherent', q4: 'adherent',
+  });
+  assert.equal(moriskyFail.primaryResult.value, 3);
+  assert.equal(moriskyFail.severity, 'moderate');
+});
+
+test('Diabetes Emergency/Inpatient & Stroke Triage: ADA 2024 DKA/HHS, RABBIT-2 Basal-Bolus, Cincinnati/FAST', () => {
+  // DKA with hypokalemia (<3.5): blocks insulin IV infusion
+  const dkaHypoK = hyperglycemicCrisesCalculator.calculate({
+    weight: { value: '70', unitId: 'kg' },
+    glucose: { value: '420', unitId: 'mg_dl' },
+    priorDiabetes: true,
+    ph: { value: '7.15', unitId: 'ph' },
+    hco3: { value: '11', unitId: 'meq_l' },
+    ketones: 'positive',
+    sodium: { value: '132', unitId: 'meq_l' },
+    potassium: { value: '3.1', unitId: 'meq_l' },
+    mentalStatus: 'alert',
+  });
+  assert.equal(dkaHypoK.primaryResult.value, 0);
+  assert.equal(dkaHypoK.severity, 'critical');
+
+  // DKA with safe K+ (4.2): 0.1 U/kg/h = 7.0 U/h
+  const dkaSafeK = hyperglycemicCrisesCalculator.calculate({
+    weight: { value: '70', unitId: 'kg' },
+    glucose: { value: '380', unitId: 'mg_dl' },
+    priorDiabetes: true,
+    ph: { value: '7.20', unitId: 'ph' },
+    hco3: { value: '14', unitId: 'meq_l' },
+    ketones: 'positive',
+    sodium: { value: '134', unitId: 'meq_l' },
+    potassium: { value: '4.2', unitId: 'meq_l' },
+    mentalStatus: 'alert',
+  });
+  assert.equal(dkaSafeK.primaryResult.value, 7);
+
+  // RABBIT-2: 80 kg with glucose 240 -> 0.5 U/kg/day = 40 U/day (20 basal + ~7x3 prandial = 41)
+  const rabbitEating = inpatientBasalBolusCalculator.calculate({
+    weight: { value: '80', unitId: 'kg' },
+    glucose: { value: '240', unitId: 'mg_dl' },
+    clinicalProfile: 'auto',
+    oralIntake: 'eating',
+  });
+  assert.equal(rabbitEating.primaryResult.value, 41);
+
+  // Hypoglycemia safety lock (<70 mg/dL)
+  const rabbitHypo = inpatientBasalBolusCalculator.calculate({
+    weight: { value: '80', unitId: 'kg' },
+    glucose: { value: '62', unitId: 'mg_dl' },
+    clinicalProfile: 'auto',
+    oralIntake: 'eating',
+  });
+  assert.equal(rabbitHypo.primaryResult.value, 0);
+  assert.equal(rabbitHypo.severity, 'critical');
+
+  // Cincinnati/FAST: 2/3 positive
+  const fastPos = cincinnatiFastCalculator.calculate({
+    facialDroop: true,
+    armDrift: true,
+    speechAbnormal: false,
+    timeWindow: 'lt_4_5h',
+  });
+  assert.equal(fastPos.primaryResult.value, 2);
+  assert.equal(fastPos.severity, 'critical');
+
+  // EDA Plan A (no dehydration, 10 kg, 14 months)
+  const edaPlanA = acuteDiarrheaPlanCalculator.calculate({
+    ageMonths: { value: '14', unitId: 'months' },
+    weight: { value: '10', unitId: 'kg' },
+    generalState: 'normal',
+    eyes: 'normal',
+    thirst: 'normal',
+    skinPinch: 'fast',
+    mucousMembranes: 'moist',
+    tears: 'present',
+    stoolType: 'watery',
+    persistentVomiting: false,
+    highFeverSepsis: false,
+    severeMalnutrition: false,
+  });
+  assert.equal(edaPlanA.primaryResult.formattedValue, 'Plan A');
+  assert.equal(edaPlanA.severity, 'normal');
+
+  // EDA Plan B (some dehydration, 12 kg -> 75 * 12 = 900 mL SRO in 4h, CDS = 4)
+  const edaPlanB = acuteDiarrheaPlanCalculator.calculate({
+    ageMonths: { value: '24', unitId: 'months' },
+    weight: { value: '12', unitId: 'kg' },
+    generalState: 'irritable',
+    eyes: 'sunken',
+    thirst: 'eager',
+    skinPinch: 'slow',
+    mucousMembranes: 'sticky',
+    tears: 'decreased',
+    stoolType: 'watery',
+    persistentVomiting: false,
+    highFeverSepsis: false,
+    severeMalnutrition: false,
+  });
+  assert.equal(edaPlanB.primaryResult.formattedValue, 'Plan B');
+  assert.equal(edaPlanB.severity, 'moderate');
+  assert.ok(edaPlanB.secondaryResults?.some((r) => r.formattedValue === '900'));
+  assert.ok(edaPlanB.secondaryResults?.some((r) => r.formattedValue === '4/8'));
+
+  // EDA Plan C (< 12 months infant, 8 kg -> 240 mL in 1h + 560 mL in 5h)
+  const edaPlanC = acuteDiarrheaPlanCalculator.calculate({
+    ageMonths: { value: '8', unitId: 'months' },
+    weight: { value: '8', unitId: 'kg' },
+    generalState: 'lethargic',
+    eyes: 'deeply_sunken',
+    thirst: 'poor',
+    skinPinch: 'very_slow',
+    mucousMembranes: 'dry',
+    tears: 'absent',
+    stoolType: 'dysentery',
+    persistentVomiting: true,
+    highFeverSepsis: true,
+    severeMalnutrition: false,
+  });
+  assert.equal(edaPlanC.primaryResult.formattedValue, 'Plan C');
+  assert.equal(edaPlanC.severity, 'critical');
+  assert.ok(edaPlanC.secondaryResults?.some((r) => r.formattedValue === '240'));
+  assert.ok(edaPlanC.secondaryResults?.some((r) => r.formattedValue === '560'));
+
+  // EDA Plan C with severe acute malnutrition safety override
+  const edaSam = acuteDiarrheaPlanCalculator.calculate({
+    ageMonths: { value: '10', unitId: 'months' },
+    weight: { value: '6', unitId: 'kg' },
+    generalState: 'lethargic',
+    eyes: 'deeply_sunken',
+    thirst: 'poor',
+    skinPinch: 'very_slow',
+    mucousMembranes: 'dry',
+    tears: 'absent',
+    stoolType: 'watery',
+    persistentVomiting: false,
+    highFeverSepsis: false,
+    severeMalnutrition: true,
+  });
+  assert.equal(edaSam.severity, 'critical');
+  assert.ok(edaSam.riskClassification.includes('desnutrición aguda grave'));
+});
+
+test('Catalog: 124 deduplicated tools, cross-specialty tagging, and accent-insensitive search', () => {
+  assert.equal(CALCULATOR_CATALOG.length, 124);
 
   const endoCalcs = getCalculatorsBySpecialty('endocrinologia');
   assert.ok(endoCalcs.some((c) => c.id === 'homa-ir-b'));
@@ -1280,6 +2042,8 @@ test('Catalog: 61 deduplicated tools, cross-specialty tagging, and accent-insens
   assert.ok(pedCalcs.some((c) => c.id === 'holliday-segar'));
   assert.ok(pedCalcs.some((c) => c.id === 'pews-brighton'));
   assert.ok(pedCalcs.some((c) => c.id === 'psofa'));
+  assert.ok(pedCalcs.some((c) => c.id === 'silverman-andersen'));
+  assert.ok(pedCalcs.some((c) => c.id === 'tanner-stages'));
 
   const obgynCalcs = getCalculatorsBySpecialty('gineco-obstetricia');
   assert.ok(obgynCalcs.some((c) => c.id === 'gestational-age'));
@@ -1287,12 +2051,62 @@ test('Catalog: 61 deduplicated tools, cross-specialty tagging, and accent-insens
   assert.ok(obgynCalcs.some((c) => c.id === 'apgar'));
   assert.ok(obgynCalcs.some((c) => c.id === 'obstetric-shock-index'));
 
+  const psychCalcs = getCalculatorsBySpecialty('psiquiatria');
+  assert.ok(psychCalcs.some((c) => c.id === 'sad-persons'));
+  assert.ok(psychCalcs.some((c) => c.id === 'gad-7'));
+  assert.ok(psychCalcs.some((c) => c.id === 'hamilton-anxiety'));
+  assert.ok(psychCalcs.some((c) => c.id === 'phq-9'));
+  assert.ok(!neuroCalcs.some((c) => c.id === 'gad-7'));
+  assert.ok(!neuroCalcs.some((c) => c.id === 'hamilton-anxiety'));
+  assert.ok(!neuroCalcs.some((c) => c.id === 'phq-9'));
+
+  const gastroCalcs = getCalculatorsBySpecialty('gastroenterologia');
+  assert.ok(gastroCalcs.some((c) => c.id === 'child-pugh'));
+  assert.ok(gastroCalcs.some((c) => c.id === 'glasgow-blatchford'));
+  assert.ok(gastroCalcs.some((c) => c.id === 'bristol-scale'));
+
+  const pneumoCalcs = getCalculatorsBySpecialty('neumologia');
+  assert.ok(pneumoCalcs.some((c) => c.id === 'copd-gold'));
+  assert.ok(pneumoCalcs.some((c) => c.id === 'stop-bang'));
+  assert.ok(pneumoCalcs.some((c) => c.id === 'asthma-act'));
+
+  const traumaCalcs = getCalculatorsBySpecialty('traumatologia');
+  assert.ok(traumaCalcs.some((c) => c.id === 'ottawa-ankle-knee'));
+  assert.ok(traumaCalcs.some((c) => c.id === 'cervical-trauma'));
+
+  const hemaCalcs = getCalculatorsBySpecialty('hematologia');
+  assert.ok(hemaCalcs.some((c) => c.id === 'ganzoni-iron'));
+  assert.ok(hemaCalcs.some((c) => c.id === 'mentzer-index'));
+
+  const uroCalcs = getCalculatorsBySpecialty('urologia');
+  assert.ok(uroCalcs.some((c) => c.id === 'ipss-prostate'));
+  assert.ok(uroCalcs.some((c) => c.id === 'twist-score'));
+  assert.ok(!surgCalcs.some((c) => c.id === 'ipss-prostate'));
+
+  const geriatricsCalcs = getCalculatorsBySpecialty('geriatria');
+  assert.ok(geriatricsCalcs.some((c) => c.id === 'mini-cog'));
+  assert.ok(geriatricsCalcs.some((c) => c.id === 'braden-scale'));
+  assert.ok(geriatricsCalcs.some((c) => c.id === 'fall-risk'));
+
+  const dermCalcs = getCalculatorsBySpecialty('dermatologia');
+  assert.ok(dermCalcs.some((c) => c.id === 'burns-parkland'));
+  assert.ok(dermCalcs.some((c) => c.id === 'lrinec-score'));
+
   const byAccentInsensitiveQuery = searchCalculators('neumonia');
   assert.ok(byAccentInsensitiveQuery.some((c) => c.id === 'curb-65'));
   assert.ok(byAccentInsensitiveQuery.some((c) => c.id === 'psi-port'));
 
   const byAcronym = searchCalculators('tfge');
   assert.equal(byAcronym[0]?.id, 'ckd-epi-2021');
+
+  for (let i = 1; i < CALCULATOR_CATALOG.length; i += 1) {
+    const prev = CALCULATOR_CATALOG[i - 1];
+    const curr = CALCULATOR_CATALOG[i];
+    assert.ok(
+      prev.name.localeCompare(curr.name, 'es', { sensitivity: 'base' }) <= 0,
+      `Orden alfabético inválido: "${prev.name}" antes de "${curr.name}"`,
+    );
+  }
 });
 
 test('Phase 6 Audit: every calculator has unique ID, clinical safety metadata, valid fields, and full specialty coverage', () => {

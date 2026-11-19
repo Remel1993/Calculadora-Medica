@@ -1,14 +1,22 @@
 export type SpecialtyId =
-  | 'medicina-interna'
-  | 'urgencias'
   | 'cardiologia'
+  | 'cirugia-general'
+  | 'dermatologia'
+  | 'endocrinologia'
+  | 'gastroenterologia'
+  | 'geriatria'
+  | 'gineco-obstetricia'
+  | 'hematologia'
+  | 'infectologia'
+  | 'medicina-interna'
   | 'nefrologia'
+  | 'neumologia'
   | 'neurologia'
   | 'pediatria'
-  | 'gineco-obstetricia'
-  | 'endocrinologia'
-  | 'cirugia-general'
-  | 'infectologia';
+  | 'psiquiatria'
+  | 'traumatologia'
+  | 'urgencias'
+  | 'urologia';
 
 export type SubcategoryId =
   | 'formulas'

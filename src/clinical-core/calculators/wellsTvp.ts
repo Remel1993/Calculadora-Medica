@@ -97,7 +97,7 @@ export const wellsTvpCalculator: CalculatorDefinition = {
   name: 'Criterios de Wells para TVP (Trombosis Venosa Profunda)',
   shortName: 'Wells TVP',
   primarySpecialty: 'medicina-interna',
-  secondarySpecialties: ['urgencias'],
+  secondarySpecialties: ['urgencias', 'hematologia'],
   subcategory: 'diagnostico',
   keywords: [
     'wells',

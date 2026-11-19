@@ -19,11 +19,49 @@
   html {
     font-family: var(--font-sans);
     -webkit-tap-highlight-color: transparent;
+    overflow-x: clip;
   }
 
   body {
     @apply bg-slate-50 text-slate-900 antialiased dark:bg-[#0B111A] dark:text-slate-100;
+    overflow-x: clip;
   }
+
+  button {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:not(:disabled) {
+    transition:
+      transform 140ms cubic-bezier(0.16, 1, 0.3, 1),
+      background-color 150ms ease,
+      border-color 150ms ease,
+      color 150ms ease,
+      opacity 150ms ease,
+      box-shadow 150ms ease;
+    will-change: transform;
+  }
+
+  button:not(:disabled):active {
+    transform: scale(0.96);
+  }
+}
+
+@keyframes btn-tap-feedback {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(0.955);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.btn-tapped {
+  animation: btn-tap-feedback 170ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .tabular-nums {
@@ -35,5 +73,9 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  button:not(:disabled):active {
+    transform: none !important;
   }
 }

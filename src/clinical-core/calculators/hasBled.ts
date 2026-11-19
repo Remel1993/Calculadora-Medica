@@ -89,8 +89,8 @@ export const hasBledCalculator: CalculatorDefinition = {
   id: 'has-bled',
   name: 'Escala HAS-BLED (Riesgo Hemorrágico)',
   shortName: 'HAS-BLED',
-  primarySpecialty: 'medicina-interna',
-  secondarySpecialties: ['cardiologia'],
+  primarySpecialty: 'cardiologia',
+  secondarySpecialties: ['medicina-interna', 'hematologia'],
   subcategory: 'gravedad',
   keywords: [
     'has-bled',

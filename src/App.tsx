@@ -1,8 +1,8 @@
 import {
   History,
+  Home,
   LayoutGrid,
   Moon,
-  Search,
   Star,
   Sun,
 } from 'lucide-react';
@@ -46,6 +46,44 @@ export default function App() {
   useEffect(() => {
     registerSW({ immediate: true });
   }, []);
+
+  useEffect(() => {
+    const timers = new WeakMap<HTMLButtonElement, number>();
+
+    const handleButtonClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      const button = target?.closest('button');
+      if (!button || button.disabled) {
+        return;
+      }
+
+      const existingTimer = timers.get(button);
+      if (existingTimer !== undefined) {
+        window.clearTimeout(existingTimer);
+      }
+
+      button.classList.remove('btn-tapped');
+      void button.offsetWidth;
+      button.classList.add('btn-tapped');
+
+      const timerId = window.setTimeout(() => {
+        button.classList.remove('btn-tapped');
+        timers.delete(button);
+      }, 190);
+      timers.set(button, timerId);
+    };
+
+    document.addEventListener('click', handleButtonClick);
+    return () => {
+      document.removeEventListener('click', handleButtonClick);
+    };
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [selectedCalculatorId, activeTab, selectedSpecialty]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -106,23 +144,29 @@ export default function App() {
     ? CALCULATOR_BY_ID[selectedCalculatorId] ?? null
     : null;
 
-  const navItems: { id: NavTab; label: string; icon: typeof Search }[] = [
-    { id: 'inicio', label: 'Inicio', icon: Search },
+  const navItems: { id: NavTab; label: string; icon: typeof Home }[] = [
+    { id: 'inicio', label: 'Inicio', icon: Home },
     { id: 'especialidades', label: 'Especialidades', icon: LayoutGrid },
     { id: 'favoritos', label: 'Favoritos', icon: Star },
     { id: 'historial', label: 'Historial', icon: History },
   ];
 
+  const isMobileHomeHero = !activeCalculator && activeTab === 'inicio';
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-[#0B111A] dark:text-slate-100">
-      {/* Top Bar: 3-zone contract on desktop, compact 52px bar on mobile */}
-      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/90">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-8 px-4 sm:px-6">
+      {/* Top Bar: 3-zone contract on desktop, compact 48px bar on mobile subviews */}
+      <header
+        className={`sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/90 ${
+          isMobileHomeHero ? 'hidden md:block' : ''
+        }`}
+      >
+        <div className="mx-auto flex h-12 max-w-6xl items-center justify-between gap-4 px-4 sm:gap-8 sm:px-6 md:h-14">
           {/* Zone 1: Single-line Brand Wordmark */}
           <button
             type="button"
             onClick={() => handleNavigateTab('inicio')}
-            className="text-left text-base font-bold tracking-tight text-slate-900 dark:text-slate-100 whitespace-nowrap shrink-0"
+            className="min-w-0 truncate text-left text-sm font-bold tracking-tight text-slate-900 sm:text-base dark:text-slate-100 whitespace-nowrap"
           >
             Calculadora Médica Integral
           </button>
@@ -157,7 +201,7 @@ export default function App() {
               type="button"
               onClick={toggleTheme}
               aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-              className="inline-flex min-h-[40px] items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 whitespace-nowrap shrink-0"
+              className="inline-flex min-h-[38px] items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100 sm:min-h-[40px] sm:px-3 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 whitespace-nowrap shrink-0"
             >
               {theme === 'dark' ? (
                 <>
@@ -178,7 +222,7 @@ export default function App() {
       <OfflineIndicator />
 
       {/* Main Content */}
-      <main className="mx-auto max-w-6xl px-4 pt-6 pb-24 sm:px-6 md:pb-12">
+      <main className="mx-auto w-full min-w-0 max-w-6xl overflow-x-clip px-3.5 pt-3.5 pb-20 sm:px-6 sm:pt-6 md:pb-12">
         {activeCalculator ? (
           <CalculatorView
             calculator={activeCalculator}
@@ -190,9 +234,13 @@ export default function App() {
         ) : activeTab === 'inicio' ? (
           <HomeView
             favorites={favorites}
+            history={history}
+            theme={theme}
+            onToggleTheme={toggleTheme}
             onSelectCalculator={(id) => setSelectedCalculatorId(id)}
             onToggleFavorite={handleToggleFavorite}
             onSelectSpecialty={(id) => handleSelectSpecialty(id)}
+            onNavigateTab={handleNavigateTab}
           />
         ) : activeTab === 'especialidades' ? (
           <SpecialtiesView
@@ -222,9 +270,9 @@ export default function App() {
       {/* Mobile Bottom Tab Bar (< 768px) */}
       <nav
         aria-label="Navegación móvil"
-        className="fixed right-0 bottom-0 left-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur-md md:hidden dark:border-slate-800 dark:bg-slate-950/95"
+        className="fixed right-0 bottom-0 left-0 z-40 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden dark:border-slate-800 dark:bg-slate-950/95"
       >
-        <div className="grid h-16 grid-cols-4 items-center">
+        <div className="grid h-14 grid-cols-4 items-center">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = !activeCalculator && activeTab === item.id;
@@ -233,13 +281,19 @@ export default function App() {
                 key={item.id}
                 type="button"
                 onClick={() => handleNavigateTab(item.id)}
-                className={`flex min-h-[48px] flex-col items-center justify-center gap-1 text-[11px] font-medium transition-colors ${
+                className={`relative flex min-h-[44px] flex-col items-center justify-center gap-0.5 text-[11px] font-medium transition-colors ${
                   isActive
                     ? 'text-sky-600 dark:text-sky-400'
                     : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
-                <Icon className="h-5 w-5" aria-hidden="true" />
+                {isActive && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-0 right-4 left-4 h-0.5 rounded-full bg-sky-600 dark:bg-sky-400"
+                  />
+                )}
+                <Icon className="h-[19px] w-[19px]" aria-hidden="true" />
                 <span className="truncate">{item.label}</span>
               </button>
             );

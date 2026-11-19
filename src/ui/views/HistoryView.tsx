@@ -27,13 +27,13 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+    <div className="w-full min-w-0 space-y-4 sm:space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-3 sm:gap-4">
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl dark:text-slate-100">
             Historial local de cálculos
           </h1>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+          <p className="mt-1 text-xs leading-relaxed text-slate-600 sm:text-sm dark:text-slate-300">
             Guardado únicamente en este dispositivo. No almacena nombres ni identificadores de pacientes.
           </p>
         </div>
@@ -51,18 +51,18 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
       </div>
 
       {history.length > 0 ? (
-        <div className="space-y-3">
+        <div className="space-y-2.5 sm:space-y-3">
           {history.map((entry) => (
             <div
               key={entry.id}
-              className="flex flex-col justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-900"
+              className="flex w-full min-w-0 items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white p-3.5 sm:gap-3 sm:p-4 dark:border-slate-800 dark:bg-slate-900"
             >
               <button
                 type="button"
                 onClick={() => onOpenCalculator(entry.calculatorId)}
-                className="min-w-0 flex-1 text-left"
+                className="w-full min-w-0 flex-1 text-left"
               >
-                <div className="flex flex-wrap items-center gap-x-2 text-xs text-slate-500 dark:text-slate-400">
+                <div className="flex flex-wrap items-center gap-x-2 text-[11px] text-slate-500 sm:text-xs dark:text-slate-400">
                   <span className="font-mono tabular-nums">
                     {formatTimestamp(entry.timestamp)}
                   </span>
@@ -71,15 +71,15 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                     {entry.calculatorName}
                   </span>
                 </div>
-                <div className="mt-1 flex flex-wrap items-baseline gap-2">
-                  <span className="font-mono text-lg font-bold tabular-nums text-slate-900 dark:text-slate-100">
+                <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                  <span className="font-mono text-base font-bold tabular-nums text-slate-900 break-words sm:text-lg dark:text-slate-100">
                     {entry.resultText}
                   </span>
-                  <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
+                  <span className="break-words text-xs font-medium text-slate-600 dark:text-slate-300">
                     — {entry.riskClassification}
                   </span>
                 </div>
-                <p className="mt-1 truncate text-xs text-slate-500 dark:text-slate-400">
+                <p className="mt-1 line-clamp-2 break-words text-xs text-slate-500 dark:text-slate-400">
                   {entry.inputsSummary}
                 </p>
               </button>
@@ -88,7 +88,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                 type="button"
                 onClick={() => onRemoveEntry(entry.id)}
                 aria-label={`Eliminar registro de ${entry.calculatorName}`}
-                className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center self-end rounded-lg text-slate-400 hover:bg-slate-100 hover:text-rose-600 sm:self-center dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-rose-400"
+                className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-rose-600 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-rose-400"
               >
                 <Trash2 className="h-4 w-4" />
               </button>

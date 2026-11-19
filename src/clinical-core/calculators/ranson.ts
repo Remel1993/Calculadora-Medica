@@ -70,8 +70,8 @@ export const ransonCalculator: CalculatorDefinition = {
   id: 'ranson',
   name: 'Criterios de Ranson (Pancreatitis Aguda — 0 h y 48 h)',
   shortName: 'Ranson',
-  primarySpecialty: 'cirugia-general',
-  secondarySpecialties: ['urgencias', 'medicina-interna'],
+  primarySpecialty: 'gastroenterologia',
+  secondarySpecialties: ['cirugia-general', 'urgencias'],
   subcategory: 'gravedad',
   keywords: ['ranson', 'pancreatitis', 'biliar', 'mortalidad', '48 horas'],
   description:

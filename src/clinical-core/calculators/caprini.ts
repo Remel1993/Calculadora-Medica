@@ -61,7 +61,7 @@ export const capriniCalculator: CalculatorDefinition = {
   name: 'Escala de Caprini (Riesgo de TEV Perioperatorio)',
   shortName: 'Caprini TEV',
   primarySpecialty: 'cirugia-general',
-  secondarySpecialties: ['medicina-interna'],
+  secondarySpecialties: ['hematologia', 'medicina-interna'],
   subcategory: 'diagnostico',
   keywords: ['caprini', 'tromboprofilaxis', 'tev', 'tvp', 'tep', 'cirugia', 'perioperatorio'],
   description:

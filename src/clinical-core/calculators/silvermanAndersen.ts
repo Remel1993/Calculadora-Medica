@@ -68,18 +68,30 @@ const gruntField: SelectFieldDef = {
 
 export const silvermanAndersenCalculator: CalculatorDefinition = {
   id: 'silverman-andersen',
-  name: 'Escala de Silverman-Andersen (Dificultad Respiratoria Neonatal)',
+  name: 'Escala de Silverman-Andersen (Dificultad Respiratoria Neonatal / Pediátrica)',
   shortName: 'Silverman-Andersen',
-  primarySpecialty: 'gineco-obstetricia',
-  secondarySpecialties: ['pediatria', 'urgencias'],
+  primarySpecialty: 'pediatria',
+  secondarySpecialties: ['gineco-obstetricia', 'neumologia', 'urgencias'],
   subcategory: 'gravedad',
-  keywords: ['silverman', 'andersen', 'neonato', 'dificultad respiratoria', 'distres', 'cpap', 'recien nacido'],
+  keywords: [
+    'silverman',
+    'andersen',
+    'silverman anderson',
+    'pediatrico',
+    'pediatria',
+    'neonato',
+    'dificultad respiratoria',
+    'distres',
+    'cpap',
+    'recien nacido',
+  ],
   description:
-    'Cuantificación clínica de la gravedad de la dificultad respiratoria del recién nacido (0–10 pts; a mayor puntuación, mayor gravedad respiratoria).',
+    'Cuantificación clínica de la gravedad de la dificultad respiratoria neonatal en pediatría y sala de partos (0–10 pts; a mayor puntuación, mayor gravedad respiratoria).',
   clinicalIndication:
-    'Evaluación inicial y vigilancia seriada en sala de partos y UCIN de taquipnea transitoria, síndrome de dificultad respiratoria (SDR) o aspiración meconial.',
-  validatedPopulation: 'Recién nacidos a término y prematuros con respiración espontánea.',
+    'Evaluación inicial y vigilancia seriada en pediatría/neonatología de taquipnea transitoria, síndrome de dificultad respiratoria (SDR) o aspiración meconial.',
+  validatedPopulation: 'Recién nacidos a término y prematuros (periodo neonatal) con respiración espontánea.',
   contraindications: [
+    'No validada para lactantes mayores ni escolares (en mayores de 1 mes usar Wood-Downes-Ferrés o Pulmonary Score).',
     'No aplicable en recién nacidos ya sometidos a ventilación mecánica invasiva o bloqueo neuromuscular.',
     '¡No confundir dirección del puntaje con Apgar!: en Silverman-Andersen, 0 es normal y 10 es gravedad extrema.',
   ],

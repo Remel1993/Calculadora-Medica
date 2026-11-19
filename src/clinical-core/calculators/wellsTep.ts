@@ -75,7 +75,7 @@ export const wellsTepCalculator: CalculatorDefinition = {
   name: 'Criterios de Wells para TEP (Tromboembolia Pulmonar)',
   shortName: 'Wells TEP',
   primarySpecialty: 'medicina-interna',
-  secondarySpecialties: ['urgencias'],
+  secondarySpecialties: ['urgencias', 'neumologia'],
   subcategory: 'diagnostico',
   keywords: [
     'wells',

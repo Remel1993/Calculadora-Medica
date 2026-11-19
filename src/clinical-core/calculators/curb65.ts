@@ -73,8 +73,8 @@ export const curb65Calculator: CalculatorDefinition = {
   id: 'curb-65',
   name: 'Escala CURB-65 (Neumonía Adquirida en la Comunidad)',
   shortName: 'CURB-65',
-  primarySpecialty: 'infectologia',
-  secondarySpecialties: ['urgencias', 'medicina-interna'],
+  primarySpecialty: 'neumologia',
+  secondarySpecialties: ['infectologia', 'urgencias', 'medicina-interna'],
   subcategory: 'gravedad',
   keywords: [
     'curb-65',

@@ -61,8 +61,8 @@ export const psiPortCalculator: CalculatorDefinition = {
   id: 'psi-port',
   name: 'Índice de Gravedad de Neumonía (PSI / PORT)',
   shortName: 'PSI / PORT',
-  primarySpecialty: 'infectologia',
-  secondarySpecialties: ['medicina-interna', 'urgencias'],
+  primarySpecialty: 'neumologia',
+  secondarySpecialties: ['infectologia', 'urgencias', 'medicina-interna'],
   subcategory: 'gravedad',
   keywords: ['psi', 'port', 'neumonia', 'fine', 'mortalidad', 'hospitalizacion'],
   description:

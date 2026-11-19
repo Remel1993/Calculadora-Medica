@@ -78,8 +78,8 @@ export const cha2ds2VascCalculator: CalculatorDefinition = {
   id: 'cha2ds2-vasc',
   name: 'CHA₂DS₂-VASc y CHA₂DS₂-VA (Riesgo Embólico en FA)',
   shortName: 'CHA₂DS₂-VASc/VA',
-  primarySpecialty: 'medicina-interna',
-  secondarySpecialties: ['cardiologia'],
+  primarySpecialty: 'cardiologia',
+  secondarySpecialties: ['medicina-interna', 'neurologia'],
   subcategory: 'gravedad',
   keywords: [
     'cha2ds2',
