@@ -1,0 +1,6 @@
+{
+  "name": "Calculadora Médica Integral",
+  "description": "Herramienta clínica modular 100% offline con calculadoras médicas, escalas validadas, criterios diagnósticos y referencias bibliográficas para consulta externa y urgencias.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
