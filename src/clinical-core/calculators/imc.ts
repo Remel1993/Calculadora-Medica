@@ -46,7 +46,7 @@ export const imcCalculator: CalculatorDefinition = {
   primarySpecialty: 'medicina-interna',
   secondarySpecialties: ['endocrinologia'],
   subcategory: 'formulas',
-  keywords: ['imc', 'bmi', 'peso', 'talla', 'obesidad', 'sobrepeso', 'antropometria', 'quetelet'],
+  keywords: ['imc', 'bmi', 'biomasa', 'indice de biomasa', 'peso', 'talla', 'obesidad', 'sobrepeso', 'antropometria', 'quetelet'],
   description: 'Relación entre peso y talla al cuadrado para clasificar el estado ponderal en adultos.',
   clinicalIndication:
     'Tamizaje inicial del estado nutricional y estratificación ponderal en consulta externa de adultos.',

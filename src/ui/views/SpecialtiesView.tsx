@@ -4,6 +4,7 @@ import { getCalculatorsBySpecialty } from '../../clinical-core/registries/catalo
 import { SPECIALTIES, SPECIALTY_MAP } from '../../clinical-core/registries/specialties.ts';
 import type { SpecialtyId } from '../../clinical-core/types/clinical.ts';
 import { CalculatorCard } from '../components/CalculatorCard.tsx';
+import { SPECIALTY_VISUALS } from '../registries/specialtyVisuals.tsx';
 
 interface SpecialtiesViewProps {
   selectedSpecialty: SpecialtyId | null;
@@ -22,6 +23,7 @@ export const SpecialtiesView: React.FC<SpecialtiesViewProps> = ({
 }) => {
   if (selectedSpecialty) {
     const spec = SPECIALTY_MAP[selectedSpecialty];
+    const visual = SPECIALTY_VISUALS[selectedSpecialty];
     const items = getCalculatorsBySpecialty(selectedSpecialty);
 
     return (
@@ -36,12 +38,21 @@ export const SpecialtiesView: React.FC<SpecialtiesViewProps> = ({
         </button>
 
         <section className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-4 sm:rounded-2xl sm:p-6 dark:border-slate-800 dark:bg-slate-900">
-          <h1 className="break-words text-xl font-bold tracking-tight text-slate-900 sm:text-2xl dark:text-slate-100">
-            {spec.name}
-          </h1>
-          <p className="mt-1 break-words text-xs leading-relaxed text-slate-600 sm:mt-1.5 sm:text-sm dark:text-slate-300">
-            {spec.description}
-          </p>
+          <div className="flex items-start gap-3.5">
+            <span
+              className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${visual.badgeBgClass} ${visual.iconClass}`}
+            >
+              {visual.renderIcon('h-7 w-7')}
+            </span>
+            <div className="min-w-0 flex-1">
+              <h1 className="break-words text-xl font-bold tracking-tight text-slate-900 sm:text-2xl dark:text-slate-100">
+                {spec.name}
+              </h1>
+              <p className="mt-1 break-words text-xs leading-relaxed text-slate-600 sm:mt-1.5 sm:text-sm dark:text-slate-300">
+                {spec.description}
+              </p>
+            </div>
+          </div>
         </section>
 
         {items.length > 0 ? (
@@ -85,20 +96,28 @@ export const SpecialtiesView: React.FC<SpecialtiesViewProps> = ({
       <div className="grid min-w-0 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
         {SPECIALTIES.map((spec) => {
           const count = getCalculatorsBySpecialty(spec.id).length;
+          const visual = SPECIALTY_VISUALS[spec.id];
           return (
             <button
               key={spec.id}
               type="button"
               onClick={() => onSelectSpecialty(spec.id)}
-              className="flex min-h-[96px] w-full min-w-0 flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 text-left transition-colors hover:border-sky-300 sm:min-h-[120px] sm:rounded-2xl sm:p-5 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-sky-700"
+              className="flex min-h-[104px] w-full min-w-0 flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 text-left transition-colors hover:border-sky-300 sm:min-h-[126px] sm:rounded-2xl sm:p-5 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-sky-700"
             >
-              <div className="w-full min-w-0">
-                <h2 className="break-words text-sm font-semibold text-slate-900 sm:text-base dark:text-slate-100">
-                  {spec.name}
-                </h2>
-                <p className="mt-1 break-words text-xs leading-relaxed text-slate-600 sm:mt-1.5 dark:text-slate-400">
-                  {spec.description}
-                </p>
+              <div className="flex w-full min-w-0 items-start gap-3">
+                <span
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${visual.badgeBgClass} ${visual.iconClass}`}
+                >
+                  {visual.renderIcon('h-6 w-6')}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <h2 className="break-words text-sm font-semibold text-slate-900 sm:text-base dark:text-slate-100">
+                    {spec.name}
+                  </h2>
+                  <p className="mt-1 break-words text-xs leading-relaxed text-slate-600 sm:mt-1.5 dark:text-slate-400">
+                    {spec.description}
+                  </p>
+                </div>
               </div>
               <div className="mt-3 font-mono text-xs font-medium tabular-nums text-slate-500 sm:mt-4 dark:text-slate-400">
                 {`${count} ${count === 1 ? 'herramienta activa' : 'herramientas activas'}`}

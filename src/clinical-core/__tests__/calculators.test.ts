@@ -19,6 +19,7 @@ import { asthmaPulmonaryScoreCalculator } from '../calculators/asthmaPulmonarySc
 import { auditCalculator } from '../calculators/audit.ts';
 import { bisapCalculator } from '../calculators/bisap.ts';
 import { bishopCalculator } from '../calculators/bishop.ts';
+import { bodyCompositionCalculator } from '../calculators/bodyComposition.ts';
 import { bradenScaleCalculator } from '../calculators/bradenScale.ts';
 import { bristolScaleCalculator } from '../calculators/bristolScale.ts';
 import { bsaMostellerCalculator } from '../calculators/bsaMosteller.ts';
@@ -125,6 +126,7 @@ import { wellsTvpCalculator } from '../calculators/wellsTvp.ts';
 import { westleyCroupCalculator } from '../calculators/westleyCroup.ts';
 import { whoGrowthCalculator } from '../calculators/whoGrowth.ts';
 import { woodDownesFerresCalculator } from '../calculators/woodDownesFerres.ts';
+import { woodSmokeExposureCalculator } from '../calculators/woodSmokeExposure.ts';
 import {
   createInitialInputs,
   roundClinical,
@@ -2003,8 +2005,83 @@ test('Diabetes Emergency/Inpatient & Stroke Triage: ADA 2024 DKA/HHS, RABBIT-2 B
   assert.ok(edaSam.riskClassification.includes('desnutrición aguda grave'));
 });
 
-test('Catalog: 124 deduplicated tools, cross-specialty tagging, and accent-insensitive search', () => {
-  assert.equal(CALCULATOR_CATALOG.length, 124);
+test('Body Composition / Índice de Biomasa (FFMI, Deurenberg %Grasa, Boer LBM y criterio GLIM)', () => {
+  // Hombre 35 años, 72 kg, 175 cm -> IMC = 23.51, %Grasa = 1.2*23.5102 + 0.23*35 - 10.8 - 5.4 = 20.06 -> 20.1%
+  // Fat mass = 72 * 0.201 = 14.47 -> 14.5 kg; FFM = 72 - 14.5 = 57.5 kg; FFMI = 57.5 / 1.75^2 = 18.8 kg/m²
+  const normalMale = bodyCompositionCalculator.calculate({
+    sex: 'male',
+    age: { value: '35', unitId: 'years' },
+    weight: { value: '72', unitId: 'kg' },
+    height: { value: '175', unitId: 'cm' },
+  });
+  assert.equal(normalMale.primaryResult.value, 18.8);
+  assert.equal(normalMale.severity, 'normal');
+  assert.equal(
+    normalMale.secondaryResults?.find((r) => r.label.includes('IMC'))?.formattedValue,
+    '23.5',
+  );
+  assert.equal(
+    normalMale.secondaryResults?.find((r) => r.label.includes('Porcentaje de Grasa'))?.formattedValue,
+    '20.1',
+  );
+  assert.equal(
+    normalMale.secondaryResults?.find((r) => r.label.includes('Masa Libre de Grasa'))?.formattedValue,
+    '57.5',
+  );
+
+  // Mujer 74 años, 46 kg, 165 cm -> IMC = 16.9, %Grasa = 1.2*16.896 + 0.23*74 - 5.4 = 31.9%
+  // Fat mass = 46 * 0.319 = 14.7 kg; FFM = 31.3 kg; FFMI = 31.3 / 1.65^2 = 11.5 kg/m² (< 15.0 GLIM)
+  const lowFfmFemale = bodyCompositionCalculator.calculate({
+    sex: 'female',
+    age: { value: '74', unitId: 'years' },
+    weight: { value: '46', unitId: 'kg' },
+    height: { value: '1.65', unitId: 'm' },
+  });
+  assert.ok(lowFfmFemale.primaryResult.value < 15.0);
+  assert.equal(lowFfmFemale.severity, 'high');
+  assert.ok(lowFfmFemale.riskClassification.includes('GLIM'));
+});
+
+test('Wood Smoke Exposure Index: horas-año cutoffs (100 / 200), concomitant smoking, and low exposure', () => {
+  const highExposure = woodSmokeExposureCalculator.calculate({
+    hoursPerDay: { value: '6', unitId: 'h_day' },
+    yearsExposed: { value: '35', unitId: 'years' },
+    ventilation: 'closed',
+    concomitantSmoking: false,
+  });
+  assert.equal(highExposure.primaryResult.value, 210);
+  assert.equal(highExposure.severity, 'high');
+  assert.ok(highExposure.riskClassification.includes('≥ 200'));
+
+  const moderateThreshold = woodSmokeExposureCalculator.calculate({
+    hoursPerDay: { value: '4', unitId: 'h_day' },
+    yearsExposed: { value: '25', unitId: 'years' },
+    ventilation: 'partial',
+    concomitantSmoking: false,
+  });
+  assert.equal(moderateThreshold.primaryResult.value, 100);
+  assert.equal(moderateThreshold.severity, 'moderate');
+
+  const mixedExposure = woodSmokeExposureCalculator.calculate({
+    hoursPerDay: { value: '4', unitId: 'h_day' },
+    yearsExposed: { value: '25', unitId: 'years' },
+    ventilation: 'closed',
+    concomitantSmoking: true,
+  });
+  assert.equal(mixedExposure.severity, 'high');
+
+  const lowExposure = woodSmokeExposureCalculator.calculate({
+    hoursPerDay: { value: '2', unitId: 'h_day' },
+    yearsExposed: { value: '8', unitId: 'years' },
+    ventilation: 'outdoor',
+    concomitantSmoking: false,
+  });
+  assert.equal(lowExposure.primaryResult.value, 16);
+  assert.equal(lowExposure.severity, 'low');
+});
+
+test('Catalog: 126 deduplicated tools, cross-specialty tagging, and accent-insensitive search', () => {
+  assert.equal(CALCULATOR_CATALOG.length, 126);
 
   const endoCalcs = getCalculatorsBySpecialty('endocrinologia');
   assert.ok(endoCalcs.some((c) => c.id === 'homa-ir-b'));
@@ -2098,6 +2175,14 @@ test('Catalog: 124 deduplicated tools, cross-specialty tagging, and accent-insen
 
   const byAcronym = searchCalculators('tfge');
   assert.equal(byAcronym[0]?.id, 'ckd-epi-2021');
+
+  const byBiomass = searchCalculators('biomasa');
+  assert.ok(byBiomass.some((c) => c.id === 'body-composition-ffmi'));
+  assert.ok(byBiomass.some((c) => c.id === 'imc'));
+  assert.ok(byBiomass.some((c) => c.id === 'wood-smoke-exposure'));
+
+  const byWoodSmoke = searchCalculators('humo de lena');
+  assert.equal(byWoodSmoke[0]?.id, 'wood-smoke-exposure');
 
   for (let i = 1; i < CALCULATOR_CATALOG.length; i += 1) {
     const prev = CALCULATOR_CATALOG[i - 1];

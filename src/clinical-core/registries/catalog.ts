@@ -16,6 +16,7 @@ import { asthmaPulmonaryScoreCalculator } from '../calculators/asthmaPulmonarySc
 import { auditCalculator } from '../calculators/audit.ts';
 import { bisapCalculator } from '../calculators/bisap.ts';
 import { bishopCalculator } from '../calculators/bishop.ts';
+import { bodyCompositionCalculator } from '../calculators/bodyComposition.ts';
 import { bradenScaleCalculator } from '../calculators/bradenScale.ts';
 import { bristolScaleCalculator } from '../calculators/bristolScale.ts';
 import { bsaMostellerCalculator } from '../calculators/bsaMosteller.ts';
@@ -122,6 +123,7 @@ import { wellsTvpCalculator } from '../calculators/wellsTvp.ts';
 import { westleyCroupCalculator } from '../calculators/westleyCroup.ts';
 import { whoGrowthCalculator } from '../calculators/whoGrowth.ts';
 import { woodDownesFerresCalculator } from '../calculators/woodDownesFerres.ts';
+import { woodSmokeExposureCalculator } from '../calculators/woodSmokeExposure.ts';
 import type { CalculatorDefinition, SpecialtyId } from '../types/clinical.ts';
 import { SPECIALTY_MAP } from './specialties.ts';
 
@@ -134,6 +136,7 @@ export function compareCalculatorsAlphabetically(
 
 export const CALCULATOR_CATALOG: CalculatorDefinition[] = [
   imcCalculator,
+  bodyCompositionCalculator,
   ckdEpi2021Calculator,
   cockcroftGaultCalculator,
   kdigoAkiCalculator,
@@ -257,6 +260,7 @@ export const CALCULATOR_CATALOG: CalculatorDefinition[] = [
   inpatientBasalBolusCalculator,
   cincinnatiFastCalculator,
   acuteDiarrheaPlanCalculator,
+  woodSmokeExposureCalculator,
 ].sort(compareCalculatorsAlphabetically);
 
 export const CALCULATOR_BY_ID: Record<string, CalculatorDefinition> = CALCULATOR_CATALOG.reduce(

@@ -9,8 +9,9 @@ import {
   Play,
   RotateCcw,
   Timer,
+  Undo2,
 } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { CalculatorInputsState, NumberInputValue } from '../../clinical-core/types/clinical.ts';
 
 interface MocaInteractiveGuideProps {
@@ -200,6 +201,177 @@ const NeckerCubeSvg: React.FC = () => (
   </svg>
 );
 
+interface DrawPoint {
+  x: number;
+  y: number;
+}
+
+interface TouchDrawingPadProps {
+  strokes: DrawPoint[][];
+  onChangeStrokes: (next: DrawPoint[][]) => void;
+  ariaLabel: string;
+  placeholder?: string;
+  heightClass?: string;
+}
+
+const TouchDrawingPad: React.FC<TouchDrawingPadProps> = ({
+  strokes,
+  onChangeStrokes,
+  ariaLabel,
+  placeholder,
+  heightClass = 'h-48 sm:h-56',
+}) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const activeStrokeRef = useRef<DrawPoint[] | null>(null);
+  const strokesRef = useRef<DrawPoint[][]>(strokes);
+  strokesRef.current = strokes;
+
+  const redraw = useCallback((liveStroke?: DrawPoint[] | null) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    const targetW = Math.round(rect.width * dpr);
+    const targetH = Math.round(rect.height * dpr);
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+      canvas.width = targetW;
+      canvas.height = targetH;
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.scale(dpr, dpr);
+    ctx.strokeStyle = '#0f172a';
+    ctx.fillStyle = '#0f172a';
+    ctx.lineWidth = 2.6;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    const allStrokes = liveStroke
+      ? [...strokesRef.current, liveStroke]
+      : strokesRef.current;
+
+    for (const stroke of allStrokes) {
+      if (stroke.length === 0) continue;
+      if (stroke.length === 1) {
+        const p = stroke[0];
+        ctx.beginPath();
+        ctx.arc(p.x * rect.width, p.y * rect.height, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+        continue;
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(stroke[0].x * rect.width, stroke[0].y * rect.height);
+      for (let i = 1; i < stroke.length - 1; i++) {
+        const currX = stroke[i].x * rect.width;
+        const currY = stroke[i].y * rect.height;
+        const nextX = stroke[i + 1].x * rect.width;
+        const nextY = stroke[i + 1].y * rect.height;
+        ctx.quadraticCurveTo(currX, currY, (currX + nextX) / 2, (currY + nextY) / 2);
+      }
+      const last = stroke[stroke.length - 1];
+      ctx.lineTo(last.x * rect.width, last.y * rect.height);
+      ctx.stroke();
+    }
+  }, []);
+
+  useEffect(() => {
+    redraw(activeStrokeRef.current);
+  }, [strokes, redraw]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => redraw(activeStrokeRef.current));
+    ro.observe(canvas);
+    return () => ro.disconnect();
+  }, [redraw]);
+
+  const toNormalizedPoint = (clientX: number, clientY: number): DrawPoint | null => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return null;
+    return {
+      x: Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)),
+      y: Math.max(0, Math.min(1, (clientY - rect.top) / rect.height)),
+    };
+  };
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    e.preventDefault();
+    const pt = toNormalizedPoint(e.clientX, e.clientY);
+    if (!pt) return;
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // Ignore if pointer capture is unsupported in WebView
+    }
+    activeStrokeRef.current = [pt];
+    redraw(activeStrokeRef.current);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!activeStrokeRef.current) return;
+    e.preventDefault();
+    const pt = toNormalizedPoint(e.clientX, e.clientY);
+    if (!pt) return;
+    const stroke = activeStrokeRef.current;
+    const prev = stroke[stroke.length - 1];
+    if (prev && Math.hypot(pt.x - prev.x, pt.y - prev.y) < 0.004) {
+      return;
+    }
+    stroke.push(pt);
+    redraw(stroke);
+  };
+
+  const commitActiveStroke = (e?: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!activeStrokeRef.current) return;
+    if (e) {
+      try {
+        if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        }
+      } catch {
+        // Ignore
+      }
+    }
+    const finished = activeStrokeRef.current;
+    activeStrokeRef.current = null;
+    if (finished.length > 0) {
+      onChangeStrokes([...strokesRef.current, finished]);
+    }
+  };
+
+  return (
+    <div className="relative w-full">
+      <canvas
+        ref={canvasRef}
+        aria-label={ariaLabel}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={commitActiveStroke}
+        onPointerCancel={commitActiveStroke}
+        className={`block w-full touch-none select-none rounded-lg border border-slate-300 bg-white shadow-inner cursor-crosshair ${heightClass}`}
+      />
+      {strokes.length === 0 && placeholder && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-4 text-center text-xs text-slate-400">
+          {placeholder}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
   inputs,
   resetCounter,
@@ -211,12 +383,23 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
 
   // Step 1: Visuospatial (5 pts)
   const [trailSeq, setTrailSeq] = useState<string[]>([]);
+  const trailSeqRef = useRef<string[]>([]);
+  trailSeqRef.current = trailSeq;
+  const [trailFreehandStrokes, setTrailFreehandStrokes] = useState<DrawPoint[][]>([]);
+  const [trailLiveStroke, setTrailLiveStroke] = useState<DrawPoint[] | null>(null);
+  const trailLiveStrokeRef = useRef<DrawPoint[] | null>(null);
+  const trailDrawingRef = useRef(false);
+  const trailSvgRef = useRef<SVGSVGElement | null>(null);
   const [trailErrorNode, setTrailErrorNode] = useState<string | null>(null);
   const [trailOk, setTrailOk] = useState(false);
   const [cubeOk, setCubeOk] = useState(false);
   const [clockContour, setClockContour] = useState(false);
   const [clockNumbers, setClockNumbers] = useState(false);
   const [clockHands, setClockHands] = useState(false);
+
+  // Separate persistent drawing strokes for Cube & Clock
+  const [cubeStrokes, setCubeStrokes] = useState<DrawPoint[][]>([]);
+  const [clockStrokes, setClockStrokes] = useState<DrawPoint[][]>([]);
 
   // Step 2: Naming (3 pts)
   const [animalSlide, setAnimalSlide] = useState(0);
@@ -255,36 +438,25 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
     false,
   ]);
 
-  // Sketch canvas for Cube / Clock on phone without paper
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const isDrawingRef = useRef(false);
-  const [sketchMode, setSketchMode] = useState<'clock' | 'cube'>('clock');
-
-  const clearCanvas = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  };
-
-  useEffect(() => {
-    clearCanvas();
-  }, [activeStep, sketchMode, resetCounter]);
-
   // Reset interactive guide when user presses "Limpiar campos"
   useEffect(() => {
     if (resetCounter === 0) return;
     setActiveStep(0);
     setPatientView(false);
+    trailSeqRef.current = [];
     setTrailSeq([]);
+    setTrailFreehandStrokes([]);
+    trailLiveStrokeRef.current = null;
+    setTrailLiveStroke(null);
+    trailDrawingRef.current = false;
     setTrailErrorNode(null);
     setTrailOk(false);
     setCubeOk(false);
     setClockContour(false);
     setClockNumbers(false);
     setClockHands(false);
+    setCubeStrokes([]);
+    setClockStrokes([]);
     setAnimalSlide(0);
     setLionOk(false);
     setRhinoOk(false);
@@ -354,58 +526,98 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
   };
 
   const handleTrailTap = (nodeId: string) => {
-    const expectedNext = EXPECTED_TRAIL[trailSeq.length];
+    const prevSeq = trailSeqRef.current;
+    const expectedNext = EXPECTED_TRAIL[prevSeq.length];
     if (!expectedNext) return;
     if (nodeId === expectedNext) {
-      const nextSeq = [...trailSeq, nodeId];
+      const nextSeq = [...prevSeq, nodeId];
+      trailSeqRef.current = nextSeq;
       setTrailSeq(nextSeq);
       setTrailErrorNode(null);
       if (nextSeq.length === EXPECTED_TRAIL.length) {
         setTrailOk(true);
         syncVisuo(true, cubeOk, clockContour, clockNumbers, clockHands);
       }
-    } else if (!trailSeq.includes(nodeId)) {
+    } else if (!prevSeq.includes(nodeId)) {
       setTrailErrorNode(nodeId);
-      window.setTimeout(() => setTrailErrorNode(null), 500);
+      window.setTimeout(() => setTrailErrorNode(null), 450);
     }
   };
 
-  const getPointerPos = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current!;
-    const rect = canvas.getBoundingClientRect();
+  const toTrailSvgPoint = (clientX: number, clientY: number): DrawPoint | null => {
+    const svg = trailSvgRef.current;
+    if (!svg) return null;
+    const rect = svg.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return null;
     return {
-      x: ((e.clientX - rect.left) / rect.width) * canvas.width,
-      y: ((e.clientY - rect.top) / rect.height) * canvas.height,
+      x: Math.max(0, Math.min(320, ((clientX - rect.left) / rect.width) * 320)),
+      y: Math.max(0, Math.min(200, ((clientY - rect.top) / rect.height) * 200)),
     };
   };
 
-  const handleCanvasDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    canvas.setPointerCapture(e.pointerId);
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const { x, y } = getPointerPos(e);
-    ctx.strokeStyle = '#0f172a';
-    ctx.lineWidth = 2.6;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    isDrawingRef.current = true;
+  const checkTrailHit = (pt: DrawPoint) => {
+    for (const node of TRAIL_NODES) {
+      if (Math.hypot(pt.x - node.x, pt.y - node.y) <= 22) {
+        handleTrailTap(node.id);
+        break;
+      }
+    }
   };
 
-  const handleCanvasMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!isDrawingRef.current || !canvasRef.current) return;
-    const ctx = canvasRef.current.getContext('2d');
-    if (!ctx) return;
-    const { x, y } = getPointerPos(e);
-    ctx.lineTo(x, y);
-    ctx.stroke();
+  const handleTrailPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    e.preventDefault();
+    const pt = toTrailSvgPoint(e.clientX, e.clientY);
+    if (!pt) return;
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // Ignore if unsupported
+    }
+    trailDrawingRef.current = true;
+    const initialStroke = [pt];
+    trailLiveStrokeRef.current = initialStroke;
+    setTrailLiveStroke(initialStroke);
+    checkTrailHit(pt);
   };
 
-  const handleCanvasUp = () => {
-    isDrawingRef.current = false;
+  const handleTrailPointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
+    if (!trailDrawingRef.current) return;
+    e.preventDefault();
+    const pt = toTrailSvgPoint(e.clientX, e.clientY);
+    if (!pt) return;
+    const prev = trailLiveStrokeRef.current;
+    if (!prev) {
+      const next = [pt];
+      trailLiveStrokeRef.current = next;
+      setTrailLiveStroke(next);
+    } else {
+      const last = prev[prev.length - 1];
+      if (!last || Math.hypot(pt.x - last.x, pt.y - last.y) >= 2) {
+        const next = [...prev, pt];
+        trailLiveStrokeRef.current = next;
+        setTrailLiveStroke(next);
+      }
+    }
+    checkTrailHit(pt);
+  };
+
+  const handleTrailPointerUp = (e: React.PointerEvent<SVGSVGElement>) => {
+    if (!trailDrawingRef.current) return;
+    trailDrawingRef.current = false;
+    try {
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      // Ignore
+    }
+    const live = trailLiveStrokeRef.current;
+    trailLiveStrokeRef.current = null;
+    setTrailLiveStroke(null);
+    if (live && live.length > 1) {
+      setTrailFreehandStrokes((prev) => [...prev, live]);
+    }
   };
 
   const getVal = (id: string) => Number((inputs[id] as NumberInputValue | undefined)?.value || 0);
@@ -486,7 +698,13 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setPatientView((prev) => !prev)}
+            onClick={() => {
+              const next = !patientView;
+              setPatientView(next);
+              if (next && activeStep > 1) {
+                setActiveStep(0);
+              }
+            }}
             className={`inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold ${
               patientView
                 ? 'border-sky-600 bg-sky-600 text-white'
@@ -503,8 +721,28 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
         </div>
       </div>
 
-      {/* Horizontal scrollable step tabs (hidden in Patient View) */}
-      {!patientView && (
+      {/* Horizontal scrollable step tabs (in Patient View, allow switching between drawing Step 1 and animals Step 2) */}
+      {patientView ? (
+        <div className="mt-3 flex gap-1.5">
+          {[
+            { id: 0, label: '1. Dibujos (Trazo, Cubo y Reloj)' },
+            { id: 1, label: '2. Identificar Animales' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveStep(tab.id)}
+              className={`min-h-[38px] flex-1 rounded-lg border px-2.5 py-1.5 text-xs font-semibold ${
+                activeStep === tab.id
+                  ? 'border-sky-600 bg-sky-600 text-white'
+                  : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      ) : (
         <div className="mt-3 flex gap-1.5 overflow-x-auto pb-1">
           {STEPS.map((st) => {
             const active = activeStep === st.id;
@@ -534,24 +772,31 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
           </h3>
         )}
 
-        {/* STEP 1: VISUOSPATIAL */}
+        {/* STEP 1: VISUOSPATIAL (3 DRAWING TASKS) */}
         {activeStep === 0 && (
           <div className="mt-2.5 space-y-4">
-            {/* 1A: Interactive Trail Making */}
+            {/* 1A: Interactive Trail Making (supports continuous finger drawing + tap) */}
             <div className="space-y-2">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-xs font-medium text-slate-800 dark:text-slate-200">
                   {patientView
-                    ? 'Toca los círculos alternando número y letra en orden: 1 → A → 2 → B...'
-                    : '1A. Trazo alternante (1 → A → 2 → B → 3 → C → 4 → D → 5 → E): pide al paciente tocar en orden.'}
+                    ? '1A. Dibuja una línea con el dedo (o toca en orden) alternando número y letra: 1 → A → 2 → B...'
+                    : '1A. Trazo alternante (1 → A → 2 → B → 3 → C → 4 → D → 5 → E): dibuja con el dedo o toca en orden.'}
                 </p>
                 <button
                   type="button"
                   onClick={() => {
+                    trailDrawingRef.current = false;
+                    trailSeqRef.current = [];
                     setTrailSeq([]);
+                    setTrailFreehandStrokes([]);
+                    trailLiveStrokeRef.current = null;
+                    setTrailLiveStroke(null);
                     setTrailErrorNode(null);
+                    setTrailOk(false);
+                    syncVisuo(false, cubeOk, clockContour, clockNumbers, clockHands);
                   }}
-                  className="inline-flex items-center gap-1 rounded-md border border-slate-200 px-2 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300"
+                  className="inline-flex min-h-[34px] items-center gap-1 rounded-md border border-slate-200 px-2.5 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300"
                 >
                   <RotateCcw className="h-3 w-3" />
                   Reiniciar trazo
@@ -560,12 +805,33 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
 
               <div className="rounded-xl border border-slate-200 bg-white p-2">
                 <svg
+                  ref={trailSvgRef}
                   viewBox="0 0 320 200"
-                  className="mx-auto w-full max-w-[360px] select-none touch-manipulation"
+                  onPointerDown={handleTrailPointerDown}
+                  onPointerMove={handleTrailPointerMove}
+                  onPointerUp={handleTrailPointerUp}
+                  onPointerCancel={handleTrailPointerUp}
+                  className="mx-auto w-full max-w-[380px] touch-none select-none cursor-crosshair"
                   role="group"
                   aria-label="Prueba interactiva de trazo alternante 1 a E"
                 >
-                  {/* Lines connecting tapped sequence */}
+                  {/* Freehand finger trace */}
+                  {[...trailFreehandStrokes, ...(trailLiveStroke ? [trailLiveStroke] : [])].map(
+                    (stroke, idx) => (
+                      <polyline
+                        key={`fh-${idx}`}
+                        points={stroke.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')}
+                        fill="none"
+                        stroke="#7dd3fc"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        opacity="0.7"
+                      />
+                    ),
+                  )}
+
+                  {/* Clean lines connecting validated node sequence */}
                   {trailSeq.slice(1).map((id, idx) => {
                     const prev = TRAIL_NODES.find((n) => n.id === trailSeq[idx])!;
                     const curr = TRAIL_NODES.find((n) => n.id === id)!;
@@ -587,11 +853,7 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
                     const done = trailSeq.includes(node.id);
                     const isErr = trailErrorNode === node.id;
                     return (
-                      <g
-                        key={node.id}
-                        onClick={() => handleTrailTap(node.id)}
-                        className="cursor-pointer"
-                      >
+                      <g key={node.id} className="cursor-pointer">
                         <circle
                           cx={node.x}
                           cy={node.y}
@@ -614,75 +876,104 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
                     );
                   })}
                 </svg>
+                <div className="mt-1 flex items-center justify-between px-1 text-[11px] text-slate-500">
+                  <span>
+                    Progreso: {trailSeq.length}/{EXPECTED_TRAIL.length}
+                    {trailSeq.length === EXPECTED_TRAIL.length ? ' (Secuencia completa)' : ''}
+                  </span>
+                  {trailSeq.length < EXPECTED_TRAIL.length && (
+                    <span>Siguiente: {EXPECTED_TRAIL[trailSeq.length]}</span>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* 1B + 1C: Necker Cube stimulus + Touch Sketch Pad */}
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5 dark:border-slate-800 dark:bg-slate-950">
-                <div className="mb-1.5 flex items-center justify-between gap-2">
-                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                    {sketchMode === 'cube' ? 'Modelo: Copia este cubo' : 'Instrucción: Dibuja un reloj (11:10)'}
-                  </span>
-                  <div className="flex gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setSketchMode('cube')}
-                      className={`rounded px-2 py-0.5 text-[11px] font-semibold ${
-                        sketchMode === 'cube'
-                          ? 'bg-sky-600 text-white'
-                          : 'bg-white text-slate-600 dark:bg-slate-800 dark:text-slate-300'
-                      }`}
-                    >
-                      Cubo
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSketchMode('clock')}
-                      className={`rounded px-2 py-0.5 text-[11px] font-semibold ${
-                        sketchMode === 'clock'
-                          ? 'bg-sky-600 text-white'
-                          : 'bg-white text-slate-600 dark:bg-slate-800 dark:text-slate-300'
-                      }`}
-                    >
-                      Reloj
-                    </button>
-                  </div>
-                </div>
-                {sketchMode === 'cube' ? (
-                  <NeckerCubeSvg />
-                ) : (
-                  <div className="flex h-28 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-white p-3 text-center text-xs text-slate-700 sm:h-32">
-                    «Dibuja un reloj grande, coloca todos los números y pon las manecillas marcando las 11 y 10.»
-                  </div>
-                )}
-              </div>
-
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5 dark:border-slate-800 dark:bg-slate-950">
-                <div className="mb-1.5 flex items-center justify-between gap-2">
-                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                    Lienzo táctil (dedo)
-                  </span>
+            {/* 1B: Necker Cube Model + Dedicated Persistent Cube Drawing Pad */}
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950">
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                  1B. Copiar el cubo tridimensional
+                </span>
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
-                    onClick={clearCanvas}
-                    className="inline-flex items-center gap-1 rounded border border-slate-300 bg-white px-2 py-0.5 text-[11px] font-medium text-slate-700 hover:bg-slate-100"
+                    disabled={cubeStrokes.length === 0}
+                    onClick={() => setCubeStrokes((prev) => prev.slice(0, -1))}
+                    className="inline-flex min-h-[32px] items-center gap-1 rounded border border-slate-300 bg-white px-2 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  >
+                    <Undo2 className="h-3 w-3" />
+                    Deshacer
+                  </button>
+                  <button
+                    type="button"
+                    disabled={cubeStrokes.length === 0}
+                    onClick={() => setCubeStrokes([])}
+                    className="inline-flex min-h-[32px] items-center gap-1 rounded border border-slate-300 bg-white px-2 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
                   >
                     <Eraser className="h-3 w-3" />
                     Borrar
                   </button>
                 </div>
-                <canvas
-                  ref={canvasRef}
-                  width={320}
-                  height={180}
-                  onPointerDown={handleCanvasDown}
-                  onPointerMove={handleCanvasMove}
-                  onPointerUp={handleCanvasUp}
-                  onPointerCancel={handleCanvasUp}
-                  className="h-36 w-full touch-none rounded-lg border border-slate-300 bg-white"
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-[170px_1fr] sm:items-center">
+                <div className="rounded-lg border border-slate-200 bg-white p-2">
+                  <div className="mb-1 text-center text-[11px] font-medium text-slate-500">
+                    Modelo a copiar
+                  </div>
+                  <NeckerCubeSvg />
+                </div>
+
+                <TouchDrawingPad
+                  strokes={cubeStrokes}
+                  onChangeStrokes={setCubeStrokes}
+                  ariaLabel="Lienzo táctil para copiar el cubo"
+                  placeholder="Dibuja aquí el cubo con el dedo o lápiz táctil"
+                  heightClass="h-44 sm:h-48"
                 />
               </div>
+            </div>
+
+            {/* 1C: Dedicated Persistent Clock Drawing Pad */}
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950">
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <span className="block text-xs font-semibold text-slate-800 dark:text-slate-200">
+                    1C. Dibujar un reloj (marcando las 11:10)
+                  </span>
+                  <span className="block text-[11px] text-slate-500 dark:text-slate-400">
+                    «Dibuja un reloj grande, coloca todos los números y pon las manecillas marcando las 11 y 10.»
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    disabled={clockStrokes.length === 0}
+                    onClick={() => setClockStrokes((prev) => prev.slice(0, -1))}
+                    className="inline-flex min-h-[32px] items-center gap-1 rounded border border-slate-300 bg-white px-2 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  >
+                    <Undo2 className="h-3 w-3" />
+                    Deshacer
+                  </button>
+                  <button
+                    type="button"
+                    disabled={clockStrokes.length === 0}
+                    onClick={() => setClockStrokes([])}
+                    className="inline-flex min-h-[32px] items-center gap-1 rounded border border-slate-300 bg-white px-2 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  >
+                    <Eraser className="h-3 w-3" />
+                    Borrar
+                  </button>
+                </div>
+              </div>
+
+              <TouchDrawingPad
+                strokes={clockStrokes}
+                onChangeStrokes={setClockStrokes}
+                ariaLabel="Lienzo táctil para dibujar el reloj marcando las 11:10"
+                placeholder="Dibuja aquí el círculo del reloj, los números 1–12 y las manecillas (11:10)"
+                heightClass="h-56 sm:h-64"
+              />
             </div>
 
             {!patientView && (

@@ -171,13 +171,15 @@ export const PediatricGrowthPanel: React.FC<PediatricGrowthPanelProps> = ({
   // Keep chart indicator and age window sensible when age changes
   useEffect(() => {
     if (ageMonths === null) return;
-    if (ageMonths > 120 && selectedIndicator === 'wfa') {
+    let nextIndicator = selectedIndicator;
+    if (ageMonths > 120 && nextIndicator === 'wfa') {
+      nextIndicator = 'lhfa';
+      setSelectedIndicator('lhfa');
+    } else if (ageMonths > 60 && nextIndicator === 'hcfa') {
+      nextIndicator = 'lhfa';
       setSelectedIndicator('lhfa');
     }
-    if (ageMonths > 60 && selectedIndicator === 'hcfa') {
-      setSelectedIndicator('lhfa');
-    }
-    setAgeWindow(getDefaultWindowForAge(ageMonths, selectedIndicator));
+    setAgeWindow(getDefaultWindowForAge(ageMonths, nextIndicator));
   }, [ageMonths]);
 
   const handleSelectIndicator = (next: WhoIndicatorId) => {

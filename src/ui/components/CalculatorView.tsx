@@ -26,6 +26,10 @@ import type {
   SeverityLevel,
   ValidationError,
 } from '../../clinical-core/types/clinical.ts';
+import {
+  ClinicalVisualGuide,
+  SUPPORTED_VISUAL_GUIDE_IDS,
+} from './ClinicalVisualGuides.tsx';
 import { MocaInteractiveGuide } from './MocaInteractiveGuide.tsx';
 import { PediatricGrowthPanel } from './PediatricGrowthPanel.tsx';
 
@@ -155,8 +159,42 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
     setSubmitError(null);
   };
 
+  const formRef = useRef<HTMLFormElement | null>(null);
+
+  const handleFieldFocusScroll = (el: HTMLElement) => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      window.setTimeout(() => {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 240);
+    }
+  };
+
+  const handleEnterAdvance = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    isLastTextField: boolean,
+  ) => {
+    if (e.key !== 'Enter') return;
+    if (isLastTextField) {
+      return;
+    }
+    const form = formRef.current;
+    if (!form) return;
+    const focusables = Array.from(
+      form.querySelectorAll<HTMLInputElement>('input[type="text"], input[type="date"]'),
+    ).filter((el) => !el.disabled && el.offsetParent !== null);
+    const idx = focusables.indexOf(e.currentTarget);
+    const next = idx >= 0 ? focusables[idx + 1] : undefined;
+    if (next) {
+      e.preventDefault();
+      next.focus();
+    }
+  };
+
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     const validationErrors = validateCalculatorInputs(calculator, inputs);
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
@@ -296,6 +334,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
       <div className="grid w-full min-w-0 gap-4 sm:gap-6 lg:grid-cols-12 lg:items-start">
         {/* Form Section */}
         <form
+          ref={formRef}
           onSubmit={handleCalculate}
           noValidate
           className="w-full min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-3.5 sm:rounded-2xl sm:p-6 lg:col-span-7 dark:border-slate-800 dark:bg-slate-900"
@@ -334,17 +373,40 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                 </button>
               </div>
             )}
-            {calculator.fields.map((field) => {
+            {(() => {
+              const VISUAL_AFTER_FIELD: Record<string, string> = {
+                'diabetic-foot-wagner-pedis-wifi': 'scaleMode',
+                'tanner-stages': 'sex',
+                'ottawa-ankle-knee': 'region',
+                'burns-parkland': 'hoursElapsed',
+              };
+              const hasVisualGuide = SUPPORTED_VISUAL_GUIDE_IDS.has(calculator.id);
+              const afterFieldId = VISUAL_AFTER_FIELD[calculator.id] ?? null;
+
+              const visibleTextFieldIds = calculator.fields
+                .filter(
+                  (f) =>
+                    (f.type === 'number' || f.type === 'date') &&
+                    (!f.visibleWhen || f.visibleWhen(inputs)),
+                )
+                .map((f) => f.id);
+              const lastTextFieldId =
+                visibleTextFieldIds[visibleTextFieldIds.length - 1] ?? null;
+
+              const renderField = (field: (typeof calculator.fields)[number]) => {
               if (field.visibleWhen && !field.visibleWhen(inputs)) {
                 return null;
               }
               const fieldError = errorByField[field.id];
+              const isLastTextField = field.id === lastTextFieldId;
 
               if (field.type === 'number') {
                 const val = (inputs[field.id] as NumberInputValue) ?? {
                   value: '',
                   unitId: field.defaultUnitId,
                 };
+                const allowsNegative =
+                  field.min < 0 || field.units.some((u) => (u.min ?? field.min) < 0);
                 return (
                   <div key={field.id} className="min-w-0 space-y-1">
                     <label
@@ -357,15 +419,21 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                       <input
                         id={`field-${field.id}`}
                         type="text"
-                        inputMode="decimal"
+                        inputMode={allowsNegative ? 'text' : 'decimal'}
+                        enterKeyHint={isLastTextField ? 'done' : 'next'}
                         autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        spellCheck={false}
                         value={val.value}
                         placeholder={field.placeholder}
+                        onFocus={(e) => handleFieldFocusScroll(e.currentTarget)}
+                        onKeyDown={(e) => handleEnterAdvance(e, isLastTextField)}
                         onChange={(e) =>
                           handleNumberChange(field.id, { value: e.target.value })
                         }
                         aria-invalid={Boolean(fieldError)}
-                        className={`min-h-[44px] w-0 min-w-0 flex-1 rounded-lg border bg-slate-50 px-3 py-2 font-mono text-sm tabular-nums text-slate-900 transition-colors focus:bg-white focus:outline-none focus:ring-2 sm:rounded-xl sm:px-3.5 sm:text-base dark:bg-slate-950 dark:text-slate-100 dark:focus:bg-slate-900 ${
+                        className={`min-h-[44px] w-0 min-w-0 flex-1 rounded-lg border bg-slate-50 px-3 py-2 font-mono text-base tabular-nums text-slate-900 transition-colors focus:bg-white focus:outline-none focus:ring-2 sm:rounded-xl sm:px-3.5 dark:bg-slate-950 dark:text-slate-100 dark:focus:bg-slate-900 ${
                           fieldError
                             ? 'border-rose-500 focus:ring-rose-500/30'
                             : 'border-slate-300 focus:border-sky-600 focus:ring-sky-600/20 dark:border-slate-700 dark:focus:border-sky-500'
@@ -378,7 +446,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                           onChange={(e) =>
                             handleNumberChange(field.id, { unitId: e.target.value })
                           }
-                          className="min-h-[44px] max-w-[46%] min-w-0 shrink-0 rounded-lg border border-slate-300 bg-slate-100 px-2 py-2 text-xs font-medium text-slate-800 focus:border-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-600/20 sm:rounded-xl sm:px-3 sm:text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                          className="min-h-[44px] max-w-[46%] min-w-0 shrink-0 rounded-lg border border-slate-300 bg-slate-100 px-2 py-2 text-base font-medium text-slate-800 focus:border-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-600/20 sm:rounded-xl sm:px-3 sm:text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                         >
                           {field.units.map((u) => (
                             <option key={u.id} value={u.id}>
@@ -488,9 +556,10 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                       id={`field-${field.id}`}
                       type="date"
                       value={dateVal}
+                      onFocus={(e) => handleFieldFocusScroll(e.currentTarget)}
                       onChange={(e) => handleValueChange(field.id, e.target.value)}
                       aria-invalid={Boolean(fieldError)}
-                      className={`block min-h-[44px] w-full min-w-0 max-w-full rounded-lg border bg-slate-50 px-3 py-2 font-mono text-sm text-slate-900 transition-colors focus:bg-white focus:outline-none focus:ring-2 sm:rounded-xl sm:px-3.5 sm:text-base dark:bg-slate-950 dark:text-slate-100 dark:focus:bg-slate-900 ${
+                      className={`block min-h-[44px] w-full min-w-0 max-w-full rounded-lg border bg-slate-50 px-3 py-2 font-mono text-base text-slate-900 transition-colors focus:bg-white focus:outline-none focus:ring-2 sm:rounded-xl sm:px-3.5 dark:bg-slate-950 dark:text-slate-100 dark:focus:bg-slate-900 ${
                         fieldError
                           ? 'border-rose-500 focus:ring-rose-500/30'
                           : 'border-slate-300 focus:border-sky-600 focus:ring-sky-600/20 dark:border-slate-700 dark:focus:border-sky-500'
@@ -571,7 +640,36 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                   </div>
                 </div>
               );
-            })}
+              };
+
+              return (
+                <>
+                  {hasVisualGuide && afterFieldId === null && (
+                    <ClinicalVisualGuide
+                      calculatorId={calculator.id}
+                      inputs={inputs}
+                      onSelectValue={(fieldId, val) => handleValueChange(fieldId, val)}
+                    />
+                  )}
+                  {calculator.fields.map((field) => {
+                    const node = renderField(field);
+                    if (!node) return null;
+                    return (
+                      <React.Fragment key={field.id}>
+                        {node}
+                        {hasVisualGuide && afterFieldId === field.id && (
+                          <ClinicalVisualGuide
+                            calculatorId={calculator.id}
+                            inputs={inputs}
+                            onSelectValue={(fieldId, val) => handleValueChange(fieldId, val)}
+                          />
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </>
+              );
+            })()}
           </div>
 
           {submitError && (
@@ -612,7 +710,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
           {output && severityStyle && SeverityIcon ? (
             <section
               aria-live="polite"
-              className={`w-full min-w-0 overflow-hidden rounded-xl border p-4 sm:rounded-2xl sm:p-6 ${severityStyle.container}`}
+              className={`w-full min-w-0 select-text overflow-hidden rounded-xl border p-4 sm:rounded-2xl sm:p-6 ${severityStyle.container}`}
             >
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide">
                 <SeverityIcon className={`h-4 w-4 shrink-0 ${severityStyle.labelClass}`} />
@@ -751,7 +849,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                 <BookOpen className="h-3.5 w-3.5 shrink-0" />
                 <span>Referencias bibliográficas</span>
               </h3>
-              <ul className="mt-2 space-y-1.5 text-xs leading-relaxed text-slate-600 sm:space-y-2 dark:text-slate-300">
+              <ul className="mt-2 select-text space-y-1.5 text-xs leading-relaxed text-slate-600 sm:space-y-2 dark:text-slate-300">
                 {calculator.references.map((ref) => (
                   <li key={ref.citation} className="break-words [overflow-wrap:anywhere]">
                     {ref.citation}

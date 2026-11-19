@@ -19,12 +19,29 @@
   html {
     font-family: var(--font-sans);
     -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    overscroll-behavior-y: contain;
     overflow-x: clip;
   }
 
   body {
     @apply bg-slate-50 text-slate-900 antialiased dark:bg-[#0B111A] dark:text-slate-100;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    overscroll-behavior-y: contain;
     overflow-x: clip;
+  }
+
+  input,
+  textarea,
+  select,
+  [contenteditable="true"] {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
   }
 
   button {
@@ -66,6 +83,12 @@
 
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+}
+
+.select-text {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
 }
 
 @media (prefers-reduced-motion: reduce) {
