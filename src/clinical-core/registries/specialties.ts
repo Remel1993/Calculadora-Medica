@@ -77,7 +77,7 @@ export const SPECIALTIES: SpecialtyMeta[] = [
     id: 'neurologia',
     name: 'Neurología',
     shortName: 'Neurología',
-    description: 'Nivel de conciencia, ictus, AIT, hemorragia intracraneal y dolor neuropático.',
+    description: 'Nivel de conciencia, ictus, cefaleas/migrañas (ICHD-3), banderas rojas (SNNOOP10), debilidad (MRC) y dolor neuropático.',
   },
   {
     id: 'pediatria',

@@ -56,6 +56,7 @@ import { glasgowPediatricCalculator } from '../calculators/glasgowPediatric.ts';
 import { graceScoreCalculator } from '../calculators/graceScore.ts';
 import { hamiltonAnxietyCalculator } from '../calculators/hamiltonAnxiety.ts';
 import { hasBledCalculator } from '../calculators/hasBled.ts';
+import { headacheRedFlagsCalculator } from '../calculators/headacheRedFlags.ts';
 import { hba1cEagCalculator } from '../calculators/hba1cEag.ts';
 import { heartScoreCalculator } from '../calculators/heartScore.ts';
 import { hollidaySegarCalculator } from '../calculators/hollidaySegar.ts';
@@ -64,6 +65,7 @@ import { huntHessCalculator } from '../calculators/huntHess.ts';
 import { hyperglycemicCrisesCalculator } from '../calculators/hyperglycemicCrises.ts';
 import { hypertensionClassificationCalculator } from '../calculators/hypertensionClassification.ts';
 import { ichScoreCalculator } from '../calculators/ichScore.ts';
+import { ichd3HeadacheCalculator } from '../calculators/ichd3Headache.ts';
 import { idealAdjustedWeightCalculator } from '../calculators/idealAdjustedWeight.ts';
 import { imcCalculator } from '../calculators/imc.ts';
 import { infusionCalculator } from '../calculators/infusionCalculator.ts';
@@ -85,6 +87,7 @@ import { miniCogCalculator } from '../calculators/miniCog.ts';
 import { minorHeadTraumaCalculator } from '../calculators/minorHeadTrauma.ts';
 import { mocaTestCalculator } from '../calculators/mocaTest.ts';
 import { moriskyGreenCalculator } from '../calculators/moriskyGreen.ts';
+import { mrcNeurologicalWeaknessCalculator } from '../calculators/mrcNeurologicalWeakness.ts';
 import { neonatalJaundiceKramerCalculator } from '../calculators/neonatalJaundiceKramer.ts';
 import { news2Calculator } from '../calculators/news2.ts';
 import { nihssCalculator } from '../calculators/nihss.ts';
@@ -261,6 +264,9 @@ export const CALCULATOR_CATALOG: CalculatorDefinition[] = [
   cincinnatiFastCalculator,
   acuteDiarrheaPlanCalculator,
   woodSmokeExposureCalculator,
+  ichd3HeadacheCalculator,
+  headacheRedFlagsCalculator,
+  mrcNeurologicalWeaknessCalculator,
 ].sort(compareCalculatorsAlphabetically);
 
 export const CALCULATOR_BY_ID: Record<string, CalculatorDefinition> = CALCULATOR_CATALOG.reduce(

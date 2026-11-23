@@ -59,6 +59,7 @@ import { glasgowPediatricCalculator } from '../calculators/glasgowPediatric.ts';
 import { graceScoreCalculator } from '../calculators/graceScore.ts';
 import { hamiltonAnxietyCalculator } from '../calculators/hamiltonAnxiety.ts';
 import { hasBledCalculator } from '../calculators/hasBled.ts';
+import { headacheRedFlagsCalculator } from '../calculators/headacheRedFlags.ts';
 import { hba1cEagCalculator } from '../calculators/hba1cEag.ts';
 import { heartScoreCalculator } from '../calculators/heartScore.ts';
 import { hollidaySegarCalculator } from '../calculators/hollidaySegar.ts';
@@ -67,6 +68,7 @@ import { huntHessCalculator } from '../calculators/huntHess.ts';
 import { hyperglycemicCrisesCalculator } from '../calculators/hyperglycemicCrises.ts';
 import { hypertensionClassificationCalculator } from '../calculators/hypertensionClassification.ts';
 import { ichScoreCalculator } from '../calculators/ichScore.ts';
+import { ichd3HeadacheCalculator } from '../calculators/ichd3Headache.ts';
 import { idealAdjustedWeightCalculator } from '../calculators/idealAdjustedWeight.ts';
 import { imcCalculator } from '../calculators/imc.ts';
 import { infusionCalculator } from '../calculators/infusionCalculator.ts';
@@ -88,6 +90,7 @@ import { miniCogCalculator } from '../calculators/miniCog.ts';
 import { minorHeadTraumaCalculator } from '../calculators/minorHeadTrauma.ts';
 import { mocaTestCalculator } from '../calculators/mocaTest.ts';
 import { moriskyGreenCalculator } from '../calculators/moriskyGreen.ts';
+import { mrcNeurologicalWeaknessCalculator } from '../calculators/mrcNeurologicalWeakness.ts';
 import { neonatalJaundiceKramerCalculator } from '../calculators/neonatalJaundiceKramer.ts';
 import { news2Calculator } from '../calculators/news2.ts';
 import { nihssCalculator } from '../calculators/nihss.ts';
@@ -2080,8 +2083,167 @@ test('Wood Smoke Exposure Index: horas-año cutoffs (100 / 200), concomitant smo
   assert.equal(lowExposure.severity, 'low');
 });
 
-test('Catalog: 126 deduplicated tools, cross-specialty tagging, and accent-insensitive search', () => {
-  assert.equal(CALCULATOR_CATALOG.length, 126);
+test('ICHD-3 Migraine & Primary Headaches, SNNOOP10 Red Flags, and MRC Neurological Weakness', () => {
+  // ICHD-3 1.1 Migraine without aura
+  const migraineNoAura = ichd3HeadacheCalculator.calculate({
+    syndrome: 'migraine_without_aura',
+    redFlagsPresent: false,
+    attackCount: 'ge5',
+    duration4to72h: true,
+    cUnilateral: true,
+    cPulsatile: true,
+    cModerateSevere: true,
+    cAggravatedActivity: false,
+    dNauseaVomiting: true,
+    dPhotoPhono: false,
+    chronicFrequency: false,
+    medicationOveruse: false,
+  });
+  assert.equal(migraineNoAura.primaryResult.formattedValue, 'ICHD-3 1.1');
+  assert.equal(migraineNoAura.severity, 'moderate');
+
+  // ICHD-3 1.3 Chronic Migraine + 8.2 Medication Overuse
+  const chronicMigraine = ichd3HeadacheCalculator.calculate({
+    syndrome: 'migraine_without_aura',
+    redFlagsPresent: false,
+    attackCount: 'ge5',
+    duration4to72h: true,
+    cUnilateral: true,
+    cPulsatile: false,
+    cModerateSevere: true,
+    cAggravatedActivity: true,
+    dNauseaVomiting: false,
+    dPhotoPhono: true,
+    chronicFrequency: true,
+    medicationOveruse: true,
+  });
+  assert.equal(chronicMigraine.primaryResult.formattedValue, 'ICHD-3 1.3');
+  assert.equal(chronicMigraine.severity, 'high');
+
+  // ICHD-3 1.2.3 Hemiplegic migraine: first/atypical motor weakness triggers critical stroke warning
+  const hemiplegicFirst = ichd3HeadacheCalculator.calculate({
+    syndrome: 'migraine_with_aura',
+    redFlagsPresent: false,
+    auraAttacks: '1',
+    auraVisual: true,
+    auraSensory: false,
+    auraSpeech: false,
+    auraMotor: true,
+    familyHemiplegic: false,
+    motorAtypicalOrFirst: true,
+    auraBrainstem: false,
+    auraRetinal: false,
+    acGradual5: true,
+    acSuccession: true,
+    acDuration60: true,
+    acUnilateral: true,
+    acPositive: false,
+    acHeadache60: true,
+    chronicFrequency: false,
+    medicationOveruse: false,
+  });
+  assert.equal(hemiplegicFirst.severity, 'critical');
+
+  // ICHD-3 3.1 Cluster Headache
+  const clusterRes = ichd3HeadacheCalculator.calculate({
+    syndrome: 'cluster_headache',
+    redFlagsPresent: false,
+    clusterAttacks: true,
+    clusterPain: true,
+    clusterAutonomic: true,
+    clusterRestlessness: true,
+    clusterFreq: true,
+  });
+  assert.equal(clusterRes.primaryResult.formattedValue, 'ICHD-3 3.1');
+  assert.equal(clusterRes.severity, 'high');
+
+  // SNNOOP10 Red Flags: thunderclap + neuro deficit -> critical
+  const snnoopCrit = headacheRedFlagsCalculator.calculate({
+    sSystemic: false,
+    nNeoplasm: false,
+    nNeuroDeficit: true,
+    oOnsetSudden: true,
+    oOlderAge: false,
+    p1PatternChange: false,
+    p2Positional: false,
+    p3Precipitated: false,
+    p4Papilledema: false,
+    p5Progressive: false,
+    p6Pregnancy: false,
+    p7PainfulEye: false,
+    p8Posttraumatic: false,
+    p9PathologyImmune: false,
+    p10PainkillerOveruse: false,
+  });
+  assert.equal(snnoopCrit.primaryResult.value, 2);
+  assert.equal(snnoopCrit.severity, 'critical');
+
+  // SNNOOP10: isolated medication overuse -> moderate orange flag
+  const snnoopOveruse = headacheRedFlagsCalculator.calculate({
+    sSystemic: false,
+    nNeoplasm: false,
+    nNeuroDeficit: false,
+    oOnsetSudden: false,
+    oOlderAge: false,
+    p1PatternChange: false,
+    p2Positional: false,
+    p3Precipitated: false,
+    p4Papilledema: false,
+    p5Progressive: false,
+    p6Pregnancy: false,
+    p7PainfulEye: false,
+    p8Posttraumatic: false,
+    p9PathologyImmune: false,
+    p10PainkillerOveruse: true,
+  });
+  assert.equal(snnoopOveruse.primaryResult.value, 1);
+  assert.equal(snnoopOveruse.severity, 'moderate');
+
+  // MRC Neurological Weakness: hyperacute right hemiparesis -> critical + right hemiparesis detection
+  const mrcHemiparesis = mrcNeurologicalWeaknessCalculator.calculate({
+    onsetTempo: 'hyperacute',
+    neuroPattern: 'umn',
+    rShoulder: '2',
+    lShoulder: '5',
+    rElbow: '2',
+    lElbow: '5',
+    rWrist: '1',
+    lWrist: '5',
+    rHip: '3',
+    lHip: '5',
+    rKnee: '3',
+    lKnee: '5',
+    rAnkle: '3',
+    lAnkle: '5',
+  });
+  assert.equal(mrcHemiparesis.primaryResult.value, 44);
+  assert.equal(mrcHemiparesis.severity, 'critical');
+  assert.ok(mrcHemiparesis.riskClassification.includes('Hemiparesia DERECHA'));
+
+  // MRC Neurological Weakness: ICU-acquired weakness < 48 (42/60)
+  const mrcIcuaw = mrcNeurologicalWeaknessCalculator.calculate({
+    onsetTempo: 'icu_critical',
+    neuroPattern: 'lmn',
+    rShoulder: '3',
+    lShoulder: '3',
+    rElbow: '4',
+    lElbow: '4',
+    rWrist: '4',
+    lWrist: '4',
+    rHip: '3',
+    lHip: '3',
+    rKnee: '4',
+    lKnee: '4',
+    rAnkle: '3',
+    lAnkle: '3',
+  });
+  assert.equal(mrcIcuaw.primaryResult.value, 42);
+  assert.equal(mrcIcuaw.severity, 'high');
+  assert.ok(mrcIcuaw.riskClassification.includes('ICUAW'));
+});
+
+test('Catalog: 129 deduplicated tools, cross-specialty tagging, and accent-insensitive search', () => {
+  assert.equal(CALCULATOR_CATALOG.length, 129);
 
   const endoCalcs = getCalculatorsBySpecialty('endocrinologia');
   assert.ok(endoCalcs.some((c) => c.id === 'homa-ir-b'));
@@ -2107,6 +2269,9 @@ test('Catalog: 126 deduplicated tools, cross-specialty tagging, and accent-insen
   assert.ok(neuroCalcs.some((c) => c.id === 'four-score'));
   assert.ok(neuroCalcs.some((c) => c.id === 'nihss'));
   assert.ok(neuroCalcs.some((c) => c.id === 'ich-score'));
+  assert.ok(neuroCalcs.some((c) => c.id === 'ichd3-migraine-headache'));
+  assert.ok(neuroCalcs.some((c) => c.id === 'headache-red-flags-snnoop10'));
+  assert.ok(neuroCalcs.some((c) => c.id === 'mrc-neurological-weakness'));
 
   const surgCalcs = getCalculatorsBySpecialty('cirugia-general');
   assert.ok(surgCalcs.some((c) => c.id === 'alvarado'));
@@ -2183,6 +2348,13 @@ test('Catalog: 126 deduplicated tools, cross-specialty tagging, and accent-insen
 
   const byWoodSmoke = searchCalculators('humo de lena');
   assert.equal(byWoodSmoke[0]?.id, 'wood-smoke-exposure');
+
+  const byMigraine = searchCalculators('migrana');
+  assert.ok(byMigraine.some((c) => c.id === 'ichd3-migraine-headache'));
+  assert.ok(byMigraine.some((c) => c.id === 'headache-red-flags-snnoop10'));
+
+  const byWeakness = searchCalculators('debilidad neurologica');
+  assert.equal(byWeakness[0]?.id, 'mrc-neurological-weakness');
 
   for (let i = 1; i < CALCULATOR_CATALOG.length; i += 1) {
     const prev = CALCULATOR_CATALOG[i - 1];
