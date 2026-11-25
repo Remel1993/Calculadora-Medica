@@ -1,30 +1,25 @@
 import {
-  Activity,
   ArrowRight,
-  Baby,
-  BookOpen,
-  Brain,
-  Calculator,
   ChevronRight,
-  Droplets,
-  Heart,
-  History,
-  LayoutGrid,
-  Menu,
-  Moon,
-  Search,
-  Star,
-  Stethoscope,
-  Sun,
-  Wind,
   X,
 } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
+import {
+  ClinicalConsoleIcon,
+  ClinicalEvidenceBookIcon,
+  ClinicalHistoryIcon,
+  ClinicalMoonIcon,
+  ClinicalSearchIcon,
+  ClinicalSpecialtiesIcon,
+  ClinicalStarIcon,
+  ClinicalSunIcon,
+} from '../icons/clinicalUiIcons.tsx';
 import {
   CALCULATOR_BY_ID,
   CALCULATOR_CATALOG,
   searchCalculators,
 } from '../../clinical-core/registries/catalog.ts';
+import { CLINICAL_REFERENCE_TABLES } from '../../clinical-core/registries/clinicalTables.ts';
 import { SPECIALTIES } from '../../clinical-core/registries/specialties.ts';
 import type { SpecialtyId } from '../../clinical-core/types/clinical.ts';
 import type { HistoryEntry, ThemeMode } from '../../storage/localStore.ts';
@@ -82,44 +77,40 @@ export const HomeView: React.FC<HomeViewProps> = ({
     [],
   );
 
-  const quickAccessItems = [
-    {
-      id: 'curb-65',
-      label: 'CURB-65',
-      icon: Wind,
-      iconColor: 'text-purple-600 dark:text-purple-400',
-    },
-    {
-      id: 'heart-score',
-      label: 'HEART Score',
-      icon: Heart,
-      iconColor: 'text-rose-600 dark:text-rose-400',
-    },
-    {
-      id: 'glasgow',
-      label: 'Glasgow',
-      icon: Brain,
-      iconColor: 'text-sky-600 dark:text-sky-400',
-    },
-    {
-      id: 'holliday-segar',
-      label: 'Cálculo de Líquidos',
-      icon: Droplets,
-      iconColor: 'text-emerald-600 dark:text-emerald-400',
-    },
-    {
-      id: 'who-growth',
-      label: 'Percentiles OMS',
-      icon: Baby,
-      iconColor: 'text-teal-600 dark:text-teal-400',
-    },
-    {
-      id: 'acute-diarrhea-plan',
-      label: 'EDA Plan A/B/C',
-      icon: Activity,
-      iconColor: 'text-amber-600 dark:text-amber-400',
-    },
-  ].filter((item) => Boolean(CALCULATOR_BY_ID[item.id]));
+  const quickAccessItems = (
+    [
+      {
+        id: 'curb-65',
+        label: 'CURB-65',
+        specialtyId: 'neumologia',
+      },
+      {
+        id: 'heart-score',
+        label: 'HEART Score',
+        specialtyId: 'cardiologia',
+      },
+      {
+        id: 'glasgow',
+        label: 'Glasgow',
+        specialtyId: 'neurologia',
+      },
+      {
+        id: 'holliday-segar',
+        label: 'Cálculo de Líquidos',
+        specialtyId: 'nefrologia',
+      },
+      {
+        id: 'who-growth',
+        label: 'Percentiles OMS',
+        specialtyId: 'pediatria',
+      },
+      {
+        id: 'acute-diarrhea-plan',
+        label: 'EDA Plan A/B/C',
+        specialtyId: 'gastroenterologia',
+      },
+    ] satisfies Array<{ id: string; label: string; specialtyId: SpecialtyId }>
+  ).filter((item) => Boolean(CALCULATOR_BY_ID[item.id]));
 
   const latestHistory = history[0] ?? null;
 
@@ -159,7 +150,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               aria-label="Abrir todas las especialidades"
               className="inline-flex min-h-[40px] min-w-[40px] items-center justify-center rounded-xl bg-white/10 text-white hover:bg-white/20 md:hidden"
             >
-              <Menu className="h-5 w-5" />
+              <ClinicalSpecialtiesIcon className="h-5 w-5" />
             </button>
 
             <div className="hidden md:flex items-center gap-2 text-xs font-medium text-cyan-200">
@@ -177,9 +168,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 className="inline-flex min-h-[40px] min-w-[40px] items-center justify-center rounded-full border border-white/25 bg-white/10 text-white hover:bg-white/20 md:hidden"
               >
                 {theme === 'dark' ? (
-                  <Sun className="h-4 w-4 text-amber-300" />
+                  <ClinicalSunIcon className="h-4 w-4 text-amber-300" />
                 ) : (
-                  <Moon className="h-4 w-4 text-cyan-100" />
+                  <ClinicalMoonIcon className="h-4 w-4 text-cyan-100" />
                 )}
               </button>
             </div>
@@ -207,7 +198,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         {/* Overlapping White Search Card */}
         <div className="relative z-20 mx-2 -mt-7 sm:mx-5 sm:-mt-7">
           <div className="flex items-center rounded-2xl border border-slate-200/90 bg-white px-3 shadow-lg shadow-slate-900/8 dark:border-slate-700 dark:bg-slate-900 dark:shadow-black/30">
-            <Search className="h-5 w-5 shrink-0 text-slate-500 dark:text-slate-400" aria-hidden="true" />
+            <ClinicalSearchIcon className="h-5 w-5 shrink-0 text-sky-600 dark:text-sky-400" />
             <input
               type="search"
               enterKeyHint="search"
@@ -243,7 +234,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 title="Explorar todas las especialidades"
                 className="inline-flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-700 hover:bg-sky-100 dark:bg-sky-950/60 dark:text-sky-300 dark:hover:bg-sky-900/60"
               >
-                <LayoutGrid className="h-4 w-4" />
+                <ClinicalSpecialtiesIcon className="h-4 w-4" />
               </button>
             )}
           </div>
@@ -309,8 +300,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     onClick={() => onSelectSpecialty(tile.id)}
                     className={`group flex min-h-[86px] w-full min-w-0 flex-col items-center justify-center gap-1.5 rounded-2xl border px-2 py-2.5 text-center shadow-xs transition-transform hover:-translate-y-0.5 sm:min-h-[104px] sm:gap-2 sm:px-3 sm:py-3 ${tile.bgClass}`}
                   >
-                    <span className={`flex h-9 w-9 shrink-0 items-center justify-center sm:h-10 sm:w-10 ${tile.iconClass}`}>
-                      {tile.renderIcon('h-7 w-7 sm:h-8 sm:w-8')}
+                    <span
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/80 shadow-2xs ring-1 ring-black/5 transition-transform group-hover:scale-105 sm:h-11 sm:w-11 dark:bg-slate-900/65 dark:ring-white/10 ${tile.iconClass}`}
+                    >
+                      {tile.renderIcon('h-6 w-6 sm:h-7 sm:w-7')}
                     </span>
                     <span className="line-clamp-2 w-full break-words text-[11px] font-semibold leading-tight text-slate-800 sm:text-xs dark:text-slate-100">
                       {tile.shortLabel}
@@ -342,7 +335,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div className="relative z-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
               <div className="flex min-w-0 items-center gap-3 sm:gap-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-white/25 bg-white/15 backdrop-blur-xs sm:h-14 sm:w-14">
-                  <Calculator className="h-7 w-7 text-cyan-200 sm:h-8 sm:w-8" />
+                  <ClinicalConsoleIcon className="h-7 w-7 text-cyan-200 sm:h-8 sm:w-8" />
                 </div>
                 <div className="min-w-0">
                   <h2 className="text-sm font-bold leading-snug text-white sm:text-lg">
@@ -372,7 +365,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 id="quick-access-heading"
                 className="flex items-center gap-2 text-base font-bold text-slate-900 sm:text-lg dark:text-slate-100"
               >
-                <Star className="h-5 w-5 fill-amber-400 text-amber-500 shrink-0" />
+                <ClinicalStarIcon filled className="h-5 w-5 shrink-0 text-amber-500 dark:text-amber-400" />
                 <span>Acceso Rápido</span>
               </h2>
               <button
@@ -387,15 +380,19 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
             <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-2.5">
               {quickAccessItems.map((item) => {
-                const Icon = item.icon;
+                const visual = SPECIALTY_VISUALS[item.specialtyId];
                 return (
                   <button
                     key={item.id}
                     type="button"
                     onClick={() => onSelectCalculator(item.id)}
-                    className="flex min-h-[46px] min-w-0 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-800 shadow-xs hover:border-sky-300 hover:bg-sky-50/40 sm:text-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-sky-700 dark:hover:bg-slate-800/70"
+                    className="flex min-h-[46px] min-w-0 items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-800 shadow-xs hover:border-sky-300 hover:bg-sky-50/40 sm:text-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-sky-700 dark:hover:bg-slate-800/70"
                   >
-                    <Icon className={`h-4 w-4 shrink-0 ${item.iconColor}`} aria-hidden="true" />
+                    <span
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ring-1 ring-black/5 dark:ring-white/10 ${visual.badgeBgClass} ${visual.iconClass}`}
+                    >
+                      {visual.renderIcon('h-4 w-4')}
+                    </span>
                     <span className="truncate">{item.label}</span>
                   </button>
                 );
@@ -413,14 +410,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   ? onSelectCalculator(latestHistory.calculatorId)
                   : onNavigateTab('historial')
               }
-              className="flex min-h-[74px] w-full min-w-0 items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-white p-3.5 text-left shadow-xs hover:border-sky-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-sky-700"
+              className="flex min-h-[78px] w-full min-w-0 items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 text-left shadow-xs hover:border-sky-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-sky-700"
             >
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-700 ring-1 ring-sky-200/70 dark:bg-sky-950/60 dark:text-sky-300 dark:ring-sky-800/60">
+                <ClinicalHistoryIcon className="h-5 w-5" />
+              </span>
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900 sm:text-sm dark:text-slate-100">
-                  <History className="h-4 w-4 shrink-0 text-sky-600 dark:text-sky-400" />
-                  <span className="truncate">Últimos Usados</span>
+                <div className="truncate text-xs font-bold text-slate-900 sm:text-sm dark:text-slate-100">
+                  Últimos Usados
                 </div>
-                <div className="mt-1 truncate text-xs font-semibold text-slate-800 dark:text-slate-200">
+                <div className="mt-0.5 truncate text-xs font-semibold text-slate-800 dark:text-slate-200">
                   {latestHistory ? latestHistory.calculatorName : 'Sin cálculos recientes'}
                 </div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -434,18 +433,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <button
               type="button"
               onClick={onOpenReferences}
-              className="flex min-h-[74px] w-full min-w-0 items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-white p-3.5 text-left shadow-xs hover:border-sky-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-sky-700"
+              className="flex min-h-[78px] w-full min-w-0 items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 text-left shadow-xs hover:border-sky-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-sky-700"
             >
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200/70 dark:bg-indigo-950/60 dark:text-indigo-300 dark:ring-indigo-800/60">
+                <ClinicalEvidenceBookIcon className="h-5 w-5" />
+              </span>
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900 sm:text-sm dark:text-slate-100">
-                  <BookOpen className="h-4 w-4 shrink-0 text-sky-600 dark:text-sky-400" />
-                  <span className="truncate">Guías y referencias validadas</span>
+                <div className="truncate text-xs font-bold text-slate-900 sm:text-sm dark:text-slate-100">
+                  Guías, tablas y fórmulas
                 </div>
-                <div className="mt-1 truncate text-xs font-semibold text-slate-800 dark:text-slate-200">
-                  {CALCULATOR_CATALOG.length} escalas · {totalCitations} citas bibliográficas
+                <div className="mt-0.5 truncate text-xs font-semibold text-slate-800 dark:text-slate-200">
+                  {CLINICAL_REFERENCE_TABLES.length} tablas clínicas · {CALCULATOR_CATALOG.length} fórmulas · {totalCitations} citas
                 </div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Toca para consultar la bibliografía usada
+                  Consulta externa, urgencias y verificación bibliográfica
                 </div>
               </div>
               <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />

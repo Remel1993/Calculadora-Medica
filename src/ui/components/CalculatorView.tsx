@@ -1,18 +1,20 @@
 import {
-  AlertCircle,
-  AlertTriangle,
   ArrowLeft,
-  BookOpen,
-  Calculator,
-  CheckCircle2,
   ChevronDown,
   ChevronUp,
-  Info,
-  RotateCcw,
-  ShieldAlert,
-  Star,
 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
+import {
+  ClinicalAlertOctagonIcon,
+  ClinicalCheckShieldIcon,
+  ClinicalConsoleIcon,
+  ClinicalEvidenceBookIcon,
+  ClinicalInfoPulseIcon,
+  ClinicalResetIcon,
+  ClinicalSafetyShieldIcon,
+  ClinicalStarIcon,
+  ClinicalWarningIcon,
+} from '../icons/clinicalUiIcons.tsx';
 import {
   createInitialInputs,
   validateCalculatorInputs,
@@ -31,6 +33,7 @@ import {
   SUPPORTED_VISUAL_GUIDE_IDS,
 } from './ClinicalVisualGuides.tsx';
 import { MocaInteractiveGuide } from './MocaInteractiveGuide.tsx';
+import { ObstetricGrowthPanel } from './ObstetricGrowthPanel.tsx';
 import { PediatricGrowthPanel } from './PediatricGrowthPanel.tsx';
 
 interface CalculatorViewProps {
@@ -54,42 +57,42 @@ const SEVERITY_STYLES: Record<
     container:
       'border-emerald-200 bg-emerald-50/70 dark:border-emerald-900/70 dark:bg-emerald-950/30',
     labelClass: 'text-emerald-800 dark:text-emerald-300',
-    icon: CheckCircle2,
+    icon: ClinicalCheckShieldIcon,
     tag: 'Referencia / Normal',
   },
   low: {
     container:
       'border-sky-200 bg-sky-50/70 dark:border-sky-900/70 dark:bg-sky-950/30',
     labelClass: 'text-sky-800 dark:text-sky-300',
-    icon: Info,
+    icon: ClinicalInfoPulseIcon,
     tag: 'Riesgo bajo / Leve',
   },
   moderate: {
     container:
       'border-amber-200 bg-amber-50/80 dark:border-amber-900/70 dark:bg-amber-950/30',
     labelClass: 'text-amber-900 dark:text-amber-300',
-    icon: AlertTriangle,
+    icon: ClinicalWarningIcon,
     tag: 'Riesgo moderado',
   },
   high: {
     container:
       'border-orange-300 bg-orange-50/80 dark:border-orange-900/70 dark:bg-orange-950/30',
     labelClass: 'text-orange-900 dark:text-orange-300',
-    icon: AlertCircle,
+    icon: ClinicalAlertOctagonIcon,
     tag: 'Riesgo alto',
   },
   critical: {
     container:
       'border-rose-300 bg-rose-50/80 dark:border-rose-900/70 dark:bg-rose-950/30',
     labelClass: 'text-rose-900 dark:text-rose-300',
-    icon: ShieldAlert,
+    icon: ClinicalSafetyShieldIcon,
     tag: 'Crítico / Muy alto',
   },
   info: {
     container:
       'border-slate-200 bg-slate-100/70 dark:border-slate-800 dark:bg-slate-900/60',
     labelClass: 'text-slate-800 dark:text-slate-200',
-    icon: Info,
+    icon: ClinicalInfoPulseIcon,
     tag: 'Informativo',
   },
 };
@@ -106,6 +109,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   );
   const [errors, setErrors] = useState<ValidationError[]>([]);
   const [output, setOutput] = useState<CalculationOutput | null>(null);
+  const [isOutputStale, setIsOutputStale] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showClinicalInfo, setShowClinicalInfo] = useState(false);
   const [resetCounter, setResetCounter] = useState(0);
@@ -115,6 +119,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
     setInputs(createInitialInputs(calculator));
     setErrors([]);
     setOutput(null);
+    setIsOutputStale(false);
     setSubmitError(null);
     setShowClinicalInfo(false);
     setResetCounter((c) => c + 1);
@@ -145,6 +150,9 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
     if (errors.length > 0) {
       setErrors((prev) => prev.filter((e) => e.fieldId !== fieldId));
     }
+    if (output !== null) {
+      setIsOutputStale(true);
+    }
     setSubmitError(null);
   };
 
@@ -155,6 +163,9 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
     }));
     if (errors.length > 0) {
       setErrors((prev) => prev.filter((e) => e.fieldId !== fieldId));
+    }
+    if (output !== null) {
+      setIsOutputStale(true);
     }
     setSubmitError(null);
   };
@@ -199,6 +210,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
       setOutput(null);
+      setIsOutputStale(false);
       setSubmitError('Revisa los campos señalados antes de calcular.');
       return;
     }
@@ -208,6 +220,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
       setErrors([]);
       setSubmitError(null);
       setOutput(calculated);
+      setIsOutputStale(false);
       onSaveHistory(calculator, calculated);
 
       if (typeof window !== 'undefined' && window.innerWidth < 1024) {
@@ -217,6 +230,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
       }
     } catch (err) {
       setOutput(null);
+      setIsOutputStale(false);
       setSubmitError(err instanceof Error ? err.message : 'Error al ejecutar el cálculo.');
     }
   };
@@ -225,6 +239,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
     setInputs(createInitialInputs(calculator));
     setErrors([]);
     setOutput(null);
+    setIsOutputStale(false);
     setSubmitError(null);
     setResetCounter((c) => c + 1);
   };
@@ -253,8 +268,9 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
           onClick={() => onToggleFavorite(calculator.id)}
           className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 sm:gap-2 sm:px-3.5 sm:text-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 whitespace-nowrap shrink-0"
         >
-          <Star
-            className={`h-4 w-4 shrink-0 ${isFavorite ? 'fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400' : ''}`}
+          <ClinicalStarIcon
+            filled={isFavorite}
+            className={`h-[18px] w-[18px] shrink-0 ${isFavorite ? 'text-amber-500 dark:text-amber-400' : ''}`}
           />
           <span className="sm:hidden">{isFavorite ? 'Favorito' : 'Guardar'}</span>
           <span className="hidden sm:inline">
@@ -339,11 +355,11 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
           noValidate
           className="w-full min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-3.5 sm:rounded-2xl sm:p-6 lg:col-span-7 dark:border-slate-800 dark:bg-slate-900"
         >
-          <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5 sm:pb-4 dark:border-slate-800">
-            <h2 className="text-sm font-semibold text-slate-900 sm:text-base dark:text-slate-100">
+          <div className="flex min-w-0 items-center justify-between gap-2 border-b border-slate-100 pb-2.5 sm:pb-4 dark:border-slate-800">
+            <h2 className="shrink-0 text-sm font-semibold text-slate-900 sm:text-base dark:text-slate-100">
               Parámetros clínicos
             </h2>
-            <span className="shrink-0 text-[11px] text-slate-500 sm:text-xs dark:text-slate-400">
+            <span className="min-w-0 truncate text-right text-[11px] text-slate-500 sm:text-xs dark:text-slate-400">
               v{calculator.version}
             </span>
           </div>
@@ -370,6 +386,22 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                   className="font-semibold text-sky-700 underline underline-offset-2 hover:text-sky-800 dark:text-sky-300"
                 >
                   Ir a Tabla y Gráfica OMS ↓
+                </button>
+              </div>
+            )}
+            {calculator.id === 'obstetric-weight-gain' && (
+              <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-sky-200 bg-sky-50/70 px-3 py-2 text-xs text-sky-900 dark:border-sky-900/60 dark:bg-sky-950/40 dark:text-sky-200">
+                <span>¿Deseas ver directamente la gráfica materna, fetal o tabla semanal?</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    document
+                      .getElementById('obstetric-growth-panel')
+                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="font-semibold text-sky-700 underline underline-offset-2 hover:text-sky-800 dark:text-sky-300"
+                >
+                  Ir a Gráficas Materna y Fetal ↓
                 </button>
               </div>
             )}
@@ -611,12 +643,14 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                       )}
                     </div>
 
-                    <div className="grid shrink-0 grid-cols-2 gap-1 rounded-lg bg-slate-200/80 p-1 dark:bg-slate-800">
+                    <div className="grid max-w-full shrink-0 grid-cols-2 gap-1 rounded-lg bg-slate-200/80 p-1 dark:bg-slate-800">
                       <button
                         type="button"
                         onClick={() => handleValueChange(field.id, false)}
                         aria-pressed={!boolVal}
-                        className={`min-h-[38px] rounded-md px-2.5 py-1 text-xs font-semibold sm:min-h-[40px] sm:px-3 whitespace-nowrap ${
+                        className={`min-h-[38px] min-w-0 rounded-md px-2.5 py-1 text-center text-xs font-semibold leading-tight sm:min-h-[40px] sm:px-3 ${
+                          compactRow ? 'whitespace-nowrap' : 'whitespace-normal'
+                        } ${
                           !boolVal
                             ? 'bg-white text-slate-900 shadow-xs dark:bg-slate-900 dark:text-slate-100'
                             : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
@@ -628,7 +662,9 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                         type="button"
                         onClick={() => handleValueChange(field.id, true)}
                         aria-pressed={boolVal}
-                        className={`min-h-[38px] rounded-md px-2.5 py-1 text-xs font-semibold sm:min-h-[40px] sm:px-3 whitespace-nowrap ${
+                        className={`min-h-[38px] min-w-0 rounded-md px-2.5 py-1 text-center text-xs font-semibold leading-tight sm:min-h-[40px] sm:px-3 ${
+                          compactRow ? 'whitespace-nowrap' : 'whitespace-normal'
+                        } ${
                           boolVal
                             ? 'bg-sky-600 text-white shadow-xs dark:bg-sky-500 dark:text-slate-950'
                             : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
@@ -677,7 +713,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
               role="alert"
               className="mt-3.5 flex items-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800 sm:mt-4 sm:rounded-xl sm:px-3.5 sm:py-2.5 sm:text-sm dark:border-rose-900/70 dark:bg-rose-950/40 dark:text-rose-200"
             >
-              <AlertCircle className="h-4 w-4 shrink-0" />
+              <ClinicalAlertOctagonIcon className="h-4 w-4 shrink-0" />
               <span className="min-w-0 break-words">{submitError}</span>
             </div>
           )}
@@ -688,7 +724,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
               type="submit"
               className="inline-flex min-h-[44px] min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-sky-600 px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-sky-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 sm:min-h-[48px] sm:px-5 sm:py-3 whitespace-nowrap"
             >
-              <Calculator className="h-4 w-4 shrink-0" />
+              <ClinicalConsoleIcon className="h-4 w-4 shrink-0" />
               <span className="min-[380px]:hidden">Calcular</span>
               <span className="hidden min-[380px]:inline">Calcular resultado</span>
             </button>
@@ -698,7 +734,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
               onClick={handleReset}
               className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 sm:min-h-[48px] sm:gap-2 sm:px-5 sm:py-3 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 whitespace-nowrap"
             >
-              <RotateCcw className="h-4 w-4 shrink-0" />
+              <ClinicalResetIcon className="h-4 w-4 shrink-0" />
               <span className="sm:hidden">Limpiar</span>
               <span className="hidden sm:inline">Limpiar campos</span>
             </button>
@@ -712,6 +748,15 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
               aria-live="polite"
               className={`w-full min-w-0 select-text overflow-hidden rounded-xl border p-4 sm:rounded-2xl sm:p-6 ${severityStyle.container}`}
             >
+              {isOutputStale && (
+                <div
+                  role="status"
+                  className="mb-3 flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-100/90 px-3 py-2 text-xs font-medium text-amber-950 dark:border-amber-700/70 dark:bg-amber-950/70 dark:text-amber-200"
+                >
+                  <ClinicalWarningIcon className="h-4 w-4 shrink-0 text-amber-700 dark:text-amber-300" />
+                  <span>Parámetros modificados — pulsa Calcular resultado para actualizar.</span>
+                </div>
+              )}
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide">
                 <SeverityIcon className={`h-4 w-4 shrink-0 ${severityStyle.labelClass}`} />
                 <span className={`min-w-0 break-words ${severityStyle.labelClass}`}>
@@ -753,7 +798,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                         <span className="min-w-0 break-words text-xs text-slate-600 dark:text-slate-300">
                           {item.label}
                         </span>
-                        <span className="font-mono text-sm font-semibold tabular-nums text-slate-900 break-words dark:text-slate-100">
+                        <span className="min-w-0 max-w-full font-mono text-sm font-semibold tabular-nums text-slate-900 break-words dark:text-slate-100">
                           {item.formattedValue}{' '}
                           <span className="text-xs font-normal text-slate-500 dark:text-slate-400">
                             {item.unit}
@@ -799,8 +844,10 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
             </section>
           ) : (
             <section className="w-full min-w-0 rounded-xl border border-dashed border-slate-300 bg-slate-50/70 p-4 text-center sm:rounded-2xl sm:p-6 dark:border-slate-700 dark:bg-slate-900/40">
-              <Calculator className="mx-auto h-6 w-6 text-slate-400 sm:h-7 sm:w-7 dark:text-slate-500" />
-              <h3 className="mt-1.5 text-sm font-semibold text-slate-800 sm:mt-2 dark:text-slate-200">
+              <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 ring-1 ring-sky-200/70 dark:bg-sky-950/60 dark:text-sky-400 dark:ring-sky-800/60">
+                <ClinicalConsoleIcon className="h-6 w-6" />
+              </span>
+              <h3 className="mt-2.5 text-sm font-semibold text-slate-800 dark:text-slate-200">
                 Resultado clínico
               </h3>
               <p className="mt-1 break-words text-xs leading-relaxed text-slate-500 dark:text-slate-400">
@@ -812,7 +859,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
           {/* Contraindications, Limitations & References */}
           <section className="w-full min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-4 sm:rounded-2xl sm:p-6 dark:border-slate-800 dark:bg-slate-900">
             <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
-              <ShieldAlert className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+              <ClinicalSafetyShieldIcon className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
               <span>Cuándo no usar y limitaciones</span>
             </h2>
 
@@ -846,7 +893,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
 
             <div className="mt-4 min-w-0 border-t border-slate-100 pt-3.5 sm:mt-5 sm:pt-4 dark:border-slate-800">
               <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                <BookOpen className="h-3.5 w-3.5 shrink-0" />
+                <ClinicalEvidenceBookIcon className="h-4 w-4 shrink-0" />
                 <span>Referencias bibliográficas</span>
               </h3>
               <ul className="mt-2 select-text space-y-1.5 text-xs leading-relaxed text-slate-600 sm:space-y-2 dark:text-slate-300">
@@ -866,6 +913,11 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
               inputs={inputs}
               onUpdateSex={(nextSex) => handleValueChange('sex', nextSex)}
             />
+          </div>
+        )}
+        {calculator.id === 'obstetric-weight-gain' && (
+          <div className="w-full min-w-0 lg:col-span-12">
+            <ObstetricGrowthPanel inputs={inputs} />
           </div>
         )}
       </div>

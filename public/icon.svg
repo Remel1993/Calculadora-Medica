@@ -1,6 +1,43 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <rect width="512" height="512" rx="112" fill="#0F172A"/>
-  <rect x="44" y="44" width="424" height="424" rx="84" stroke="#1E293B" stroke-width="6"/>
-  <path d="M224 136h64v88h88v64h-88v88h-64v-88h-88v-64h88v-88z" fill="#0EA5E9"/>
-  <path d="M136 256h68l22-44 30 88 26-52 18 8h76" stroke="#F8FAFC" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <defs>
+    <linearGradient id="bgGrad" x1="32" y1="24" x2="480" y2="488" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0B3D91"/>
+      <stop offset="55%" stop-color="#082A68"/>
+      <stop offset="100%" stop-color="#06142E"/>
+    </linearGradient>
+    <linearGradient id="crossGrad" x1="256" y1="108" x2="256" y2="404" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+    <linearGradient id="rimGrad" x1="40" y1="40" x2="472" y2="472" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#67E8F9" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#0EA5E9" stop-opacity="0.12"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base squircle -->
+  <rect width="512" height="512" rx="116" fill="url(#bgGrad)"/>
+  <rect x="28" y="28" width="456" height="456" rx="92" stroke="url(#rimGrad)" stroke-width="5"/>
+
+  <!-- Subtle clinical grid crosshairs -->
+  <circle cx="256" cy="256" r="168" stroke="#38BDF8" stroke-opacity="0.12" stroke-width="3"/>
+
+  <!-- Medical cross with rounded corners -->
+  <path
+    d="M222 114C222 106.268 228.268 100 236 100H276C283.732 100 290 106.268 290 114V222H398C405.732 222 412 228.268 412 236V276C412 283.732 405.732 290 398 290H290V398C290 405.732 283.732 412 276 412H236C228.268 412 222 405.732 222 398V290H114C106.268 290 100 283.732 100 276V236C100 228.268 106.268 222 114 222H222V114Z"
+    fill="url(#crossGrad)"
+  />
+
+  <!-- Inner pulse channel for high contrast ECG legibility -->
+  <rect x="108" y="228" width="296" height="56" rx="12" fill="#071B3E" fill-opacity="0.58"/>
+
+  <!-- Crisp P-QRS-T ECG trace -->
+  <path
+    d="M120 258H176L192 240L206 270L226 196L248 318L268 232L284 264L296 258H392"
+    stroke="#F8FAFC"
+    stroke-width="15"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <circle cx="392" cy="258" r="9" fill="#67E8F9"/>
 </svg>

@@ -226,64 +226,64 @@ const chronicField: SelectFieldDef = {
 };
 
 function scoreTemp(t: number): number {
-  if (t >= 41 || t <= 29.9) return 4;
-  if ((t >= 39 && t <= 40.9) || (t >= 30 && t <= 31.9)) return 3;
-  if (t >= 32 && t <= 33.9) return 2;
-  if ((t >= 38.5 && t <= 38.9) || (t >= 34 && t <= 35.9)) return 1;
+  if (t >= 41 || t < 30) return 4;
+  if (t >= 39 || t < 32) return 3;
+  if (t < 34) return 2;
+  if (t >= 38.5 || t < 36) return 1;
   return 0;
 }
 
 function scoreMap(m: number): number {
-  if (m >= 160 || m <= 49) return 4;
+  if (m >= 160 || m < 50) return 4;
   if (m >= 130) return 3;
-  if ((m >= 110 && m <= 129) || (m >= 50 && m <= 69)) return 2;
+  if (m >= 110 || m < 70) return 2;
   return 0;
 }
 
 function scoreHr(hr: number): number {
-  if (hr >= 180 || hr <= 39) return 4;
-  if ((hr >= 140 && hr <= 179) || (hr >= 40 && hr <= 54)) return 3;
-  if ((hr >= 110 && hr <= 139) || (hr >= 55 && hr <= 69)) return 2;
+  if (hr >= 180 || hr < 40) return 4;
+  if (hr >= 140 || hr < 55) return 3;
+  if (hr >= 110 || hr < 70) return 2;
   return 0;
 }
 
 function scoreRr(rr: number): number {
-  if (rr >= 50 || rr <= 5) return 4;
+  if (rr >= 50 || rr < 6) return 4;
   if (rr >= 35) return 3;
-  if (rr >= 6 && rr <= 9) return 2;
-  if ((rr >= 25 && rr <= 34) || (rr >= 10 && rr <= 11)) return 1;
+  if (rr < 10) return 2;
+  if (rr >= 25 || rr < 12) return 1;
   return 0;
 }
 
 function scorePh(ph: number): number {
   if (ph >= 7.7 || ph < 7.15) return 4;
-  if ((ph >= 7.6 && ph <= 7.69) || (ph >= 7.15 && ph <= 7.24)) return 3;
-  if (ph >= 7.25 && ph <= 7.32) return 2;
-  if (ph >= 7.5 && ph <= 7.59) return 1;
+  if (ph >= 7.6 || ph < 7.25) return 3;
+  if (ph < 7.33) return 2;
+  if (ph >= 7.5) return 1;
   return 0;
 }
 
 function scoreHco3(h: number): number {
   if (h >= 52 || h < 15) return 4;
-  if ((h >= 41 && h <= 51.9) || (h >= 15 && h <= 17.9)) return 3;
-  if (h >= 18 && h <= 21.9) return 2;
-  if (h >= 32 && h <= 40.9) return 1;
+  if (h >= 41 || h < 18) return 3;
+  if (h < 22) return 2;
+  if (h >= 32) return 1;
   return 0;
 }
 
 function scoreNa(na: number): number {
-  if (na >= 180 || na <= 110) return 4;
-  if ((na >= 160 && na <= 179) || (na >= 111 && na <= 119)) return 3;
-  if ((na >= 155 && na <= 159) || (na >= 120 && na <= 129)) return 2;
-  if (na >= 150 && na <= 154) return 1;
+  if (na >= 180 || na < 111) return 4;
+  if (na >= 160 || na < 120) return 3;
+  if (na >= 155 || na < 130) return 2;
+  if (na >= 150) return 1;
   return 0;
 }
 
 function scoreK(k: number): number {
   if (k >= 7 || k < 2.5) return 4;
   if (k >= 6) return 3;
-  if (k >= 2.5 && k <= 2.9) return 2;
-  if ((k >= 5.5 && k <= 5.9) || (k >= 3.0 && k <= 3.4)) return 1;
+  if (k < 3) return 2;
+  if (k >= 5.5 || k < 3.5) return 1;
   return 0;
 }
 
@@ -297,15 +297,15 @@ function scoreCr(cr: number, isArf: boolean): number {
 
 function scoreHct(hct: number): number {
   if (hct >= 60 || hct < 20) return 4;
-  if ((hct >= 50 && hct <= 59.9) || (hct >= 20 && hct <= 29.9)) return 2;
-  if (hct >= 46 && hct <= 49.9) return 1;
+  if (hct >= 50 || hct < 30) return 2;
+  if (hct >= 46) return 1;
   return 0;
 }
 
 function scoreWbc(wbc: number): number {
   if (wbc >= 40 || wbc < 1) return 4;
-  if ((wbc >= 20 && wbc <= 39.9) || (wbc >= 1 && wbc <= 2.9)) return 2;
-  if (wbc >= 15 && wbc <= 19.9) return 1;
+  if (wbc >= 20 || wbc < 3) return 2;
+  if (wbc >= 15) return 1;
   return 0;
 }
 

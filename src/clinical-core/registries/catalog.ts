@@ -41,6 +41,7 @@ import { edinburghEpdsCalculator } from '../calculators/edinburghEpds.ts';
 import { epworthCalculator } from '../calculators/epworth.ts';
 import { fallRiskCalculator } from '../calculators/fallRisk.ts';
 import { fenaFeureaCalculator } from '../calculators/fenaFeurea.ts';
+import { fetalBiophysicalProfileCalculator } from '../calculators/fetalBiophysicalProfile.ts';
 import { fib4Calculator } from '../calculators/fib4.ts';
 import { findriscCalculator } from '../calculators/findrisc.ts';
 import { fisherModificadaCalculator } from '../calculators/fisherModificada.ts';
@@ -50,6 +51,7 @@ import { freeWaterDeficitCalculator } from '../calculators/freeWaterDeficit.ts';
 import { gad7Calculator } from '../calculators/gad7.ts';
 import { ganzoniIronDeficitCalculator } from '../calculators/ganzoniIronDeficit.ts';
 import { gestationalAgeCalculator } from '../calculators/gestationalAge.ts';
+import { gestationalDiabetesCalculator } from '../calculators/gestationalDiabetes.ts';
 import { glasgowCalculator } from '../calculators/glasgow.ts';
 import { glasgowBlatchfordCalculator } from '../calculators/glasgowBlatchford.ts';
 import { glasgowPediatricCalculator } from '../calculators/glasgowPediatric.ts';
@@ -59,6 +61,7 @@ import { hasBledCalculator } from '../calculators/hasBled.ts';
 import { headacheRedFlagsCalculator } from '../calculators/headacheRedFlags.ts';
 import { hba1cEagCalculator } from '../calculators/hba1cEag.ts';
 import { heartScoreCalculator } from '../calculators/heartScore.ts';
+import { hintsPlusVertigoCalculator } from '../calculators/hintsPlusVertigo.ts';
 import { hollidaySegarCalculator } from '../calculators/hollidaySegar.ts';
 import { homaIrBCalculator } from '../calculators/homaIrB.ts';
 import { huntHessCalculator } from '../calculators/huntHess.ts';
@@ -93,7 +96,9 @@ import { news2Calculator } from '../calculators/news2.ts';
 import { nihssCalculator } from '../calculators/nihss.ts';
 import { nyhaCalculator } from '../calculators/nyha.ts';
 import { obstetricMgso4Calculator } from '../calculators/obstetricMgso4.ts';
+import { obstetricSepsisMeowsCalculator } from '../calculators/obstetricSepsisMeows.ts';
 import { obstetricShockIndexCalculator } from '../calculators/obstetricShockIndex.ts';
+import { obstetricWeightGainCalculator } from '../calculators/obstetricWeightGain.ts';
 import { ottawaAnkleKneeCalculator } from '../calculators/ottawaAnkleKnee.ts';
 import { oxygenationPafiSafiAaCalculator } from '../calculators/oxygenationPafiSafiAa.ts';
 import { pediatricDehydrationCalculator } from '../calculators/pediatricDehydration.ts';
@@ -102,6 +107,7 @@ import { percRuleCalculator } from '../calculators/percRule.ts';
 import { pewsBrightonCalculator } from '../calculators/pewsBrighton.ts';
 import { phq9Calculator } from '../calculators/phq9.ts';
 import { plasmaOsmolarityCalculator } from '../calculators/plasmaOsmolarity.ts';
+import { preeclampsiaHellpCalculator } from '../calculators/preeclampsiaHellp.ts';
 import { psiPortCalculator } from '../calculators/psiPort.ts';
 import { psofaCalculator } from '../calculators/psofa.ts';
 import { qsofaCalculator } from '../calculators/qsofa.ts';
@@ -127,6 +133,39 @@ import { westleyCroupCalculator } from '../calculators/westleyCroup.ts';
 import { whoGrowthCalculator } from '../calculators/whoGrowth.ts';
 import { woodDownesFerresCalculator } from '../calculators/woodDownesFerres.ts';
 import { woodSmokeExposureCalculator } from '../calculators/woodSmokeExposure.ts';
+import { barthelIndexCalculator } from '../calculators/barthelIndex.ts';
+import { charlsonComorbidityCalculator } from '../calculators/charlsonComorbidity.ts';
+import { clinicalFrailtyScaleCalculator } from '../calculators/clinicalFrailtyScale.ts';
+import { pediatricSchwartzCalculator } from '../calculators/pediatricSchwartz.ts';
+import { bicarbonateDeficitCalculator } from '../calculators/bicarbonateDeficit.ts';
+import { fourTsHitCalculator } from '../calculators/fourTsHit.ts';
+import { isthDicCalculator } from '../calculators/isthDic.ts';
+import { spesiPeCalculator } from '../calculators/spesiPe.ts';
+import { stoneScoreCalculator } from '../calculators/stoneScore.ts';
+import { psaDensityCalculator } from '../calculators/psaDensity.ts';
+import { gustiloAndersonCalculator } from '../calculators/gustiloAnderson.ts';
+import { messScoreCalculator } from '../calculators/messScore.ts';
+import { scortenScoreCalculator } from '../calculators/scortenScore.ts';
+import { uas7UrticariaCalculator } from '../calculators/uas7Urticaria.ts';
+import { lawtonBrodyCalculator } from '../calculators/lawtonBrody.ts';
+import { anticholinergicBurdenCalculator } from '../calculators/anticholinergicBurden.ts';
+import { mnaSfCalculator } from '../calculators/mnaSf.ts';
+import { sarcFCalculator } from '../calculators/sarcF.ts';
+import { yesavageGds15Calculator } from '../calculators/yesavageGds15.ts';
+import { score2CvdCalculator } from '../calculators/score2Cvd.ts';
+import { dutchLipidClinicCalculator } from '../calculators/dutchLipidClinic.ts';
+import { masldApriNfsCalculator } from '../calculators/masldApriNfs.ts';
+import { osteoporosisOstaWhoCalculator } from '../calculators/osteoporosisOstaWho.ts';
+import { fibromyalgiaAcr2016Calculator } from '../calculators/fibromyalgiaAcr2016.ts';
+import { das28RaCalculator } from '../calculators/das28Ra.ts';
+import { romeIvBowelCalculator } from '../calculators/romeIvBowel.ts';
+import { acuteRhinosinusitisCalculator } from '../calculators/acuteRhinosinusitis.ts';
+import { menopauseMrsCalculator } from '../calculators/menopauseMrs.ts';
+import { pcosRotterdamCalculator } from '../calculators/pcosRotterdam.ts';
+import { pediatricBloodPressureCalculator } from '../calculators/pediatricBloodPressure.ts';
+import { targetHeightVelocityCalculator } from '../calculators/targetHeightVelocity.ts';
+import { mchatRCalculator } from '../calculators/mchatR.ts';
+import { vppbManipulationCalculator } from '../calculators/vppbManipulation.ts';
 import type { CalculatorDefinition, SpecialtyId } from '../types/clinical.ts';
 import { SPECIALTY_MAP } from './specialties.ts';
 
@@ -267,6 +306,45 @@ export const CALCULATOR_CATALOG: CalculatorDefinition[] = [
   ichd3HeadacheCalculator,
   headacheRedFlagsCalculator,
   mrcNeurologicalWeaknessCalculator,
+  obstetricWeightGainCalculator,
+  preeclampsiaHellpCalculator,
+  gestationalDiabetesCalculator,
+  fetalBiophysicalProfileCalculator,
+  obstetricSepsisMeowsCalculator,
+  barthelIndexCalculator,
+  charlsonComorbidityCalculator,
+  clinicalFrailtyScaleCalculator,
+  pediatricSchwartzCalculator,
+  bicarbonateDeficitCalculator,
+  fourTsHitCalculator,
+  isthDicCalculator,
+  spesiPeCalculator,
+  stoneScoreCalculator,
+  psaDensityCalculator,
+  gustiloAndersonCalculator,
+  messScoreCalculator,
+  scortenScoreCalculator,
+  uas7UrticariaCalculator,
+  lawtonBrodyCalculator,
+  anticholinergicBurdenCalculator,
+  mnaSfCalculator,
+  sarcFCalculator,
+  yesavageGds15Calculator,
+  score2CvdCalculator,
+  dutchLipidClinicCalculator,
+  masldApriNfsCalculator,
+  osteoporosisOstaWhoCalculator,
+  fibromyalgiaAcr2016Calculator,
+  das28RaCalculator,
+  romeIvBowelCalculator,
+  acuteRhinosinusitisCalculator,
+  menopauseMrsCalculator,
+  pcosRotterdamCalculator,
+  pediatricBloodPressureCalculator,
+  targetHeightVelocityCalculator,
+  mchatRCalculator,
+  hintsPlusVertigoCalculator,
+  vppbManipulationCalculator,
 ].sort(compareCalculatorsAlphabetically);
 
 export const CALCULATOR_BY_ID: Record<string, CalculatorDefinition> = CALCULATOR_CATALOG.reduce(
@@ -315,6 +393,33 @@ export function searchCalculators(query: string): CalculatorDefinition[] {
         calc.clinicalIndication,
         calc.keywords.join(' '),
         specialtyNames,
+      ].join(' '),
+    );
+
+    return terms.every((term) => haystack.includes(term));
+  });
+}
+
+export function searchCalculatorsInSpecialty(
+  specialtyId: SpecialtyId,
+  query: string,
+): CalculatorDefinition[] {
+  const specialtyItems = getCalculatorsBySpecialty(specialtyId);
+  const normalizedQuery = normalizeSearchText(query);
+  if (!normalizedQuery) {
+    return specialtyItems;
+  }
+
+  const terms = normalizedQuery.split(/\s+/).filter(Boolean);
+
+  return specialtyItems.filter((calc) => {
+    const haystack = normalizeSearchText(
+      [
+        calc.name,
+        calc.shortName,
+        calc.description,
+        calc.clinicalIndication,
+        calc.keywords.join(' '),
       ].join(' '),
     );
 

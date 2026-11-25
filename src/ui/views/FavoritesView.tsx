@@ -1,10 +1,10 @@
-import { Star } from 'lucide-react';
 import React from 'react';
 import {
   CALCULATOR_BY_ID,
   compareCalculatorsAlphabetically,
 } from '../../clinical-core/registries/catalog.ts';
 import { CalculatorCard } from '../components/CalculatorCard.tsx';
+import { ClinicalStarIcon } from '../icons/clinicalUiIcons.tsx';
 
 interface FavoritesViewProps {
   favorites: string[];
@@ -49,8 +49,10 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
         </div>
       ) : (
         <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center dark:border-slate-800 dark:bg-slate-900">
-          <Star className="mx-auto h-7 w-7 text-slate-400 dark:text-slate-500" />
-          <h2 className="mt-2 text-base font-semibold text-slate-900 dark:text-slate-100">
+          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-500 ring-1 ring-amber-200/80 dark:bg-amber-950/50 dark:text-amber-400 dark:ring-amber-800/60">
+            <ClinicalStarIcon className="h-6 w-6" />
+          </span>
+          <h2 className="mt-3 text-base font-semibold text-slate-900 dark:text-slate-100">
             Aún no tienes favoritos
           </h2>
           <p className="mx-auto mt-1 max-w-md text-xs leading-relaxed text-slate-500 dark:text-slate-400">

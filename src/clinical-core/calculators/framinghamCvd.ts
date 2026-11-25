@@ -159,6 +159,9 @@ export const framinghamCvdCalculator: CalculatorDefinition = {
       .canonicalValue!;
     const hdl = getCanonicalNumberValue(hdlCholField, inputs.hdlChol as NumberInputValue)
       .canonicalValue!;
+    if (hdl >= tc) {
+      throw new Error('El colesterol HDL debe ser menor que el colesterol total.');
+    }
     const sbp = getCanonicalNumberValue(sbpField, inputs.sbp as NumberInputValue).canonicalValue!;
     const isFemale = inputs.sex === 'female';
     const treated = inputs.treatedBp === true;

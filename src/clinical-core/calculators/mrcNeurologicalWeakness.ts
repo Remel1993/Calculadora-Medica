@@ -7,12 +7,12 @@ import type {
 } from '../types/clinical.ts';
 
 const MRC_GRADE_OPTIONS = [
-  { value: '5', label: '5/5 — Fuerza normal contra resistencia completa', points: 5 },
-  { value: '4', label: '4/5 — Movimiento contra gravedad y resistencia moderada', points: 4 },
-  { value: '3', label: '3/5 — Movimiento activo solo contra la gravedad', points: 3 },
-  { value: '2', label: '2/5 — Movimiento activo eliminando la gravedad', points: 2 },
-  { value: '1', label: '1/5 — Contracción muscular visible/palpable sin movimiento articular', points: 1 },
-  { value: '0', label: '0/5 — Sin contracción muscular (plejía)', points: 0 },
+  { value: '5', label: '5/5 · Normal', points: 5 },
+  { value: '4', label: '4/5 · Resist.', points: 4 },
+  { value: '3', label: '3/5 · Gravedad', points: 3 },
+  { value: '2', label: '2/5 · Sin grav.', points: 2 },
+  { value: '1', label: '1/5 · Esbozo', points: 1 },
+  { value: '0', label: '0/5 · Plejía', points: 0 },
 ];
 
 const onsetTempoField: SelectFieldDef = {
@@ -21,10 +21,26 @@ const onsetTempoField: SelectFieldDef = {
   type: 'select',
   defaultValue: 'acute_subacute',
   options: [
-    { value: 'hyperacute', label: 'Hiperaguda / súbita (< 24 h, minutos u horas) — Alerta vascular / medular' },
-    { value: 'acute_subacute', label: 'Aguda / subaguda progresiva (días a < 4 semanas)' },
-    { value: 'chronic_fluctuating', label: 'Crónica (> 4 semanas) o fluctuante con fatigabilidad' },
-    { value: 'icu_critical', label: 'Paciente crítico / UCI (tamizaje de debilidad adquirida en UCI)' },
+    {
+      value: 'hyperacute',
+      label: 'Hiperaguda / súbita (< 24 h)',
+      description: 'Minutos u horas — alerta de ictus, AIT, hemorragia o compresión medular aguda.',
+    },
+    {
+      value: 'acute_subacute',
+      label: 'Aguda / subaguda (días a < 4 sem)',
+      description: 'Progresiva — valorar Guillain-Barré, mielitis, radiculopatía o miopatía inflamatoria.',
+    },
+    {
+      value: 'chronic_fluctuating',
+      label: 'Crónica (> 4 sem) o fluctuante',
+      description: 'Fatigabilidad o curso lento — miastenia gravis, miopatía crónica o neuropatía.',
+    },
+    {
+      value: 'icu_critical',
+      label: 'Paciente crítico / UCI',
+      description: 'Tamizaje de debilidad adquirida en UCI (ICUAW: umbral MRC-SS < 48/60).',
+    },
   ],
 };
 
@@ -34,36 +50,61 @@ const neuroPatternField: SelectFieldDef = {
   type: 'select',
   defaultValue: 'none_untested',
   options: [
-    { value: 'none_untested', label: 'Solo cuantificación de fuerza MRC (sin patrón especificado)' },
-    { value: 'umn', label: '1.ª Motoneurona / SNC (hiperreflexia, espasticidad, Babinski +, nivel sensitivo o déficit cortical)' },
-    { value: 'lmn', label: '2.ª Motoneurona / SNP (hiporreflexia/arreflexia, hipotonía, fasciculaciones, atrofia)' },
-    { value: 'nmj', label: 'Unión neuromuscular (fluctuación, fatigabilidad, ptosis/diplopía, reflejos normales)' },
-    { value: 'myopathic', label: 'Patrón miopático (debilidad proximal simétrica, sensibilidad normal, reflejos conservados)' },
+    {
+      value: 'none_untested',
+      label: 'Solo cuantificación MRC',
+      description: 'Calcular MRC Sum Score y patrón de distribución sin signo localizador adicional.',
+    },
+    {
+      value: 'umn',
+      label: '1.ª Motoneurona / SNC',
+      description: 'Hiperreflexia, espasticidad, Babinski positivo, nivel sensitivo o déficit cortical.',
+    },
+    {
+      value: 'lmn',
+      label: '2.ª Motoneurona / SNP',
+      description: 'Hiporreflexia o arreflexia, hipotonía, fasciculaciones o atrofia precoz.',
+    },
+    {
+      value: 'nmj',
+      label: 'Unión neuromuscular',
+      description: 'Fluctuación diurna, fatigabilidad al esfuerzo, ptosis/diplopía y reflejos normales.',
+    },
+    {
+      value: 'myopathic',
+      label: 'Patrón miopático',
+      description: 'Debilidad proximal simétrica, sensibilidad normal y reflejos proporcionales.',
+    },
   ],
 };
 
-function makeMrcField(id: string, label: string): SelectFieldDef {
+function makeMrcField(id: string, label: string, helpText?: string): SelectFieldDef {
   return {
     id,
     label,
+    helpText,
     type: 'select',
     defaultValue: '5',
     options: MRC_GRADE_OPTIONS,
   };
 }
 
-const rShoulderField = makeMrcField('rShoulder', '1. Abducción de hombro DERECHO (Deltoides, C5)');
-const lShoulderField = makeMrcField('lShoulder', '2. Abducción de hombro IZQUIERDO (Deltoides, C5)');
-const rElbowField = makeMrcField('rElbow', '3. Flexión de codo DERECHO (Bíceps, C5–C6)');
-const lElbowField = makeMrcField('lElbow', '4. Flexión de codo IZQUIERDO (Bíceps, C5–C6)');
-const rWristField = makeMrcField('rWrist', '5. Extensión de muñeca DERECHA (Extensores del carpo, C6–C7)');
-const lWristField = makeMrcField('lWrist', '6. Extensión de muñeca IZQUIERDA (Extensores del carpo, C6–C7)');
-const rHipField = makeMrcField('rHip', '7. Flexión de cadera DERECHA (Iliopsoas, L1–L2)');
-const lHipField = makeMrcField('lHip', '8. Flexión de cadera IZQUIERDA (Iliopsoas, L1–L2)');
-const rKneeField = makeMrcField('rKnee', '9. Extensión de rodilla DERECHA (Cuádriceps, L3–L4)');
-const lKneeField = makeMrcField('lKnee', '10. Extensión de rodilla IZQUIERDA (Cuádriceps, L3–L4)');
-const rAnkleField = makeMrcField('rAnkle', '11. Dorsiflexión de tobillo DERECHO (Tibial anterior, L4–L5)');
-const lAnkleField = makeMrcField('lAnkle', '12. Dorsiflexión de tobillo IZQUIERDO (Tibial anterior, L4–L5)');
+const rShoulderField = makeMrcField(
+  'rShoulder',
+  '1. Hombro DERECHO — Abducción (Deltoides, C5)',
+  'Escala MRC: 5 = fuerza normal · 4 = vence resistencia moderada · 3 = vence gravedad · 2 = sin gravedad · 1 = contracción sin movimiento · 0 = plejía.',
+);
+const lShoulderField = makeMrcField('lShoulder', '2. Hombro IZQUIERDO — Abducción (Deltoides, C5)');
+const rElbowField = makeMrcField('rElbow', '3. Codo DERECHO — Flexión (Bíceps, C5–C6)');
+const lElbowField = makeMrcField('lElbow', '4. Codo IZQUIERDO — Flexión (Bíceps, C5–C6)');
+const rWristField = makeMrcField('rWrist', '5. Muñeca DERECHA — Extensión (Carpo, C6–C7)');
+const lWristField = makeMrcField('lWrist', '6. Muñeca IZQUIERDA — Extensión (Carpo, C6–C7)');
+const rHipField = makeMrcField('rHip', '7. Cadera DERECHA — Flexión (Iliopsoas, L1–L2)');
+const lHipField = makeMrcField('lHip', '8. Cadera IZQUIERDA — Flexión (Iliopsoas, L1–L2)');
+const rKneeField = makeMrcField('rKnee', '9. Rodilla DERECHA — Extensión (Cuádriceps, L3–L4)');
+const lKneeField = makeMrcField('lKnee', '10. Rodilla IZQUIERDA — Extensión (Cuádriceps, L3–L4)');
+const rAnkleField = makeMrcField('rAnkle', '11. Tobillo DERECHO — Dorsiflexión (Tibial ant., L4–L5)');
+const lAnkleField = makeMrcField('lAnkle', '12. Tobillo IZQUIERDO — Dorsiflexión (Tibial ant., L4–L5)');
 
 const MUSCLE_FIELDS = [
   rShoulderField,
@@ -114,7 +155,7 @@ export const mrcNeurologicalWeaknessCalculator: CalculatorDefinition = {
     'MRC-SS evalúa 6 grupos musculares bilaterales de extremidades y NO incluye musculatura craneal, cervical ni diafragmática/respiratoria (valorar siempre disfagia, disnea, tos débil y capacidad vital forzada).',
     'La escala MRC estándar utiliza grados enteros 0–5; en déficit focal leve de origen central (ictus) complementar siempre con NIHSS.',
   ],
-  version: 'MRC Sum Score (Kleyweg 1991 / De Jonghe 2002)',
+  version: 'MRC-SS (Kleyweg 1991 / De Jonghe 2002)',
   references: [
     {
       citation:
@@ -156,20 +197,19 @@ export const mrcNeurologicalWeaknessCalculator: CalculatorDefinition = {
     const la = Number(inputs.lAnkle ?? 5);
 
     const total = rs + ls + re + le + rw + lw + rh + lh + rk + lk + ra + la;
-    const rightSide = rs + re + rw + rh + rk + ra; // max 30
-    const leftSide = ls + le + lw + lh + lk + la; // max 30
-    const upperLimbs = rs + ls + re + le + rw + lw; // max 30
-    const lowerLimbs = rh + lh + rk + lk + ra + la; // max 30
+    const rightSide = rs + re + rw + rh + rk + ra;
+    const leftSide = ls + le + lw + lh + lk + la;
+    const upperLimbs = rs + ls + re + le + rw + lw;
+    const lowerLimbs = rh + lh + rk + lk + ra + la;
 
-    const rightUpper = rs + re + rw; // max 15
-    const leftUpper = ls + le + lw; // max 15
-    const rightLower = rh + rk + ra; // max 15
-    const leftLower = lh + lk + la; // max 15
+    const rightUpper = rs + re + rw;
+    const leftUpper = ls + le + lw;
+    const rightLower = rh + rk + ra;
+    const leftLower = lh + lk + la;
 
-    const proximalScore = rs + ls + rh + lh; // 4 proximal girdles, max 20
-    const distalScore = rw + lw + ra + la; // 4 distal groups, max 20
+    const proximalScore = rs + ls + rh + lh;
+    const distalScore = rw + lw + ra + la;
 
-    // Topographic distribution detection
     let distributionPattern = 'Fuerza muscular conservada (sin paresia en los 12 grupos)';
     if (total < 60) {
       const rightWeak = rightSide < 30;
@@ -192,24 +232,23 @@ export const mrcNeurologicalWeaknessCalculator: CalculatorDefinition = {
               ? 'Monoparesia braquial IZQUIERDA'
               : 'Monoparesia crural IZQUIERDA';
       } else if (lowerWeak && !upperWeak) {
-        distributionPattern = 'Paraparesia (afectación selectiva de miembros inferiores)';
+        distributionPattern = 'Paraparesia (miembros inferiores)';
       } else if (upperWeak && !lowerWeak) {
-        distributionPattern = 'Diparesia braquial (afectación selectiva de miembros superiores)';
+        distributionPattern = 'Diparesia braquial (miembros superiores)';
       } else if (Math.abs(rightSide - leftSide) >= 4) {
         distributionPattern =
           rightSide < leftSide
-            ? 'Debilidad asimétrica con predominio DERECHO'
-            : 'Debilidad asimétrica con predominio IZQUIERDO';
+            ? 'Debilidad asimétrica de predominio DERECHO'
+            : 'Debilidad asimétrica de predominio IZQUIERDO';
       } else if (proximalScore <= distalScore - 3) {
-        distributionPattern = 'Tetraparesia de predominio PROXIMAL (cintura escapular/pélvica)';
+        distributionPattern = 'Tetraparesia de predominio PROXIMAL';
       } else if (distalScore <= proximalScore - 3) {
-        distributionPattern = 'Tetraparesia de predominio DISTAL (muñecas/tobillos)';
+        distributionPattern = 'Tetraparesia de predominio DISTAL';
       } else {
-        distributionPattern = 'Tetraparesia / debilidad generalizada bilateral';
+        distributionPattern = 'Tetraparesia / debilidad generalizada';
       }
     }
 
-    // Severity & clinical interpretation
     let severity: SeverityLevel = 'normal';
     let riskClassification = 'Fuerza muscular normal (MRC-SS 60 / 60)';
     let clinicalInterpretation = 'Sin déficit motor detectable en los 12 grupos musculares evaluados.';
@@ -262,7 +301,6 @@ export const mrcNeurologicalWeaknessCalculator: CalculatorDefinition = {
       );
     }
 
-    // Add pattern-specific orientation when weakness exists
     if (total < 60) {
       if (neuroPattern === 'umn') {
         guidance.push('Patrón de 1.ª Motoneurona (SNC): orienta a lesión encefálica o medular (ictus, tumor, mielopatía compresiva/inflamatoria, enfermedad desmielinizante). Priorizar neuroimagen (TC/RM).');

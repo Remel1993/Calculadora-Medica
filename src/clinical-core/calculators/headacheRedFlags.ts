@@ -20,7 +20,8 @@ const SNNOOP_ITEMS: SnnoopItem[] = [
     suspicion: 'Infección del SNC (meningitis/encefalitis/absceso), arteritis o enfermedad sistémica',
     field: {
       id: 'sSystemic',
-      label: 'S — Síntomas sistémicos incluida fiebre (rigidez de nuca, pérdida ponderal, mialgias/claudicación mandibular)',
+      label: 'S — Síntomas sistémicos incluida fiebre',
+      helpText: 'Rigidez de nuca, pérdida ponderal, mialgias o claudicación mandibular.',
       type: 'boolean',
       trueLabel: 'Presente',
       falseLabel: 'Ausente',
@@ -46,8 +47,8 @@ const SNNOOP_ITEMS: SnnoopItem[] = [
     suspicion: 'Ictus/AIT, hemorragia intracraneal, masa expansiva, trombosis venosa o absceso',
     field: {
       id: 'nNeuroDeficit',
-      label: 'N — Déficit o disfunción neurológica (debilidad motora, afasia, ataxia, diplopía o alteración de conciencia)',
-      helpText: 'Incluye cualquier focalidad motora o sensitiva nueva, asimetría facial/braquial o caída del nivel de conciencia.',
+      label: 'N — Déficit o disfunción neurológica',
+      helpText: 'Debilidad motora/paresia, afasia, ataxia, diplopía, déficit visual o caída del nivel de conciencia.',
       type: 'boolean',
       trueLabel: 'Presente',
       falseLabel: 'Ausente',
@@ -60,7 +61,8 @@ const SNNOOP_ITEMS: SnnoopItem[] = [
     suspicion: 'Hemorragia subaracnoidea (HSA), vasoconstricción cerebral reversible (RCVS), disección o trombosis venosa',
     field: {
       id: 'oOnsetSudden',
-      label: 'O — Inicio súbito / abrupto «en trueno» (alcanza máxima intensidad en < 1 minuto)',
+      label: 'O — Inicio súbito o abrupto «en trueno»',
+      helpText: 'Dolor que alcanza máxima intensidad en < 1 minuto.',
       type: 'boolean',
       trueLabel: 'Presente',
       falseLabel: 'Ausente',
@@ -99,7 +101,8 @@ const SNNOOP_ITEMS: SnnoopItem[] = [
     suspicion: 'Hipotensión de LCR (empeora al incorporarse) o hipertensión intracraneal/masa (empeora en decúbito)',
     field: {
       id: 'p2Positional',
-      label: 'P2 — Cefalea posicional (cambia significativamente al ponerse de pie o acostarse)',
+      label: 'P2 — Cefalea posicional',
+      helpText: 'Empeora claramente al ponerse de pie (hipotensión LCR) o al acostarse (hipertensión intracraneal).',
       type: 'boolean',
       trueLabel: 'Presente',
       falseLabel: 'Ausente',
@@ -112,7 +115,7 @@ const SNNOOP_ITEMS: SnnoopItem[] = [
     suspicion: 'Malformación de Chiari, lesión de fosa posterior, HSA o RCVS',
     field: {
       id: 'p3Precipitated',
-      label: 'P3 — Precipitada por tos, estornudo, maniobra de Valsalva o ejercicio físico',
+      label: 'P3 — Precipitada por tos, estornudo, Valsalva o ejercicio',
       type: 'boolean',
       trueLabel: 'Presente',
       falseLabel: 'Ausente',
@@ -138,7 +141,8 @@ const SNNOOP_ITEMS: SnnoopItem[] = [
     suspicion: 'Neoplasia, lesión ocupante de espacio o causa secundaria no clasificada',
     field: {
       id: 'p5Progressive',
-      label: 'P5 — Cefalea progresiva (empeoramiento continuo) o presentación atípica',
+      label: 'P5 — Cefalea progresiva o presentación atípica',
+      helpText: 'Empeoramiento continuo o características fuera de las cefaleas primarias.',
       type: 'boolean',
       trueLabel: 'Presente',
       falseLabel: 'Ausente',
@@ -164,7 +168,8 @@ const SNNOOP_ITEMS: SnnoopItem[] = [
     suspicion: 'Glaucoma agudo de ángulo cerrado, patología de seno cavernoso/órbita, síndrome de Tolosa-Hunt o disección carotídea',
     field: {
       id: 'p7PainfulEye',
-      label: 'P7 — Ojo doloroso con signos autonómicos (ojo rojo, miosis/ptosis, diplopía o pérdida visual)',
+      label: 'P7 — Ojo doloroso con signos autonómicos',
+      helpText: 'Ojo rojo, miosis/ptosis, diplopía o pérdida visual acompañante.',
       type: 'boolean',
       trueLabel: 'Presente',
       falseLabel: 'Ausente',
@@ -177,7 +182,7 @@ const SNNOOP_ITEMS: SnnoopItem[] = [
     suspicion: 'Hematoma subdural/epidural, hemorragia postraumática, disección arterial o fístula de LCR',
     field: {
       id: 'p8Posttraumatic',
-      label: 'P8 — Inicio postraumático (traumatismo craneal o cervical reciente)',
+      label: 'P8 — Inicio postraumático (trauma craneal o cervical reciente)',
       type: 'boolean',
       trueLabel: 'Presente',
       falseLabel: 'Ausente',
@@ -190,7 +195,7 @@ const SNNOOP_ITEMS: SnnoopItem[] = [
     suspicion: 'Infecciones oportunistas del SNC (criptococosis, toxoplasmosis, LMP) o linfoma primario del SNC',
     field: {
       id: 'p9PathologyImmune',
-      label: 'P9 — Patología del sistema inmune (VIH, inmunosupresión farmacológica o trasplante)',
+      label: 'P9 — Patología inmune (VIH, inmunosupresión o trasplante)',
       type: 'boolean',
       trueLabel: 'Presente',
       falseLabel: 'Ausente',
@@ -203,7 +208,7 @@ const SNNOOP_ITEMS: SnnoopItem[] = [
     suspicion: 'Cefalea por uso excesivo de medicación (ICHD-3 8.2) o cefalea inducida por fármacos (nitratos, vasodilatadores)',
     field: {
       id: 'p10PainkillerOveruse',
-      label: 'P10 — Uso excesivo de analgésicos o inicio de cefalea tras nuevo fármaco',
+      label: 'P10 — Uso excesivo de analgésicos o inicio tras fármaco nuevo',
       type: 'boolean',
       trueLabel: 'Presente',
       falseLabel: 'Ausente',
@@ -244,7 +249,7 @@ export const headacheRedFlagsCalculator: CalculatorDefinition = {
   limitations: [
     'SNNOOP10 es una herramienta de cribado de alta sensibilidad diseñada para orientar la solicitud de neuroimagen, punción lumbar o marcadores inflamatorios; cada bandera positiva tiene diferente grado de urgencia (inmediata vs. estudio ambulatorio preferente).',
   ],
-  version: 'Do TP et al. — SNNOOP10 (Neurology 2019)',
+  version: 'Do TP et al. — SNNOOP10 (2019)',
   references: [
     {
       citation:
@@ -350,8 +355,8 @@ export const headacheRedFlagsCalculator: CalculatorDefinition = {
         ...(total > 0
           ? [
               {
-                label: 'Sospechas clínicas principales',
-                formattedValue: activeItems.map((i) => i.suspicion).slice(0, 3).join(' · '),
+                label: 'Sospechas principales',
+                formattedValue: activeItems.map((i) => i.suspicion).slice(0, 2).join(' · '),
                 unit: '',
               },
             ]

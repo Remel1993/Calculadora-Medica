@@ -167,13 +167,16 @@ export const pediatricDehydrationCalculator: CalculatorDefinition = {
     let riskClassification = '';
     let guidance: string[] = [];
 
-    if (pctRounded < 5) {
+    const isMild = mode === 'clinical' ? inputs.clinicalGrade === 'mild' : pctRounded < 5;
+    const isModerate = mode === 'clinical' ? inputs.clinicalGrade === 'moderate' : pctRounded < 10;
+
+    if (isMild) {
       severity = 'low';
       riskClassification = `Deshidratación leve (${pctRounded.toFixed(1)} %)`;
       guidance = [
         `Primera línea: rehidratación oral (SRO hipoosmolar ≈ ${roundClinical(currW * 50, 0)} mL en 4 horas) más reposición de pérdidas continuas.`,
       ];
-    } else if (pctRounded < 10) {
+    } else if (isModerate) {
       severity = 'moderate';
       riskClassification = `Deshidratación moderada (${pctRounded.toFixed(1)} %)`;
       guidance = [
@@ -182,7 +185,10 @@ export const pediatricDehydrationCalculator: CalculatorDefinition = {
       ];
     } else {
       severity = 'critical';
-      riskClassification = `Deshidratación grave (≥ 10 %: ${pctRounded.toFixed(1)} %)`;
+      riskClassification =
+        mode === 'clinical'
+          ? `Deshidratación grave (${pctRounded.toFixed(1)} %)`
+          : `Deshidratación grave (≥ 10 %: ${pctRounded.toFixed(1)} %)`;
       guidance = [
         `Ante signos de choque/hipoperfusión administrar bolo inicial de cristaloide isotónico (NaCl 0.9 % o Ringer Lactato) a 20 mL/kg = ${shockBolus20} mL y reevaluar.`,
         'Monitorizar electrolitos (Na⁺, K⁺, glucemia, gasometría) antes de ajustar soluciones definitivas.',

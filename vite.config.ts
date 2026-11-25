@@ -60,7 +60,7 @@ export default defineConfig(() => {
           navigateFallback: '/index.html',
         },
         devOptions: {
-          enabled: true,
+          enabled: process.env.DISABLE_HMR !== 'true',
           type: 'module',
         },
       }),

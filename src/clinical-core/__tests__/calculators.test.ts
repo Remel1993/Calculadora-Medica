@@ -143,8 +143,56 @@ import {
   CALCULATOR_CATALOG,
   getCalculatorsBySpecialty,
   searchCalculators,
+  searchCalculatorsInSpecialty,
 } from '../registries/catalog.ts';
 import { SPECIALTIES } from '../registries/specialties.ts';
+import {
+  computeHadlockEfw1985,
+  evaluateFetalWeight,
+  evaluateMaternalWeightGain,
+  getHadlockFetalPercentilesAtGa,
+} from '../data/obstetricWeightStandards.ts';
+import { fetalBiophysicalProfileCalculator } from '../calculators/fetalBiophysicalProfile.ts';
+import { gestationalDiabetesCalculator } from '../calculators/gestationalDiabetes.ts';
+import { obstetricSepsisMeowsCalculator } from '../calculators/obstetricSepsisMeows.ts';
+import { obstetricWeightGainCalculator } from '../calculators/obstetricWeightGain.ts';
+import { preeclampsiaHellpCalculator } from '../calculators/preeclampsiaHellp.ts';
+import { barthelIndexCalculator } from '../calculators/barthelIndex.ts';
+import { charlsonComorbidityCalculator } from '../calculators/charlsonComorbidity.ts';
+import { clinicalFrailtyScaleCalculator } from '../calculators/clinicalFrailtyScale.ts';
+import { pediatricSchwartzCalculator } from '../calculators/pediatricSchwartz.ts';
+import { bicarbonateDeficitCalculator } from '../calculators/bicarbonateDeficit.ts';
+import { fourTsHitCalculator } from '../calculators/fourTsHit.ts';
+import { isthDicCalculator } from '../calculators/isthDic.ts';
+import { spesiPeCalculator } from '../calculators/spesiPe.ts';
+import { stoneScoreCalculator } from '../calculators/stoneScore.ts';
+import { psaDensityCalculator } from '../calculators/psaDensity.ts';
+import { gustiloAndersonCalculator } from '../calculators/gustiloAnderson.ts';
+import { messScoreCalculator } from '../calculators/messScore.ts';
+import { scortenScoreCalculator } from '../calculators/scortenScore.ts';
+import { uas7UrticariaCalculator } from '../calculators/uas7Urticaria.ts';
+import { lawtonBrodyCalculator } from '../calculators/lawtonBrody.ts';
+import { anticholinergicBurdenCalculator } from '../calculators/anticholinergicBurden.ts';
+import { mnaSfCalculator } from '../calculators/mnaSf.ts';
+import { sarcFCalculator } from '../calculators/sarcF.ts';
+import { yesavageGds15Calculator } from '../calculators/yesavageGds15.ts';
+import { score2CvdCalculator } from '../calculators/score2Cvd.ts';
+import { dutchLipidClinicCalculator } from '../calculators/dutchLipidClinic.ts';
+import { masldApriNfsCalculator } from '../calculators/masldApriNfs.ts';
+import { osteoporosisOstaWhoCalculator } from '../calculators/osteoporosisOstaWho.ts';
+import { fibromyalgiaAcr2016Calculator } from '../calculators/fibromyalgiaAcr2016.ts';
+import { das28RaCalculator } from '../calculators/das28Ra.ts';
+import { romeIvBowelCalculator } from '../calculators/romeIvBowel.ts';
+import { acuteRhinosinusitisCalculator } from '../calculators/acuteRhinosinusitis.ts';
+import { menopauseMrsCalculator } from '../calculators/menopauseMrs.ts';
+import { pcosRotterdamCalculator } from '../calculators/pcosRotterdam.ts';
+import { pediatricBloodPressureCalculator } from '../calculators/pediatricBloodPressure.ts';
+import { targetHeightVelocityCalculator } from '../calculators/targetHeightVelocity.ts';
+import { mchatRCalculator } from '../calculators/mchatR.ts';
+import { hintsPlusVertigoCalculator } from '../calculators/hintsPlusVertigo.ts';
+import { vppbManipulationCalculator } from '../calculators/vppbManipulation.ts';
+import { CLINICAL_REFERENCE_TABLES } from '../registries/clinicalTables.ts';
+import { getCalculatorFormulaReference } from '../registries/formulaReference.ts';
 
 test('precision: roundClinical handles classic half-up cases safely', () => {
   assert.equal(roundClinical(1.005, 2), 1.01);
@@ -2120,6 +2168,24 @@ test('ICHD-3 Migraine & Primary Headaches, SNNOOP10 Red Flags, and MRC Neurologi
   assert.equal(chronicMigraine.primaryResult.formattedValue, 'ICHD-3 1.3');
   assert.equal(chronicMigraine.severity, 'high');
 
+  // ICHD-3 1.5.1 Probable migraine when >= 5 attacks, B, C met, but D missing (e.g. photophobia only, no nausea)
+  const probableMigraineMissingD = ichd3HeadacheCalculator.calculate({
+    syndrome: 'migraine_without_aura',
+    redFlagsPresent: false,
+    attackCount: 'ge5',
+    duration4to72h: true,
+    cUnilateral: true,
+    cPulsatile: true,
+    cModerateSevere: true,
+    cAggravatedActivity: false,
+    dNauseaVomiting: false,
+    dPhotoPhono: false,
+    chronicFrequency: false,
+    medicationOveruse: false,
+  });
+  assert.equal(probableMigraineMissingD.primaryResult.formattedValue, 'ICHD-3 1.5.1');
+  assert.equal(probableMigraineMissingD.severity, 'low');
+
   // ICHD-3 1.2.3 Hemiplegic migraine: first/atypical motor weakness triggers critical stroke warning
   const hemiplegicFirst = ichd3HeadacheCalculator.calculate({
     syndrome: 'migraine_with_aura',
@@ -2144,7 +2210,45 @@ test('ICHD-3 Migraine & Primary Headaches, SNNOOP10 Red Flags, and MRC Neurologi
   });
   assert.equal(hemiplegicFirst.severity, 'critical');
 
-  // ICHD-3 3.1 Cluster Headache
+  // ICHD-3 1.5.2 Probable migraine with aura (2 attacks with visual aura, 2/6 C criteria)
+  const probableAura = ichd3HeadacheCalculator.calculate({
+    syndrome: 'migraine_with_aura',
+    redFlagsPresent: false,
+    auraAttacks: 'ge2',
+    auraVisual: true,
+    auraSensory: false,
+    auraSpeech: false,
+    auraMotor: false,
+    auraBrainstem: false,
+    auraRetinal: false,
+    acGradual5: true,
+    acSuccession: false,
+    acDuration60: true,
+    acUnilateral: false,
+    acPositive: false,
+    acHeadache60: false,
+    chronicFrequency: false,
+    medicationOveruse: false,
+  });
+  assert.equal(probableAura.primaryResult.formattedValue, 'ICHD-3 1.5.2');
+
+  // ICHD-3 2.4 Probable tension headache (< 10 episodes but B, C, D fulfilled)
+  const probableTth = ichd3HeadacheCalculator.calculate({
+    syndrome: 'tension_headache',
+    redFlagsPresent: false,
+    tthFrequency: 'lt10',
+    tthDuration: true,
+    tthBilateral: true,
+    tthPressing: true,
+    tthMildMod: true,
+    tthNoAggravation: true,
+    tthNoNausea: true,
+    tthPhotoPhonoMaxOne: true,
+    medicationOveruse: false,
+  });
+  assert.equal(probableTth.primaryResult.formattedValue, 'ICHD-3 2.4');
+
+  // ICHD-3 3.1 Cluster Headache & 3.5.1 Probable Cluster (< 5 attacks)
   const clusterRes = ichd3HeadacheCalculator.calculate({
     syndrome: 'cluster_headache',
     redFlagsPresent: false,
@@ -2156,6 +2260,17 @@ test('ICHD-3 Migraine & Primary Headaches, SNNOOP10 Red Flags, and MRC Neurologi
   });
   assert.equal(clusterRes.primaryResult.formattedValue, 'ICHD-3 3.1');
   assert.equal(clusterRes.severity, 'high');
+
+  const probableCluster = ichd3HeadacheCalculator.calculate({
+    syndrome: 'cluster_headache',
+    redFlagsPresent: false,
+    clusterAttacks: false,
+    clusterPain: true,
+    clusterAutonomic: true,
+    clusterRestlessness: false,
+    clusterFreq: true,
+  });
+  assert.equal(probableCluster.primaryResult.formattedValue, 'ICHD-3 3.5.1');
 
   // SNNOOP10 Red Flags: thunderclap + neuro deficit -> critical
   const snnoopCrit = headacheRedFlagsCalculator.calculate({
@@ -2242,8 +2357,577 @@ test('ICHD-3 Migraine & Primary Headaches, SNNOOP10 Red Flags, and MRC Neurologi
   assert.ok(mrcIcuaw.riskClassification.includes('ICUAW'));
 });
 
-test('Catalog: 129 deduplicated tools, cross-specialty tagging, and accent-insensitive search', () => {
-  assert.equal(CALCULATOR_CATALOG.length, 129);
+test('Obstetrics expansion: IOM/Hadlock weight gain & fetal curves, Preeclampsia/HELLP, GDM, BPP, SOS/MEOWS', () => {
+  // 1. Hadlock 1991 standard matches exact published P50 = 3619 g (P10 = 3004 g, P90 = 4234 g) at 40 weeks
+  const bands40 = getHadlockFetalPercentilesAtGa(40)!;
+  assert.equal(bands40.p50, 3619);
+  assert.equal(bands40.p10, 3004);
+  assert.equal(bands40.p90, 4234);
+
+  // Hadlock 1985 4-parameter biometry EFW sanity check (~1210 g around 28w)
+  const biometryEfw = computeHadlockEfw1985({
+    bpdMm: 71,
+    hcMm: 263,
+    acMm: 240,
+    flMm: 53,
+  });
+  assert.ok(biometryEfw > 1100 && biometryEfw < 1300);
+
+  // Maternal weight gain IOM 2009: normal BMI (62 kg, 1.62 m -> 23.6), +8.0 kg at 28 sem -> within band
+  const matOk = evaluateMaternalWeightGain({
+    preWeightKg: 62,
+    currentWeightKg: 70,
+    heightM: 1.62,
+    weeks: 28,
+    plurality: 'singleton',
+  });
+  assert.equal(matOk.bmiCategory, 'normal');
+  assert.equal(matOk.status, 'within');
+  assert.equal(matOk.severity, 'normal');
+
+  // SGA (< P3) detection at 34 weeks (1700 g < P3 ~1784 g)
+  const fetSga = evaluateFetalWeight(1700, 34)!;
+  assert.equal(fetSga.severity, 'high');
+  assert.ok(fetSga.classification.includes('< P3'));
+
+  // Full calculator execution in biometry mode
+  const obGainRes = obstetricWeightGainCalculator.calculate({
+    gestationalWeeks: { value: '32', unitId: 'weeks' },
+    plurality: 'singleton',
+    preWeight: { value: '58', unitId: 'kg' },
+    height: { value: '160', unitId: 'cm' },
+    currentWeight: { value: '68', unitId: 'kg' },
+    fetalInputMode: 'biometry',
+    bpdMm: { value: '81', unitId: 'mm' },
+    hcMm: { value: '295', unitId: 'mm' },
+    acMm: { value: '280', unitId: 'mm' },
+    flMm: { value: '62', unitId: 'mm' },
+  });
+  assert.equal(obGainRes.primaryResult.value, 10);
+  assert.ok((obGainRes.secondaryResults?.length ?? 0) >= 4);
+
+  // 2. Preeclampsia / HELLP: Complete Tennessee HELLP -> critical
+  const hellpRes = preeclampsiaHellpCalculator.calculate({
+    gestationalContext: 'ge20_new',
+    sbp: { value: '154', unitId: 'mmhg' },
+    dbp: { value: '98', unitId: 'mmhg' },
+    proteinuria: 'positive',
+    platelets: { value: '68', unitId: 'k_ul' },
+    astAltMax: { value: '145', unitId: 'ul' },
+    ldh: { value: '780', unitId: 'ul' },
+    creatinine: { value: '1.0', unitId: 'mg_dl' },
+    creatinineDoubled: false,
+    hemolysisEvidence: true,
+    neuroVisualSymptoms: false,
+    epigastricPain: true,
+    pulmonaryEdema: false,
+    eclampsiaSeizures: false,
+  });
+  assert.equal(hellpRes.severity, 'critical');
+  assert.equal(hellpRes.primaryResult.formattedValue, 'HELLP Completo');
+
+  // Preeclampsia without severe features
+  const mildPeRes = preeclampsiaHellpCalculator.calculate({
+    gestationalContext: 'ge20_new',
+    sbp: { value: '146', unitId: 'mmhg' },
+    dbp: { value: '94', unitId: 'mmhg' },
+    proteinuria: 'positive',
+    platelets: { value: '210', unitId: 'k_ul' },
+    astAltMax: { value: '24', unitId: 'ul' },
+    ldh: { value: '220', unitId: 'ul' },
+    creatinine: { value: '0.7', unitId: 'mg_dl' },
+    creatinineDoubled: false,
+    hemolysisEvidence: false,
+    neuroVisualSymptoms: false,
+    epigastricPain: false,
+    pulmonaryEdema: false,
+    eclampsiaSeizures: false,
+  });
+  assert.equal(mildPeRes.primaryResult.formattedValue, 'Preeclampsia');
+  assert.equal(mildPeRes.severity, 'high');
+
+  // 3. Gestational Diabetes: IADPSG 75 g (1 altered value = GDM) & Carpenter-Coustan 100 g (1 vs 2 altered)
+  const iadpsgDmg = gestationalDiabetesCalculator.calculate({
+    protocol: 'iadpsg_75g',
+    fastingGlucose: { value: '94', unitId: 'mg_dl' },
+    glucose1h: { value: '170', unitId: 'mg_dl' },
+    glucose2h: { value: '140', unitId: 'mg_dl' },
+  });
+  assert.equal(iadpsgDmg.primaryResult.formattedValue, 'DMG (+)');
+  assert.equal(iadpsgDmg.severity, 'moderate');
+
+  const ccSingle = gestationalDiabetesCalculator.calculate({
+    protocol: 'carpenter_coustan_100g',
+    fastingGlucose: { value: '90', unitId: 'mg_dl' },
+    glucose1h: { value: '185', unitId: 'mg_dl' },
+    glucose2h: { value: '140', unitId: 'mg_dl' },
+    glucose3h: { value: '120', unitId: 'mg_dl' },
+  });
+  assert.equal(ccSingle.primaryResult.formattedValue, '1 Valor Alterado');
+  assert.equal(ccSingle.severity, 'low');
+
+  // 4. Manning Biophysical Profile: 8/10 with oligohydramnios -> high alert
+  const bppOligo = fetalBiophysicalProfileCalculator.calculate({
+    nstReactive: true,
+    fetalBreathing: true,
+    fetalMovements: true,
+    fetalTone: true,
+    amnioticMethod: 'sdp',
+    sdpCm: { value: '1.6', unitId: 'cm' },
+  });
+  assert.equal(bppOligo.primaryResult.value, 8);
+  assert.equal(bppOligo.severity, 'high');
+  assert.ok(bppOligo.riskClassification.includes('Oligohidramnios'));
+
+  // 5. Obstetric Sepsis (SOS): Albright >= 6 -> critical
+  const sosHigh = obstetricSepsisMeowsCalculator.calculate({
+    temperature: { value: '39.4', unitId: 'c' }, // +3
+    sbp: { value: '86', unitId: 'mmhg' }, // +2
+    heartRate: { value: '132', unitId: 'bpm' }, // +2
+    respiratoryRate: { value: '26', unitId: 'rpm' }, // +1
+    spo2: { value: '95', unitId: 'pct' }, // 0
+    wbc: { value: '19.2', unitId: 'k_ul' }, // +1
+    immatureNeutrophilsPct: { value: '14', unitId: 'pct' }, // +2
+    lactate: { value: '2.5', unitId: 'mmol_l' }, // 0
+    neuroAltered: false,
+    oliguria: false,
+  });
+  assert.equal(sosHigh.primaryResult.value, 11);
+  assert.equal(sosHigh.severity, 'critical');
+});
+
+test('Specialty Gaps Expansion: Geriatrics, Nephrology, Hematology, Urology, Trauma & Dermatology', () => {
+  // 1. Barthel Index (Geriatrics): 100 = independent, 20 = critical dependence
+  const barthelFull = barthelIndexCalculator.calculate({
+    feeding: '10', bathing: '5', grooming: '5', dressing: '10', bowels: '10',
+    bladder: '10', toilet: '10', transfers: '15', mobility: '15', stairs: '10',
+  });
+  assert.equal(barthelFull.primaryResult.value, 100);
+  assert.equal(barthelFull.severity, 'normal');
+
+  const barthelDep = barthelIndexCalculator.calculate({
+    feeding: '5', bathing: '0', grooming: '0', dressing: '5', bowels: '5',
+    bladder: '5', toilet: '0', transfers: '0', mobility: '0', stairs: '0',
+  });
+  assert.equal(barthelDep.primaryResult.value, 20);
+  assert.equal(barthelDep.severity, 'critical');
+
+  // 2. Charlson Comorbidity Index: Age 72 (+3) + CHF (+1) + DM w/ organ damage (+2) + CKD (+2) = 8
+  const charlsonRes = charlsonComorbidityCalculator.calculate({
+    age: { value: '72', unitId: 'years' },
+    mi: false, chf: true, pvd: false, cva: false, dementia: false, copd: false,
+    ctd: false, pud: false, hemiplegia: false, ckd: true,
+    diabetes: '2', liver: '0', tumor: '0', leukemia: false, lymphoma: false, aids: false,
+  });
+  assert.equal(charlsonRes.primaryResult.value, 8);
+  assert.equal(charlsonRes.severity, 'critical');
+
+  // 3. Clinical Frailty Scale (Rockwood 2.0): level 6 moderate, level 9 terminal
+  const cfsMod = clinicalFrailtyScaleCalculator.calculate({ cfsLevel: '6' });
+  assert.equal(cfsMod.primaryResult.value, 6);
+  assert.equal(cfsMod.severity, 'moderate');
+  assert.equal(clinicalFrailtyScaleCalculator.calculate({ cfsLevel: '9' }).severity, 'critical');
+
+  // 4. Pediatric Schwartz CKiD (2009): 0.413 * 100 / 0.50 = 82.6 -> G2 low
+  const schwartzRes = pediatricSchwartzCalculator.calculate({
+    heightCm: { value: '100', unitId: 'cm' },
+    creatinine: { value: '0.50', unitId: 'mg_dl' },
+    ageYears: { value: '4', unitId: 'years' },
+  });
+  assert.equal(schwartzRes.primaryResult.value, 82.6);
+  assert.equal(schwartzRes.severity, 'low');
+
+  // 5. Bicarbonate Deficit: 0.5 * 70 * (16 - 10) = 210 mEq total, 105 mEq initial 50%
+  const hco3Res = bicarbonateDeficitCalculator.calculate({
+    weight: { value: '70', unitId: 'kg' },
+    currentHco3: { value: '10', unitId: 'meq_l' },
+    targetHco3: { value: '16', unitId: 'meq_l' },
+    vdFactor: '0.5',
+  });
+  assert.equal(hco3Res.primaryResult.value, 210);
+  assert.equal(hco3Res.severity, 'high');
+  assert.ok(hco3Res.secondaryResults?.[0].formattedValue.includes('105'));
+
+  // 6. 4Ts HIT Score: 2+2+1+2 = 7 -> high/critical probability
+  const hitHigh = fourTsHitCalculator.calculate({
+    thrombocytopenia: '2', timing: '2', thrombosis: '1', otherCauses: '2',
+  });
+  assert.equal(hitHigh.primaryResult.value, 7);
+  assert.equal(hitHigh.severity, 'critical');
+
+  // 7. ISTH Overt DIC: Plt <50 (+2) + D-dimer mod (+2) + PT 3-6 (+1) + Fbg <100 (+1) = 6 -> critical
+  const dicOvert = isthDicCalculator.calculate({
+    hasUnderlyingDisorder: true, platelets: '2', fibrinMarkers: '2', ptProlongation: '1', fibrinogen: '1',
+  });
+  assert.equal(dicOvert.primaryResult.value, 6);
+  assert.equal(dicOvert.severity, 'critical');
+
+  // 8. sPESI: 0 = low, >=1 = high/critical
+  const spesiLow = spesiPeCalculator.calculate({
+    age80: false, cancer: false, cardiopulmonary: false, hr110: false, sbp100: false, spo290: false,
+  });
+  assert.equal(spesiLow.primaryResult.value, 0);
+  assert.equal(spesiLow.severity, 'low');
+
+  const spesiUnstable = spesiPeCalculator.calculate({
+    age80: true, cancer: false, cardiopulmonary: false, hr110: true, sbp100: true, spo290: false,
+  });
+  assert.equal(spesiUnstable.primaryResult.value, 3);
+  assert.equal(spesiUnstable.severity, 'critical');
+
+  // 9. STONE Score: Male(+2) + <6h(+3) + NonBlack(+3) + Vomiting(+2) + RBC(+3) = 13 -> high
+  const stoneHigh = stoneScoreCalculator.calculate({
+    sex: '2', timing: '3', origin: '3', nausea: '2', erythrocytes: true,
+  });
+  assert.equal(stoneHigh.primaryResult.value, 13);
+  assert.equal(stoneHigh.severity, 'high');
+
+  // 10. PSA Density: 7.5 / 30 = 0.25 -> critical (>=0.20) + 12% free PSA
+  const psadHigh = psaDensityCalculator.calculate({
+    totalPsa: { value: '7.5', unitId: 'ng_ml' },
+    prostateVolume: { value: '30', unitId: 'cm3' },
+    freePsa: { value: '0.9', unitId: 'ng_ml' },
+  });
+  assert.equal(psadHigh.primaryResult.value, 0.25);
+  assert.equal(psadHigh.severity, 'critical');
+
+  // 11. Gustilo-Anderson: Grade I wound + farm contamination -> upgraded to Tipo IIIA
+  const gaUpgraded = gustiloAndersonCalculator.calculate({
+    woundGrade: '1', specialContamination: true,
+  });
+  assert.equal(gaUpgraded.primaryResult.formattedValue, 'Tipo IIIA');
+  assert.equal(gaUpgraded.severity, 'high');
+
+  // 12. MESS Score: High energy(3) + Moderate ischemia(2 * 2 if >6h = 4) + Shock(1) + Age 35(1) = 9
+  const messRes = messScoreCalculator.calculate({
+    skeletalSoftTissue: '3', ischemia: '2', ischemiaGt6h: true, shock: '1', age: '1',
+  });
+  assert.equal(messRes.primaryResult.value, 9);
+  assert.equal(messRes.severity, 'critical');
+
+  // 13. SCORTEN: Age 52(+1) + Malignancy(+1) + HR 128(+1) + BSA 25%(+1) + Urea 12 mmol/L(+1) + HCO3 17(+1) + Glucose 280(+1) = 7
+  const scortenMax = scortenScoreCalculator.calculate({
+    age: { value: '52', unitId: 'years' },
+    malignancy: true,
+    hr: { value: '128', unitId: 'bpm' },
+    bsaDetached: { value: '25', unitId: 'pct' },
+    bun: { value: '12', unitId: 'mmol_l' },
+    hco3: { value: '17', unitId: 'meq_l' },
+    glucose: { value: '280', unitId: 'mg_dl' },
+  });
+  assert.equal(scortenMax.primaryResult.value, 7);
+  assert.equal(scortenMax.severity, 'critical');
+
+  // 14. UAS7: weekly 15 + 16 = 31 -> severe (28-42)
+  const uas7High = uas7UrticariaCalculator.calculate({
+    mode: 'weekly',
+    weeklyWheals: { value: '15', unitId: 'pts' },
+    weeklyItch: { value: '16', unitId: 'pts' },
+    dailyWheals: '2',
+    dailyItch: '2',
+  });
+  assert.equal(uas7High.primaryResult.value, 31);
+  assert.equal(uas7High.severity, 'critical');
+});
+
+test('Consulta Externa Expansion (18 tools): Geriatrics, Cardio/Lipids, Hepato/GI, Rheum/Bone, ENT, Gyn & Well-Child Pediatrics', () => {
+  // 1. Lawton & Brody IADL: 8/8 normal vs 5/8 moderate with medication/finances flagged
+  const lawtonFull = lawtonBrodyCalculator.calculate({
+    telephone: '1', shopping: '1', foodPrep: '1', housekeeping: '1',
+    laundry: '1', transport: '1', medication: '1', finances: '1',
+  });
+  assert.equal(lawtonFull.primaryResult.value, 8);
+  assert.equal(lawtonFull.severity, 'normal');
+
+  const lawtonMod = lawtonBrodyCalculator.calculate({
+    telephone: '1', shopping: '0', foodPrep: '1', housekeeping: '1',
+    laundry: '1', transport: '1', medication: '0', finances: '0',
+  });
+  assert.equal(lawtonMod.primaryResult.value, 5);
+  assert.equal(lawtonMod.severity, 'moderate');
+  assert.ok(lawtonMod.secondaryResults?.[0].formattedValue.includes('Medicación'));
+
+  // 2. Anticholinergic Burden (ACB): Amitriptilina (+3) + Carbamazepina (+2) + Furosemida (+1) = 6 -> critical
+  const acbHigh = anticholinergicBurdenCalculator.calculate({
+    ...createInitialInputs(anticholinergicBurdenCalculator),
+    acb3_amitriptilina: true,
+    acb2_carbamazepina: true,
+    acb1_furosemida: true,
+  });
+  assert.equal(acbHigh.primaryResult.value, 6);
+  assert.equal(acbHigh.severity, 'critical');
+
+  // 3. MNA-SF: 14 normal, 10 moderate risk, 5 high malnutrition
+  const mnaRisk = mnaSfCalculator.calculate({
+    intake: '1', weightLoss: '2', mobility: '2', acuteStress: '2', neuropsych: '1', bmiOrCalf: '2',
+  });
+  assert.equal(mnaRisk.primaryResult.value, 10);
+  assert.equal(mnaRisk.severity, 'moderate');
+
+  const mnaMal = mnaSfCalculator.calculate({
+    intake: '0', weightLoss: '0', mobility: '1', acuteStress: '0', neuropsych: '2', bmiOrCalf: '1',
+  });
+  assert.equal(mnaMal.primaryResult.value, 4);
+  assert.equal(mnaMal.severity, 'high');
+
+  // 4. SARC-F: cutoff >= 4 positive
+  const sarcPos = sarcFCalculator.calculate({
+    strength: '1', assistance: '1', riseChair: '1', climbStairs: '1', falls: '0',
+  });
+  assert.equal(sarcPos.primaryResult.value, 4);
+  assert.equal(sarcPos.severity, 'high');
+
+  // 5. Yesavage GDS-15: reverse-scored items q1, q5, q7, q11, q13 (No = +1)
+  const gdsInit = createInitialInputs(yesavageGds15Calculator);
+  const gdsNormal = yesavageGds15Calculator.calculate(gdsInit);
+  assert.equal(gdsNormal.primaryResult.value, 0);
+  assert.equal(gdsNormal.severity, 'normal');
+
+  const gdsMod = yesavageGds15Calculator.calculate({
+    ...gdsInit,
+    q1: false, // +1 (reverse)
+    q5: false, // +1 (reverse)
+    q2: true,  // +1
+    q3: true,  // +1
+    q12: true, // +1
+    q14: true, // +1
+  });
+  assert.equal(gdsMod.primaryResult.value, 6);
+  assert.equal(gdsMod.severity, 'moderate');
+
+  // 6. SCORE2 (ESC 2021): high-risk region older male smoker has much higher risk than low-risk young female non-smoker
+  const score2LowYoungFemale = score2CvdCalculator.calculate({
+    region: 'low',
+    sex: 'female',
+    age: { value: '45', unitId: 'years' },
+    smoker: false,
+    sbp: { value: '115', unitId: 'mmhg' },
+    totalChol: { value: '180', unitId: 'mg_dl' },
+    hdlChol: { value: '60', unitId: 'mg_dl' },
+  });
+  assert.equal(score2LowYoungFemale.severity, 'low');
+  assert.ok(score2LowYoungFemale.primaryResult.value! < 2.5);
+
+  const score2VeryHighMale = score2CvdCalculator.calculate({
+    region: 'very_high',
+    sex: 'male',
+    age: { value: '65', unitId: 'years' },
+    smoker: true,
+    sbp: { value: '165', unitId: 'mmhg' },
+    totalChol: { value: '270', unitId: 'mg_dl' },
+    hdlChol: { value: '35', unitId: 'mg_dl' },
+  });
+  assert.equal(score2VeryHighMale.severity, 'critical');
+  assert.ok(score2VeryHighMale.primaryResult.value! >= 10);
+
+  // 7. Dutch Lipid Clinic Network (DLCN): 2 + 2 + 6 + 5 + 0 = 15 -> Definitive (> 8)
+  const dlcnDef = dutchLipidClinicCalculator.calculate({
+    familyHistory: '2', clinicalHistory: '2', physicalExam: '6', ldlBaseline: '5', genetics: '0',
+  });
+  assert.equal(dlcnDef.primaryResult.value, 15);
+  assert.equal(dlcnDef.severity, 'critical');
+
+  // 8. MASLD / APRI + NFS: low-risk young vs high-risk older cirrhotic
+  const nfsLow = masldApriNfsCalculator.calculate({
+    age: { value: '35', unitId: 'years' },
+    bmi: { value: '26', unitId: 'kg_m2' },
+    diabetesOrIfg: false,
+    ast: { value: '24', unitId: 'u_l' },
+    astUln: { value: '40', unitId: 'u_l' },
+    alt: { value: '32', unitId: 'u_l' },
+    platelets: { value: '270', unitId: '10e9_l' },
+    albumin: { value: '4.5', unitId: 'g_dl' },
+  });
+  assert.ok(nfsLow.primaryResult.value! < -1.455);
+  assert.equal(nfsLow.severity, 'low');
+
+  const nfsHigh = masldApriNfsCalculator.calculate({
+    age: { value: '68', unitId: 'years' },
+    bmi: { value: '34', unitId: 'kg_m2' },
+    diabetesOrIfg: true,
+    ast: { value: '88', unitId: 'u_l' },
+    astUln: { value: '40', unitId: 'u_l' },
+    alt: { value: '55', unitId: 'u_l' },
+    platelets: { value: '105', unitId: '10e9_l' },
+    albumin: { value: '3.2', unitId: 'g_dl' },
+  });
+  assert.ok(nfsHigh.primaryResult.value! > 0.676);
+  assert.equal(nfsHigh.severity, 'high');
+
+  // 9. Osteoporosis OMS/ISCD & OSTA: T-score -2.7 + fracture = critical; Z-score -2.3 young = moderate; OSTA 0.2*(50-75) = -5 -> high
+  const osteoCrit = osteoporosisOstaWhoCalculator.calculate({
+    mode: 'who_dxa',
+    population: 'postmeno_ge50',
+    tScore: { value: '-2.7', unitId: 'sd' },
+    zScore: { value: '-1.0', unitId: 'sd' },
+    fragilityFracture: true,
+    weight: { value: '54', unitId: 'kg' },
+    age: { value: '68', unitId: 'years' },
+  });
+  assert.equal(osteoCrit.severity, 'critical');
+
+  const osteoYoung = osteoporosisOstaWhoCalculator.calculate({
+    mode: 'who_dxa',
+    population: 'premeno_lt50',
+    tScore: { value: '-2.1', unitId: 'sd' },
+    zScore: { value: '-2.3', unitId: 'sd' },
+    fragilityFracture: false,
+    weight: { value: '54', unitId: 'kg' },
+    age: { value: '38', unitId: 'years' },
+  });
+  assert.equal(osteoYoung.severity, 'moderate');
+
+  const ostaHigh = osteoporosisOstaWhoCalculator.calculate({
+    mode: 'osta',
+    population: 'postmeno_ge50',
+    tScore: { value: '-2.1', unitId: 'sd' },
+    zScore: { value: '-1.8', unitId: 'sd' },
+    fragilityFracture: false,
+    weight: { value: '50', unitId: 'kg' },
+    age: { value: '75', unitId: 'years' },
+  });
+  assert.equal(ostaHigh.primaryResult.value, -5);
+  assert.equal(ostaHigh.severity, 'high');
+
+  // 10. Fibromyalgia ACR 2016: WPI 9 + SSS 7 = FS 16 + >=4/5 regions + >=3m -> Cumple criterios
+  const fibroPos = fibromyalgiaAcr2016Calculator.calculate({
+    wpi: { value: '9', unitId: 'areas' },
+    fatigue: '2', wakingUnrefreshed: '2', cognitive: '1',
+    headache: true, abdominalPain: false, depression: true,
+    generalizedRegions: true, duration3Months: true,
+  });
+  assert.equal(fibroPos.primaryResult.formattedValue, 'Cumple criterios');
+  assert.equal(fibroPos.primaryResult.value, 16);
+
+  // 11. DAS28-ESR & DAS28-CRP
+  const dasEsrRemission = das28RaCalculator.calculate({
+    variant: 'esr',
+    tjc: { value: '0', unitId: 'joints' },
+    sjc: { value: '0', unitId: 'joints' },
+    gh: { value: '15', unitId: 'mm' },
+    esr: { value: '14', unitId: 'mm_h' },
+    crp: { value: '4', unitId: 'mg_l' },
+  });
+  assert.ok(dasEsrRemission.primaryResult.value! < 2.6);
+  assert.equal(dasEsrRemission.severity, 'normal');
+
+  const dasCrpHigh = das28RaCalculator.calculate({
+    variant: 'crp',
+    tjc: { value: '12', unitId: 'joints' },
+    sjc: { value: '8', unitId: 'joints' },
+    gh: { value: '70', unitId: 'mm' },
+    esr: { value: '40', unitId: 'mm_h' },
+    crp: { value: '35', unitId: 'mg_l' },
+  });
+  assert.ok(dasCrpHigh.primaryResult.value! > 5.1);
+  assert.equal(dasCrpHigh.severity, 'critical');
+
+  // 12. Rome IV IBS & Functional Constipation + Alarm override
+  const romeIbs = romeIvBowelCalculator.calculate({
+    ...createInitialInputs(romeIvBowelCalculator),
+    syndrome: 'ibs',
+    chronicity: true,
+    alarmFlags: false,
+    ibsPainFreq: true,
+    ibsDefecation: true,
+    ibsFreqChange: true,
+    ibsFormChange: false,
+  });
+  assert.equal(romeIbs.primaryResult.formattedValue, 'Cumple Roma IV');
+  assert.equal(romeIbs.severity, 'moderate');
+
+  const romeAlarm = romeIvBowelCalculator.calculate({
+    ...createInitialInputs(romeIvBowelCalculator),
+    syndrome: 'constipation',
+    alarmFlags: true,
+  });
+  assert.equal(romeAlarm.severity, 'critical');
+
+  // 13. Acute Rhinosinusitis IDSA/EPOS: Viral vs Bacterial vs Alarm
+  const sinusViral = acuteRhinosinusitisCalculator.calculate({
+    persistent10d: false, severeOnset: false, doubleSickening: false, redFlags: false,
+  });
+  assert.equal(sinusViral.primaryResult.formattedValue, 'Viral');
+  assert.equal(sinusViral.severity, 'low');
+
+  const sinusBact = acuteRhinosinusitisCalculator.calculate({
+    persistent10d: true, severeOnset: false, doubleSickening: false, redFlags: false,
+  });
+  assert.equal(sinusBact.primaryResult.formattedValue, 'Bacteriana');
+  assert.equal(sinusBact.severity, 'high');
+
+  const sinusAlarm = acuteRhinosinusitisCalculator.calculate({
+    persistent10d: false, severeOnset: false, doubleSickening: false, redFlags: true,
+  });
+  assert.equal(sinusAlarm.severity, 'critical');
+
+  // 14. Menopause Rating Scale (MRS): sum across 11 items -> >= 16 severe
+  const mrsSevere = menopauseMrsCalculator.calculate({
+    m1: '3', m2: '1', m3: '3', m4: '2', m5: '2', m6: '1', m7: '2', m8: '1', m9: '1', m10: '2', m11: '2',
+  });
+  assert.equal(mrsSevere.primaryResult.value, 20);
+  assert.equal(mrsSevere.severity, 'high');
+
+  // 15. PCOS Rotterdam 2023: Phenotype B (OD + HA, excluded=true) vs pending exclusion
+  const pcosPhenB = pcosRotterdamCalculator.calculate({
+    ovulatoryDysfunction: true, hyperandrogenism: true, pcomOrAmh: false, mimickersExcluded: true,
+  });
+  assert.equal(pcosPhenB.primaryResult.formattedValue, 'Fenotipo B');
+  assert.equal(pcosPhenB.severity, 'moderate');
+
+  const pcosPending = pcosRotterdamCalculator.calculate({
+    ovulatoryDysfunction: true, hyperandrogenism: true, pcomOrAmh: true, mimickersExcluded: false,
+  });
+  assert.equal(pcosPending.severity, 'high');
+
+  // 16. Pediatric BP AAP 2017: 1y girl 96/52 normal (< 98/54), 1y girl 96/54 positive (>= 54 DBP), 15y teen 132/82 Stage 1
+  const pedBp1yNorm = pediatricBloodPressureCalculator.calculate({
+    sex: 'female', ageYears: { value: '1', unitId: 'years' }, sbp: { value: '96', unitId: 'mmhg' }, dbp: { value: '52', unitId: 'mmhg' },
+  });
+  assert.equal(pedBp1yNorm.severity, 'normal');
+
+  const pedBp1yPos = pediatricBloodPressureCalculator.calculate({
+    sex: 'female', ageYears: { value: '1', unitId: 'years' }, sbp: { value: '96', unitId: 'mmhg' }, dbp: { value: '54', unitId: 'mmhg' },
+  });
+  assert.equal(pedBp1yPos.severity, 'high');
+
+  const teenStage1 = pediatricBloodPressureCalculator.calculate({
+    sex: 'male', ageYears: { value: '15', unitId: 'years' }, sbp: { value: '132', unitId: 'mmhg' }, dbp: { value: '82', unitId: 'mmhg' },
+  });
+  assert.equal(teenStage1.severity, 'high');
+
+  // 17. Target Height (Tanner) & Growth Velocity: boy (160+174+13)/2 = 173.5 cm; velocity (117.5-112)/12*12 = 5.5 cm/yr
+  const targetRes = targetHeightVelocityCalculator.calculate({
+    sex: 'male',
+    motherHeight: { value: '160', unitId: 'cm' },
+    fatherHeight: { value: '174', unitId: 'cm' },
+    prevHeight: { value: '112.0', unitId: 'cm' },
+    currHeight: { value: '117.5', unitId: 'cm' },
+    intervalMonths: { value: '12', unitId: 'months' },
+  });
+  assert.equal(targetRes.primaryResult.value, 173.5);
+  assert.equal(targetRes.severity, 'normal');
+  assert.ok(targetRes.secondaryResults?.some((r) => r.formattedValue === '5.5'));
+
+  // 18. M-CHAT-R: default all pass = 0; reverse items m2=true (+1), m5=true (+1), m12=true (+1) + m6=false (+1) = 4 moderate
+  const mchatInit = createInitialInputs(mchatRCalculator);
+  const mchatLow = mchatRCalculator.calculate(mchatInit);
+  assert.equal(mchatLow.primaryResult.value, 0);
+  assert.equal(mchatLow.severity, 'normal');
+
+  const mchatMod = mchatRCalculator.calculate({
+    ...mchatInit,
+    m2: true,  // +1 reverse
+    m5: true,  // +1 reverse
+    m12: true, // +1 reverse
+    m6: false, // +1 normal
+  });
+  assert.equal(mchatMod.primaryResult.value, 4);
+  assert.equal(mchatMod.severity, 'moderate');
+});
+
+test('Catalog: 168 deduplicated tools, cross-specialty tagging, and accent-insensitive search', () => {
+  assert.equal(CALCULATOR_CATALOG.length, 168);
 
   const endoCalcs = getCalculatorsBySpecialty('endocrinologia');
   assert.ok(endoCalcs.some((c) => c.id === 'homa-ir-b'));
@@ -2272,6 +2956,8 @@ test('Catalog: 129 deduplicated tools, cross-specialty tagging, and accent-insen
   assert.ok(neuroCalcs.some((c) => c.id === 'ichd3-migraine-headache'));
   assert.ok(neuroCalcs.some((c) => c.id === 'headache-red-flags-snnoop10'));
   assert.ok(neuroCalcs.some((c) => c.id === 'mrc-neurological-weakness'));
+  assert.ok(neuroCalcs.some((c) => c.id === 'hints-plus-vertigo'));
+  assert.ok(neuroCalcs.some((c) => c.id === 'vppb-dix-hallpike-epley'));
 
   const surgCalcs = getCalculatorsBySpecialty('cirugia-general');
   assert.ok(surgCalcs.some((c) => c.id === 'alvarado'));
@@ -2286,12 +2972,22 @@ test('Catalog: 129 deduplicated tools, cross-specialty tagging, and accent-insen
   assert.ok(pedCalcs.some((c) => c.id === 'psofa'));
   assert.ok(pedCalcs.some((c) => c.id === 'silverman-andersen'));
   assert.ok(pedCalcs.some((c) => c.id === 'tanner-stages'));
+  assert.ok(pedCalcs.some((c) => c.id === 'pediatric-bp-aap'));
+  assert.ok(pedCalcs.some((c) => c.id === 'target-height-velocity'));
+  assert.ok(pedCalcs.some((c) => c.id === 'mchat-r'));
 
   const obgynCalcs = getCalculatorsBySpecialty('gineco-obstetricia');
   assert.ok(obgynCalcs.some((c) => c.id === 'gestational-age'));
   assert.ok(obgynCalcs.some((c) => c.id === 'bishop'));
   assert.ok(obgynCalcs.some((c) => c.id === 'apgar'));
   assert.ok(obgynCalcs.some((c) => c.id === 'obstetric-shock-index'));
+  assert.ok(obgynCalcs.some((c) => c.id === 'obstetric-weight-gain'));
+  assert.ok(obgynCalcs.some((c) => c.id === 'preeclampsia-hellp'));
+  assert.ok(obgynCalcs.some((c) => c.id === 'gestational-diabetes'));
+  assert.ok(obgynCalcs.some((c) => c.id === 'fetal-biophysical-profile'));
+  assert.ok(obgynCalcs.some((c) => c.id === 'obstetric-sepsis-meows'));
+  assert.ok(obgynCalcs.some((c) => c.id === 'menopause-mrs'));
+  assert.ok(obgynCalcs.some((c) => c.id === 'pcos-rotterdam'));
 
   const psychCalcs = getCalculatorsBySpecialty('psiquiatria');
   assert.ok(psychCalcs.some((c) => c.id === 'sad-persons'));
@@ -2306,6 +3002,8 @@ test('Catalog: 129 deduplicated tools, cross-specialty tagging, and accent-insen
   assert.ok(gastroCalcs.some((c) => c.id === 'child-pugh'));
   assert.ok(gastroCalcs.some((c) => c.id === 'glasgow-blatchford'));
   assert.ok(gastroCalcs.some((c) => c.id === 'bristol-scale'));
+  assert.ok(gastroCalcs.some((c) => c.id === 'masld-apri-nfs'));
+  assert.ok(gastroCalcs.some((c) => c.id === 'rome-iv-bowel'));
 
   const pneumoCalcs = getCalculatorsBySpecialty('neumologia');
   assert.ok(pneumoCalcs.some((c) => c.id === 'copd-gold'));
@@ -2315,24 +3013,53 @@ test('Catalog: 129 deduplicated tools, cross-specialty tagging, and accent-insen
   const traumaCalcs = getCalculatorsBySpecialty('traumatologia');
   assert.ok(traumaCalcs.some((c) => c.id === 'ottawa-ankle-knee'));
   assert.ok(traumaCalcs.some((c) => c.id === 'cervical-trauma'));
+  assert.ok(traumaCalcs.some((c) => c.id === 'gustilo-anderson'));
+  assert.ok(traumaCalcs.some((c) => c.id === 'mess-extremity'));
 
   const hemaCalcs = getCalculatorsBySpecialty('hematologia');
   assert.ok(hemaCalcs.some((c) => c.id === 'ganzoni-iron'));
   assert.ok(hemaCalcs.some((c) => c.id === 'mentzer-index'));
+  assert.ok(hemaCalcs.some((c) => c.id === 'four-ts-hit'));
+  assert.ok(hemaCalcs.some((c) => c.id === 'isth-dic'));
+  assert.ok(hemaCalcs.some((c) => c.id === 'spesi-tep'));
 
   const uroCalcs = getCalculatorsBySpecialty('urologia');
   assert.ok(uroCalcs.some((c) => c.id === 'ipss-prostate'));
   assert.ok(uroCalcs.some((c) => c.id === 'twist-score'));
+  assert.ok(uroCalcs.some((c) => c.id === 'stone-score'));
+  assert.ok(uroCalcs.some((c) => c.id === 'psa-density'));
   assert.ok(!surgCalcs.some((c) => c.id === 'ipss-prostate'));
 
   const geriatricsCalcs = getCalculatorsBySpecialty('geriatria');
   assert.ok(geriatricsCalcs.some((c) => c.id === 'mini-cog'));
   assert.ok(geriatricsCalcs.some((c) => c.id === 'braden-scale'));
   assert.ok(geriatricsCalcs.some((c) => c.id === 'fall-risk'));
+  assert.ok(geriatricsCalcs.some((c) => c.id === 'barthel-index'));
+  assert.ok(geriatricsCalcs.some((c) => c.id === 'charlson-comorbidity'));
+  assert.ok(geriatricsCalcs.some((c) => c.id === 'clinical-frailty-scale'));
+  assert.ok(geriatricsCalcs.some((c) => c.id === 'lawton-brody'));
+  assert.ok(geriatricsCalcs.some((c) => c.id === 'anticholinergic-acb'));
+  assert.ok(geriatricsCalcs.some((c) => c.id === 'mna-sf'));
+  assert.ok(geriatricsCalcs.some((c) => c.id === 'sarc-f'));
+  assert.ok(geriatricsCalcs.some((c) => c.id === 'yesavage-gds15'));
+
+  assert.ok(cardioCalcs.some((c) => c.id === 'score2-cvd'));
+  assert.ok(endoCalcs.some((c) => c.id === 'dutch-lipid-clinic'));
+  assert.ok(idCalcs.some((c) => c.id === 'acute-rhinosinusitis'));
+  const imCalcs = getCalculatorsBySpecialty('medicina-interna');
+  assert.ok(imCalcs.some((c) => c.id === 'osteoporosis-osta-who'));
+  assert.ok(imCalcs.some((c) => c.id === 'fibromyalgia-acr-2016'));
+  assert.ok(imCalcs.some((c) => c.id === 'das28-ra'));
 
   const dermCalcs = getCalculatorsBySpecialty('dermatologia');
   assert.ok(dermCalcs.some((c) => c.id === 'burns-parkland'));
   assert.ok(dermCalcs.some((c) => c.id === 'lrinec-score'));
+  assert.ok(dermCalcs.some((c) => c.id === 'scorten-sjs-ten'));
+  assert.ok(dermCalcs.some((c) => c.id === 'uas7-urticaria'));
+
+  const nephroCalcs = getCalculatorsBySpecialty('nefrologia');
+  assert.ok(nephroCalcs.some((c) => c.id === 'pediatric-schwartz'));
+  assert.ok(nephroCalcs.some((c) => c.id === 'bicarbonate-deficit'));
 
   const byAccentInsensitiveQuery = searchCalculators('neumonia');
   assert.ok(byAccentInsensitiveQuery.some((c) => c.id === 'curb-65'));
@@ -2355,6 +3082,22 @@ test('Catalog: 129 deduplicated tools, cross-specialty tagging, and accent-insen
 
   const byWeakness = searchCalculators('debilidad neurologica');
   assert.equal(byWeakness[0]?.id, 'mrc-neurological-weakness');
+
+  // Specialty-scoped search strictly filters to tools inside the selected specialty
+  const obgynPreeclampsia = searchCalculatorsInSpecialty('gineco-obstetricia', 'preeclampsia');
+  assert.ok(obgynPreeclampsia.some((c) => c.id === 'preeclampsia-hellp'));
+  assert.ok(obgynPreeclampsia.some((c) => c.id === 'obstetric-mgso4'));
+  assert.equal(searchCalculatorsInSpecialty('gineco-obstetricia', 'heart').length, 0);
+  assert.equal(searchCalculatorsInSpecialty('gineco-obstetricia', 'glasgow').length, 0);
+  assert.equal(searchCalculatorsInSpecialty('gineco-obstetricia', 'psiquiatria').length, 0);
+  assert.equal(searchCalculatorsInSpecialty('cardiologia', 'migrana').length, 0);
+  assert.ok(
+    searchCalculatorsInSpecialty('cardiologia', 'heart').some((c) => c.id === 'heart-score'),
+  );
+  assert.equal(
+    searchCalculatorsInSpecialty('cardiologia', '').length,
+    getCalculatorsBySpecialty('cardiologia').length,
+  );
 
   for (let i = 1; i < CALCULATOR_CATALOG.length; i += 1) {
     const prev = CALCULATOR_CATALOG[i - 1];
@@ -2435,5 +3178,310 @@ test('Phase 6 Audit: every calculator has unique ID, clinical safety metadata, v
     }
   }
 });
+
+test('Logic Audit Regressions: unit-aware validation bounds, clinical dehydration grades, decimal boundaries & cross-field guards', () => {
+  // 1. Unit-aware validation error messages must match field bounds in the active unit
+  const cgWeightErrKg = validateCalculatorInputs(cockcroftGaultCalculator, {
+    age: { value: '55', unitId: 'years' },
+    weight: { value: '20', unitId: 'kg' },
+    creatinine: { value: '1.0', unitId: 'mg_dl' },
+    sex: 'male',
+  });
+  assert.equal(cgWeightErrKg.length, 1);
+  assert.ok(cgWeightErrKg[0].message.includes('25 y 350 kg'), cgWeightErrKg[0].message);
+
+  const cgWeightErrLb = validateCalculatorInputs(cockcroftGaultCalculator, {
+    age: { value: '55', unitId: 'years' },
+    weight: { value: '40', unitId: 'lb' },
+    creatinine: { value: '1.0', unitId: 'mg_dl' },
+    sex: 'male',
+  });
+  assert.equal(cgWeightErrLb.length, 1);
+  const lbBoundsMatch = cgWeightErrLb[0].message.match(/entre ([\d.]+) y ([\d.]+) lb/);
+  assert.ok(lbBoundsMatch, cgWeightErrLb[0].message);
+  // Any value equal to printed min/max in lb must pass validation cleanly
+  assert.equal(
+    validateCalculatorInputs(cockcroftGaultCalculator, {
+      age: { value: '55', unitId: 'years' },
+      weight: { value: lbBoundsMatch[1], unitId: 'lb' },
+      creatinine: { value: '1.0', unitId: 'mg_dl' },
+      sex: 'male',
+    }).length,
+    0,
+  );
+  assert.equal(
+    validateCalculatorInputs(cockcroftGaultCalculator, {
+      age: { value: '55', unitId: 'years' },
+      weight: { value: lbBoundsMatch[2], unitId: 'lb' },
+      creatinine: { value: '1.0', unitId: 'mg_dl' },
+      sex: 'male',
+    }).length,
+    0,
+  );
+
+  const obHeightErr = validateCalculatorInputs(obstetricWeightGainCalculator, {
+    gestationalWeeks: { value: '28', unitId: 'weeks' },
+    plurality: 'singleton',
+    preWeight: { value: '60', unitId: 'kg' },
+    height: { value: '100', unitId: 'cm' },
+    currentWeight: { value: '68', unitId: 'kg' },
+    fetalInputMode: 'none',
+  });
+  assert.equal(obHeightErr.length, 1);
+  assert.ok(obHeightErr[0].message.includes('110 y 220 cm'), obHeightErr[0].message);
+
+  const ldlTcErr = validateCalculatorInputs(ldlNonHdlCalculator, {
+    tc: { value: '850', unitId: 'mg_dl' },
+    hdl: { value: '45', unitId: 'mg_dl' },
+    tg: { value: '150', unitId: 'mg_dl' },
+  });
+  assert.equal(ldlTcErr.length, 1);
+  assert.ok(ldlTcErr[0].message.includes('40 y 800 mg/dL'), ldlTcErr[0].message);
+
+  // 2. Pediatric Dehydration clinical mode respects clinicalGrade regardless of ageGroup %
+  const infantMild = pediatricDehydrationCalculator.calculate({
+    mode: 'clinical',
+    ageGroup: 'infant',
+    clinicalGrade: 'mild',
+    currentWeight: { value: '10', unitId: 'kg' },
+    bolusGiven: { value: '0', unitId: 'ml' },
+  });
+  assert.equal(infantMild.severity, 'low');
+  assert.ok(infantMild.riskClassification.includes('leve'));
+
+  const infantModerate = pediatricDehydrationCalculator.calculate({
+    mode: 'clinical',
+    ageGroup: 'infant',
+    clinicalGrade: 'moderate',
+    currentWeight: { value: '10', unitId: 'kg' },
+    bolusGiven: { value: '0', unitId: 'ml' },
+  });
+  assert.equal(infantModerate.severity, 'moderate');
+  assert.ok(infantModerate.riskClassification.includes('moderada'));
+
+  const olderSevere = pediatricDehydrationCalculator.calculate({
+    mode: 'clinical',
+    ageGroup: 'older',
+    clinicalGrade: 'severe',
+    currentWeight: { value: '30', unitId: 'kg' },
+    bolusGiven: { value: '0', unitId: 'ml' },
+  });
+  assert.equal(olderSevere.severity, 'critical');
+  assert.ok(olderSevere.riskClassification.includes('grave'));
+
+  // 3. APACHE II continuous decimal boundaries (no fall-through to 0 pts)
+  const apacheDecimalPh = apacheIiCalculator.calculate({
+    temp: { value: '40.95', unitId: 'c' }, // +3
+    map: { value: '129.5', unitId: 'mmhg' }, // +2
+    hr: { value: '80', unitId: 'bpm' }, // 0
+    rr: { value: '16', unitId: 'rpm' }, // 0
+    oxygenation: '0',
+    acidBaseSource: 'ph',
+    ph: { value: '7.695', unitId: 'ph' }, // +3
+    sodium: { value: '140', unitId: 'meq_l' }, // 0
+    potassium: { value: '5.95', unitId: 'meq_l' }, // +1
+    creatinine: { value: '1.0', unitId: 'mg_dl' }, // 0
+    acuteRenalFailure: false,
+    hematocrit: { value: '59.95', unitId: 'pct' }, // +2
+    wbc: { value: '39.95', unitId: 'k_ul' }, // +2
+    gcs: { value: '15', unitId: 'pts' }, // 0
+    age: { value: '30', unitId: 'years' }, // 0
+    chronicHealth: '0',
+  });
+  assert.equal(apacheDecimalPh.primaryResult.value, 13);
+
+  const apacheDecimalHco3 = apacheIiCalculator.calculate({
+    temp: { value: '29.95', unitId: 'c' }, // +4
+    map: { value: '85', unitId: 'mmhg' }, // 0
+    hr: { value: '80', unitId: 'bpm' }, // 0
+    rr: { value: '16', unitId: 'rpm' }, // 0
+    oxygenation: '0',
+    acidBaseSource: 'hco3',
+    hco3: { value: '51.95', unitId: 'meq_l' }, // +3
+    sodium: { value: '140', unitId: 'meq_l' }, // 0
+    potassium: { value: '4.0', unitId: 'meq_l' }, // 0
+    creatinine: { value: '1.0', unitId: 'mg_dl' }, // 0
+    acuteRenalFailure: false,
+    hematocrit: { value: '40', unitId: 'pct' }, // 0
+    wbc: { value: '8', unitId: 'k_ul' }, // 0
+    gcs: { value: '15', unitId: 'pts' }, // 0
+    age: { value: '30', unitId: 'years' }, // 0
+    chronicHealth: '0',
+  });
+  assert.equal(apacheDecimalHco3.primaryResult.value, 7);
+
+  // 4. Obstetric SOS continuous decimal boundaries
+  const sosDecimals = obstetricSepsisMeowsCalculator.calculate({
+    temperature: { value: '31.95', unitId: 'c' }, // +3
+    sbp: { value: '110', unitId: 'mmhg' }, // 0
+    heartRate: { value: '90', unitId: 'bpm' }, // 0
+    respiratoryRate: { value: '9.5', unitId: 'rpm' }, // +2
+    spo2: { value: '98', unitId: 'pct' }, // 0
+    wbc: { value: '2.95', unitId: 'k_ul' }, // +2
+    immatureNeutrophilsPct: { value: '2', unitId: 'pct' }, // 0
+    lactate: { value: '1.2', unitId: 'mmol_l' }, // 0
+    neuroAltered: false,
+    oliguria: false,
+  });
+  assert.equal(sosDecimals.primaryResult.value, 7);
+
+  // 5. Framingham rejects HDL >= Total Cholesterol
+  assert.throws(
+    () =>
+      framinghamCvdCalculator.calculate({
+        age: { value: '50', unitId: 'years' },
+        sex: 'male',
+        totalChol: { value: '140', unitId: 'mg_dl' },
+        hdlChol: { value: '145', unitId: 'mg_dl' },
+        sbp: { value: '120', unitId: 'mmhg' },
+        treatedBp: false,
+        smoker: false,
+        diabetes: false,
+      }),
+    /HDL/,
+  );
+
+  // 6. Target Height & Velocity notifies when only one height is entered
+  const partialVelocity = targetHeightVelocityCalculator.calculate({
+    sex: 'male',
+    motherHeight: { value: '160', unitId: 'cm' },
+    fatherHeight: { value: '174', unitId: 'cm' },
+    prevHeight: { value: '110', unitId: 'cm' },
+    currHeight: { value: '', unitId: 'cm' },
+    intervalMonths: { value: '12', unitId: 'months' },
+  });
+  assert.equal(partialVelocity.primaryResult.value, 173.5);
+  assert.ok(
+    partialVelocity.secondaryResults?.some((r) => r.formattedValue === 'Pendiente'),
+  );
+});
+
+test('HINTS / HINTS Plus: peripheral AVS, INFARCT central stroke alerts, AICA hearing loss & eligibility guards', () => {
+  const peripheral = hintsPlusVertigoCalculator.calculate({
+    avsStatus: 'eligible',
+    headImpulse: 'abnormal_catchup',
+    nystagmus: 'unidirectional_horizontal',
+    testOfSkew: 'absent',
+    acuteHearingLoss: 'absent',
+  });
+  assert.equal(peripheral.primaryResult.formattedValue, 'Periférico');
+  assert.equal(peripheral.primaryResult.value, 0);
+  assert.equal(peripheral.severity, 'low');
+
+  const centralNormalHit = hintsPlusVertigoCalculator.calculate({
+    avsStatus: 'eligible',
+    headImpulse: 'normal_no_saccade',
+    nystagmus: 'unidirectional_horizontal',
+    testOfSkew: 'absent',
+    acuteHearingLoss: 'absent',
+  });
+  assert.equal(centralNormalHit.primaryResult.formattedValue, 'CENTRAL (+)');
+  assert.equal(centralNormalHit.primaryResult.value, 1);
+  assert.equal(centralNormalHit.severity, 'critical');
+
+  const hintsPlusAica = hintsPlusVertigoCalculator.calculate({
+    avsStatus: 'eligible',
+    headImpulse: 'abnormal_catchup',
+    nystagmus: 'unidirectional_horizontal',
+    testOfSkew: 'absent',
+    acuteHearingLoss: 'present_acute',
+  });
+  assert.equal(hintsPlusAica.primaryResult.formattedValue, 'CENTRAL (+)');
+  assert.equal(hintsPlusAica.severity, 'critical');
+  assert.ok(hintsPlusAica.clinicalInterpretation.includes('AICA'));
+
+  const notAvs = hintsPlusVertigoCalculator.calculate({
+    avsStatus: 'episodic_no_nystagmus',
+  });
+  assert.equal(notAvs.primaryResult.formattedValue, 'No aplicable');
+  assert.equal(notAvs.severity, 'info');
+
+  const focalCns = hintsPlusVertigoCalculator.calculate({
+    avsStatus: 'focal_cns',
+  });
+  assert.equal(focalCns.primaryResult.formattedValue, 'CENTRAL');
+  assert.equal(focalCns.severity, 'critical');
+});
+
+test('VPPB (Dix-Hallpike / Roll Test): posterior Epley, horizontal geotropic/apogeotropic lateralization & central red flags', () => {
+  const rightPost = vppbManipulationCalculator.calculate({
+    centralFlags: false,
+    maneuver: 'dix_hallpike_right',
+    cervicalPrecaution: false,
+  });
+  assert.equal(rightPost.primaryResult.formattedValue, 'Epley Derecho');
+  assert.equal(rightPost.severity, 'low');
+
+  const horizGeo = vppbManipulationCalculator.calculate({
+    centralFlags: false,
+    maneuver: 'roll_geotropic',
+    strongerSide: 'left',
+    cervicalPrecaution: false,
+  });
+  assert.ok(horizGeo.primaryResult.formattedValue.includes('Izquierdo'));
+  assert.equal(horizGeo.severity, 'low');
+
+  // Apogeotropic horizontal BPPV: affected ear is opposite to the stronger nystagmus side
+  const horizApogeo = vppbManipulationCalculator.calculate({
+    centralFlags: false,
+    maneuver: 'roll_apogeotropic',
+    strongerSide: 'right',
+    cervicalPrecaution: false,
+  });
+  assert.ok(horizApogeo.primaryResult.formattedValue.includes('Izquierdo'));
+  assert.ok(horizApogeo.riskClassification.includes('Apogeotrópico'));
+
+  const centralAlert = vppbManipulationCalculator.calculate({
+    centralFlags: true,
+  });
+  assert.equal(centralAlert.primaryResult.formattedValue, 'CENTRAL / Atípico');
+  assert.equal(centralAlert.severity, 'critical');
+});
+
+test('Clinical Reference Tables & Formula Verification: valid tables for outpatient/emergency settings and formula metadata for all 168 tools', () => {
+  assert.ok(CLINICAL_REFERENCE_TABLES.length >= 16);
+  const tableIds = new Set<string>();
+  const specialtyIds = new Set(SPECIALTIES.map((s) => s.id));
+
+  let hasOutpatient = false;
+  let hasEmergency = false;
+
+  for (const table of CLINICAL_REFERENCE_TABLES) {
+    assert.ok(!tableIds.has(table.id), `ID de tabla duplicado: ${table.id}`);
+    tableIds.add(table.id);
+    assert.ok(specialtyIds.has(table.specialty), `Especialidad inválida en tabla: ${table.id}`);
+    assert.ok(table.columns.length >= 3, `${table.id}: columnas insuficientes`);
+    assert.ok(table.rows.length >= 3, `${table.id}: filas insuficientes`);
+    for (const row of table.rows) {
+      assert.equal(
+        row.length,
+        table.columns.length,
+        `${table.id}: longitud de fila no coincide con columnas`,
+      );
+    }
+    assert.ok(table.references.length > 0, `${table.id}: sin referencias`);
+    if (table.setting === 'consulta-externa' || table.setting === 'ambos') hasOutpatient = true;
+    if (table.setting === 'urgencias' || table.setting === 'ambos') hasEmergency = true;
+  }
+
+  assert.ok(hasOutpatient && hasEmergency);
+
+  for (const calc of CALCULATOR_CATALOG) {
+    const info = getCalculatorFormulaReference(calc);
+    assert.ok(info.formulaUsed.trim().length > 0, `${calc.id}: formulaUsed vacío`);
+    assert.ok(
+      !info.formulaUsed.includes('evaluación clínica estructurada sobre'),
+      `${calc.id}: cayó en fallback de fórmula (${info.formulaUsed})`,
+    );
+    assert.equal(
+      info.variables.length,
+      calc.fields.length,
+      `${calc.id}: número de variables en referencia no coincide`,
+    );
+  }
+});
+
+
+
 
 

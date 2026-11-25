@@ -12,6 +12,7 @@ import {
   Undo2,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { parseStrictNumber } from '../../clinical-core/math/precision.ts';
 import type { CalculatorInputsState, NumberInputValue } from '../../clinical-core/types/clinical.ts';
 
 interface MocaInteractiveGuideProps {
@@ -620,7 +621,8 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
     }
   };
 
-  const getVal = (id: string) => Number((inputs[id] as NumberInputValue | undefined)?.value || 0);
+  const getVal = (id: string) =>
+    Math.max(0, parseStrictNumber((inputs[id] as NumberInputValue | undefined)?.value ?? '') ?? 0);
   const lowEdu = inputs.lowEducation === true;
   const rawScore =
     getVal('visuospatial') +

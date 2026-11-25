@@ -1,7 +1,8 @@
-import { ChevronRight, Star } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import React from 'react';
 import { SPECIALTY_MAP, SUBCATEGORY_LABELS } from '../../clinical-core/registries/specialties.ts';
 import type { CalculatorDefinition } from '../../clinical-core/types/clinical.ts';
+import { ClinicalStarIcon } from '../icons/clinicalUiIcons.tsx';
 
 interface CalculatorCardProps {
   calculator: CalculatorDefinition;
@@ -58,8 +59,9 @@ export const CalculatorCard: React.FC<CalculatorCardProps> = ({
           }
           className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-amber-500 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-amber-400"
         >
-          <Star
-            className={`h-4 w-4 ${isFavorite ? 'fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400' : ''}`}
+          <ClinicalStarIcon
+            filled={isFavorite}
+            className={`h-[18px] w-[18px] ${isFavorite ? 'text-amber-500 dark:text-amber-400' : ''}`}
           />
         </button>
 

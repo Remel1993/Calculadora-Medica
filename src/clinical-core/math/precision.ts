@@ -3,6 +3,7 @@ import type {
   CalculatorInputsState,
   NumberFieldDef,
   NumberInputValue,
+  UnitOption,
   ValidationError,
 } from '../types/clinical.ts';
 
@@ -63,6 +64,45 @@ export function getCanonicalNumberValue(
   return { canonicalValue, unitLabel: unit.label, rawNumber };
 }
 
+function getDisplayUnitBounds(
+  field: NumberFieldDef,
+  unit: UnitOption,
+): { min: number; max: number } {
+  const b = unit.toCanonical(0);
+  const a = unit.toCanonical(1) - b;
+
+  if (!Number.isFinite(a) || !Number.isFinite(b) || a <= 0) {
+    return { min: unit.min ?? field.min, max: unit.max ?? field.max };
+  }
+  if (Math.abs(a - 1) < 1e-12 && Math.abs(b) < 1e-12) {
+    return { min: field.min, max: field.max };
+  }
+
+  const rawMin = (field.min - b) / a;
+  const rawMax = (field.max - b) / a;
+
+  const stepStr = unit.step && unit.step > 0 ? String(unit.step) : '';
+  const dotIdx = stepStr.indexOf('.');
+  const decimals = stepStr ? (dotIdx === -1 ? 0 : Math.min(3, stepStr.length - dotIdx - 1)) : 2;
+  const factor = Math.pow(10, decimals);
+
+  let displayMin = roundClinical(rawMin, decimals);
+  if (unit.toCanonical(displayMin) < field.min) {
+    displayMin = roundClinical(Math.ceil(rawMin * factor - 1e-9) / factor, decimals);
+  }
+
+  let displayMax = roundClinical(rawMax, decimals);
+  if (unit.toCanonical(displayMax) > field.max) {
+    displayMax = roundClinical(Math.floor(rawMax * factor + 1e-9) / factor, decimals);
+  }
+
+  if (displayMin > displayMax) {
+    return { min: roundClinical(rawMin, 2), max: roundClinical(rawMax, 2) };
+  }
+
+  return { min: displayMin, max: displayMax };
+}
+
 export function validateCalculatorInputs(
   definition: CalculatorDefinition,
   inputs: CalculatorInputsState,
@@ -116,8 +156,7 @@ export function validateCalculatorInputs(
       }
 
       if (canonical < field.min || canonical > field.max) {
-        const displayMin = unit.min ?? field.min;
-        const displayMax = unit.max ?? field.max;
+        const { min: displayMin, max: displayMax } = getDisplayUnitBounds(field, unit);
         errors.push({
           fieldId: field.id,
           message: `${field.label} debe estar entre ${displayMin} y ${displayMax} ${unit.label}.`,

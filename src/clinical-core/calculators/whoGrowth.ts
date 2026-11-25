@@ -1,6 +1,7 @@
 import {
   formatClinicalNumber,
   getCanonicalNumberValue,
+  parseStrictNumber,
   roundClinical,
   validateCalculatorInputs,
 } from '../math/precision.ts';
@@ -85,8 +86,8 @@ const headCircField: NumberFieldDef = {
   visibleWhen: (inputs) => {
     const raw = inputs.ageMonths as NumberInputValue | undefined;
     if (!raw || raw.value === '') return true;
-    const num = Number(raw.value.replace(',', '.'));
-    if (!Number.isFinite(num)) return true;
+    const num = parseStrictNumber(raw.value);
+    if (num === null) return true;
     const months = raw.unitId === 'years' ? num * 12 : num;
     return months <= 60;
   },

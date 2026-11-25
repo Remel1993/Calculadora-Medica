@@ -1,6 +1,6 @@
-import { History, Trash2 } from 'lucide-react';
 import React from 'react';
 import type { HistoryEntry } from '../../storage/localStore.ts';
+import { ClinicalHistoryIcon, ClinicalTrashIcon } from '../icons/clinicalUiIcons.tsx';
 
 interface HistoryViewProps {
   history: HistoryEntry[];
@@ -44,7 +44,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
             onClick={onClearAll}
             className="inline-flex min-h-[44px] items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-50 dark:border-slate-700 dark:bg-slate-900 dark:text-rose-400 dark:hover:bg-rose-950/30 whitespace-nowrap"
           >
-            <Trash2 className="h-4 w-4" />
+            <ClinicalTrashIcon className="h-4 w-4" />
             <span>Borrar historial</span>
           </button>
         )}
@@ -90,15 +90,17 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                 aria-label={`Eliminar registro de ${entry.calculatorName}`}
                 className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-rose-600 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-rose-400"
               >
-                <Trash2 className="h-4 w-4" />
+                <ClinicalTrashIcon className="h-4 w-4" />
               </button>
             </div>
           ))}
         </div>
       ) : (
         <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center dark:border-slate-800 dark:bg-slate-900">
-          <History className="mx-auto h-7 w-7 text-slate-400 dark:text-slate-500" />
-          <h2 className="mt-2 text-base font-semibold text-slate-900 dark:text-slate-100">
+          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 ring-1 ring-sky-200/80 dark:bg-sky-950/60 dark:text-sky-400 dark:ring-sky-800/60">
+            <ClinicalHistoryIcon className="h-6 w-6" />
+          </span>
+          <h2 className="mt-3 text-base font-semibold text-slate-900 dark:text-slate-100">
             Sin cálculos recientes
           </h2>
           <p className="mx-auto mt-1 max-w-md text-xs leading-relaxed text-slate-500 dark:text-slate-400">

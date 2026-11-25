@@ -1,7 +1,11 @@
 import { Baby, BarChart3, Ruler, Scale, Table2 } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import type { WhoIndicatorId, WhoSex } from '../../clinical-core/data/whoGrowthStandards.ts';
-import { formatClinicalNumber, roundClinical } from '../../clinical-core/math/precision.ts';
+import {
+  formatClinicalNumber,
+  parseStrictNumber,
+  roundClinical,
+} from '../../clinical-core/math/precision.ts';
 import {
   WHO_INDICATOR_META,
   evaluateWhoIndicator,
@@ -22,10 +26,8 @@ type AgeWindow = '0-24' | '24-60' | '60-120' | '120-228';
 
 function parseNumericInput(raw: NumberInputValue | undefined, factor = 1): number | null {
   if (!raw || typeof raw.value !== 'string') return null;
-  const cleaned = raw.value.trim().replace(',', '.');
-  if (!cleaned) return null;
-  const num = Number(cleaned);
-  if (!Number.isFinite(num) || num < 0) return null;
+  const num = parseStrictNumber(raw.value);
+  if (num === null || num < 0) return null;
   return num * factor;
 }
 
@@ -171,15 +173,16 @@ export const PediatricGrowthPanel: React.FC<PediatricGrowthPanelProps> = ({
   // Keep chart indicator and age window sensible when age changes
   useEffect(() => {
     if (ageMonths === null) return;
-    let nextIndicator = selectedIndicator;
-    if (ageMonths > 120 && nextIndicator === 'wfa') {
-      nextIndicator = 'lhfa';
-      setSelectedIndicator('lhfa');
-    } else if (ageMonths > 60 && nextIndicator === 'hcfa') {
-      nextIndicator = 'lhfa';
-      setSelectedIndicator('lhfa');
-    }
-    setAgeWindow(getDefaultWindowForAge(ageMonths, nextIndicator));
+    setSelectedIndicator((curr) => {
+      let nextIndicator = curr;
+      if (ageMonths > 120 && curr === 'wfa') {
+        nextIndicator = 'lhfa';
+      } else if (ageMonths > 60 && curr === 'hcfa') {
+        nextIndicator = 'lhfa';
+      }
+      setAgeWindow(getDefaultWindowForAge(ageMonths, nextIndicator));
+      return nextIndicator;
+    });
   }, [ageMonths]);
 
   const handleSelectIndicator = (next: WhoIndicatorId) => {

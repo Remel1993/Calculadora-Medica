@@ -1,14 +1,14 @@
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import {
-  History,
-  Home,
-  LayoutGrid,
-  Moon,
-  RotateCcw,
-  Star,
-  Sun,
-} from 'lucide-react';
+  ClinicalHistoryIcon,
+  ClinicalHomeIcon,
+  ClinicalMoonIcon,
+  ClinicalResetIcon,
+  ClinicalSpecialtiesIcon,
+  ClinicalStarIcon,
+  ClinicalSunIcon,
+} from './ui/icons/clinicalUiIcons.tsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { registerSW } from 'virtual:pwa-register';
 import { CALCULATOR_BY_ID } from './clinical-core/registries/catalog.ts';
@@ -308,11 +308,31 @@ export default function App() {
     ? CALCULATOR_BY_ID[selectedCalculatorId] ?? null
     : null;
 
-  const navItems: { id: NavTab; label: string; icon: typeof Home }[] = [
-    { id: 'inicio', label: 'Inicio', icon: Home },
-    { id: 'especialidades', label: 'Especialidades', icon: LayoutGrid },
-    { id: 'favoritos', label: 'Favoritos', icon: Star },
-    { id: 'historial', label: 'Historial', icon: History },
+  const navItems: {
+    id: NavTab;
+    label: string;
+    renderIcon: (active: boolean, className: string) => React.ReactNode;
+  }[] = [
+    {
+      id: 'inicio',
+      label: 'Inicio',
+      renderIcon: (_active, cls) => <ClinicalHomeIcon className={cls} />,
+    },
+    {
+      id: 'especialidades',
+      label: 'Especialidades',
+      renderIcon: (_active, cls) => <ClinicalSpecialtiesIcon className={cls} />,
+    },
+    {
+      id: 'favoritos',
+      label: 'Favoritos',
+      renderIcon: (active, cls) => <ClinicalStarIcon filled={active} className={cls} />,
+    },
+    {
+      id: 'historial',
+      label: 'Historial',
+      renderIcon: (_active, cls) => <ClinicalHistoryIcon className={cls} />,
+    },
   ];
 
   const isMobileHomeHero = !activeCalculator && !showReferences && activeTab === 'inicio';
@@ -330,9 +350,14 @@ export default function App() {
           <button
             type="button"
             onClick={() => handleNavigateTab('inicio')}
-            className="min-w-0 truncate text-left text-sm font-bold tracking-tight text-slate-900 sm:text-base dark:text-slate-100 whitespace-nowrap"
+            className="flex min-w-0 items-center gap-2.5 text-left text-sm font-bold tracking-tight text-slate-900 sm:text-base dark:text-slate-100 whitespace-nowrap"
           >
-            Calculadora Médica Integral
+            <img
+              src="/pwa-192x192.png"
+              alt=""
+              className="h-7 w-7 shrink-0 rounded-lg border border-slate-200 object-cover shadow-2xs dark:border-slate-700"
+            />
+            <span className="truncate">Calculadora Médica Integral</span>
           </button>
 
           {/* Zone 2: 4 concise single-line text nav links (Desktop) */}
@@ -369,12 +394,12 @@ export default function App() {
             >
               {theme === 'dark' ? (
                 <>
-                  <Sun className="h-4 w-4 text-amber-400" aria-hidden="true" />
+                  <ClinicalSunIcon className="h-4 w-4 text-amber-400" />
                   <span className="hidden sm:inline">Modo claro</span>
                 </>
               ) : (
                 <>
-                  <Moon className="h-4 w-4 text-slate-600" aria-hidden="true" />
+                  <ClinicalMoonIcon className="h-4 w-4 text-slate-600" />
                   <span className="hidden sm:inline">Modo oscuro</span>
                 </>
               )}
@@ -400,10 +425,7 @@ export default function App() {
             onSaveHistory={handleSaveHistory}
           />
         ) : showReferences ? (
-          <ReferencesView
-            onBack={() => setShowReferences(false)}
-            onSelectCalculator={handleSelectCalculator}
-          />
+          <ReferencesView onBack={() => setShowReferences(false)} />
         ) : activeTab === 'inicio' ? (
           <HomeView
             favorites={favorites}
@@ -455,7 +477,6 @@ export default function App() {
         >
         <div className="grid h-14 grid-cols-4 items-center">
           {navItems.map((item) => {
-            const Icon = item.icon;
             const isActive = !activeCalculator && !showReferences && activeTab === item.id;
             return (
               <button
@@ -474,7 +495,7 @@ export default function App() {
                     className="absolute top-0 right-4 left-4 h-0.5 rounded-full bg-sky-600 dark:bg-sky-400"
                   />
                 )}
-                <Icon className="h-[19px] w-[19px]" aria-hidden="true" />
+                {item.renderIcon(isActive, 'h-[21px] w-[21px]')}
                 <span className="truncate">{item.label}</span>
               </button>
             );
@@ -520,7 +541,7 @@ export default function App() {
               }}
               className="mt-5 inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700"
             >
-              <RotateCcw className="h-4 w-4" />
+              <ClinicalResetIcon className="h-4 w-4" />
               <span>Volver a entrar</span>
             </button>
           </div>
