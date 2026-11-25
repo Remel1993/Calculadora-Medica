@@ -146,6 +146,12 @@ export const oxygenationPafiSafiAaCalculator: CalculatorDefinition = {
     const aaGrad = roundClinical(pAo2 - pao2, 1);
     const expectedAa = roundClinical(age / 4 + 4, 1);
 
+    if (aaGrad < -10) {
+      throw new Error(
+        `Inconsistencia fisiológica: la PaO₂ (${pao2} mmHg) supera la PAO₂ alveolar calculada (${pAo2} mmHg) en > 10 mmHg (gradiente A-a = ${aaGrad} mmHg). Verifica la FiO₂ real administrada (¿recibió O₂ suplementario?), la Patm o la PaCO₂.`,
+      );
+    }
+
     let severity: SeverityLevel = 'normal';
     let riskClassification = '';
     let clinicalInterpretation = '';
@@ -173,11 +179,13 @@ export const oxygenationPafiSafiAaCalculator: CalculatorDefinition = {
     }
 
     const aaNote =
-      fio2 <= 0.22
-        ? aaGrad > expectedAa
-          ? `Elevado para la edad (esperado ≤ ${expectedAa} mmHg): sugiere alteración V/Q, shunt o difusión.`
-          : `Normal para la edad (esperado ≤ ${expectedAa} mmHg): si hay hipoxemia, sugiere hipoventilación o baja PiO₂.`
-        : 'Calculado con O₂ suplementario (referencia por edad aplica estrictamente a FiO₂ 21 %).';
+      aaGrad < 0
+        ? `Discretamente negativo (${aaGrad} mmHg, probable variabilidad analítica o cociente respiratorio R≠0.8); confirmar FiO₂ real.`
+        : fio2 <= 0.22
+          ? aaGrad > expectedAa
+            ? `Elevado para la edad (esperado ≤ ${expectedAa} mmHg): sugiere alteración V/Q, shunt o difusión.`
+            : `Normal para la edad (esperado ≤ ${expectedAa} mmHg): si hay hipoxemia, sugiere hipoventilación o baja PiO₂.`
+          : 'Calculado con O₂ suplementario (referencia por edad aplica estrictamente a FiO₂ 21 %).';
 
     return {
       primaryResult: {

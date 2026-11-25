@@ -206,6 +206,7 @@ export const hyperglycemicCrisesCalculator: CalculatorDefinition = {
 
     const effectiveOsm = roundClinical(2 * sodium + glucose / 18, 1);
     const correctedNa = roundClinical(sodium + 0.016 * Math.max(0, glucose - 100), 1);
+    const correctedNaHillier = roundClinical(sodium + 0.024 * Math.max(0, glucose - 100), 1);
 
     // 2024 ADA DKA Criteria:
     // D: Glucose >= 200 mg/dL OR prior diabetes
@@ -217,10 +218,11 @@ export const hyperglycemicCrisesCalculator: CalculatorDefinition = {
     const isDka = meetsDkaD && meetsDkaK && meetsDkaA;
 
     // 2024 ADA HHS Criteria:
-    // Glucose >= 600 mg/dL, Effective Osm > 300 mOsm/kg, pH >= 7.30, HCO3 >= 15, BHB < 3.0
+    // Glucose >= 600 mg/dL, Effective Osm > 300 mOsm/kg, pH >= 7.30, HCO3 >= 15, BHB < 3.0 (MUST exclude significant ketosis!)
     const isHyperosmolar = glucose >= 600 && effectiveOsm > 300;
-    const isHhsPure = isHyperosmolar && !isDka && ph >= 7.3 && hco3 >= 15;
-    const isMixed = isDka && isHyperosmolar;
+    const isHhsPure = isHyperosmolar && !isDka && ketones !== 'positive' && ph >= 7.3 && hco3 >= 15;
+    const isMixedKetosisAlkalosis = !isDka && meetsDkaD && meetsDkaK && ph >= 7.3 && hco3 >= 18;
+    const isMixed = (isDka || isMixedKetosisAlkalosis) && isHyperosmolar;
 
     let dkaSeverityLabel = '';
     if (isDka) {
@@ -238,10 +240,13 @@ export const hyperglycemicCrisesCalculator: CalculatorDefinition = {
     let interpretation = '';
 
     if (isMixed) {
-      diagnosisTitle = `Cuadro Mixto: ${dkaSeverityLabel} + Estado Hiperosmolar (EHH)`;
+      diagnosisTitle = isMixedKetosisAlkalosis
+        ? 'Cuadro Mixto: Cetosis significativa (alcalosis enmascarante) + EHH'
+        : `Cuadro Mixto: ${dkaSeverityLabel} + Estado Hiperosmolar (EHH)`;
       severity = 'critical';
-      interpretation =
-        'Cumple simultáneamente criterios de cetoacidosis diabética y estado hiperosmolar hiperglucémico (osmolaridad efectiva > 300 mOsm/kg y glucemia ≥ 600 mg/dL).';
+      interpretation = isMixedKetosisAlkalosis
+        ? 'Hiperosmolaridad (osmolaridad efectiva > 300 mOsm/kg) y glucemia ≥ 600 mg/dL asociadas a cetosis significativa (β-HB ≥ 3.0 o cetonuria ≥ 2+) con pH/HCO₃⁻ preservados o elevados (sospechar alcalosis metabólica concomitante por vómitos o diuréticos que enmascara la cetoacidosis). NO tratar como EHH puro.'
+        : 'Cumple simultáneamente criterios de cetoacidosis diabética y estado hiperosmolar hiperglucémico (osmolaridad efectiva > 300 mOsm/kg y glucemia ≥ 600 mg/dL).';
     } else if (isDka) {
       const euglycemicNote = glucose < 200 ? ' (CAD Euglucémica)' : '';
       diagnosisTitle = `${dkaSeverityLabel}${euglycemicNote} (Criterios ADA 2024)`;
@@ -250,6 +255,11 @@ export const hyperglycemicCrisesCalculator: CalculatorDefinition = {
         glucose < 200
           ? 'Cumple criterios de CAD con glucemia < 200 mg/dL (CAD euglucémica; investigar uso de iSGLT2, ayuno, embarazo o alcohol). Requiere dextrosa desde el inicio junto con insulina para aclarar cetonas.'
           : 'Cumple la tríada diagnóstica ADA 2024: hiperglucemia/diabetes previa + cetosis significativa + acidosis metabólica.';
+    } else if (isMixedKetosisAlkalosis) {
+      diagnosisTitle = 'Cetoacidosis potencial enmascarada por alcalosis (Cetonas positivas con pH ≥ 7.30)';
+      severity = 'high';
+      interpretation =
+        'Cetonemia/cetonuria significativa con pH ≥ 7.30 y HCO₃⁻ ≥ 18 mEq/L: cuadro compatible con trastorno ácido-base mixto (cetoacidosis diabética + alcalosis metabólica por vómitos, aspiración gástrica o diuréticos). Calcular Brecha Aniónica (Anion Gap) y cloro sérico.';
     } else if (isHhsPure) {
       diagnosisTitle = 'Estado Hiperosmolar Hiperglucémico (EHH — ADA 2024)';
       severity = 'critical';
@@ -262,9 +272,11 @@ export const hyperglycemicCrisesCalculator: CalculatorDefinition = {
         'Los datos introducidos no completan criterios formales de CAD ni de EHH según ADA 2024; evaluar deshidratación, causa precipitante y tendencia metabólica.';
     }
 
+    const requiresIvProtocol = isDka || isHhsPure || isMixed || isMixedKetosisAlkalosis;
+
     // Potassium safety gate & Insulin calculation
     const insulinBlocked = potassium < 3.5;
-    // ADA 2024: DKA / Mixed 0.1 U/kg/h; Pure HHS 0.05 U/kg/h after initial fluid resuscitation
+    // ADA 2024: DKA / Mixed (including masked ketoacidosis) 0.1 U/kg/h; Pure HHS 0.05 U/kg/h after initial fluid resuscitation
     const infusionRatePerKg = isHhsPure ? 0.05 : 0.1;
     const insulinUnitsPerHour = insulinBlocked
       ? 0
@@ -274,17 +286,17 @@ export const hyperglycemicCrisesCalculator: CalculatorDefinition = {
     if (potassium < 3.5) {
       severity = 'critical';
       kRule =
-        'BLOQUEO DE SEGURIDAD: K⁺ < 3.5 mEq/L. NO iniciar insulina todavía. Administrar KCl IV (10–20 mEq/h o 20–40 mEq/L) hasta K⁺ ≥ 3.5 mEq/L.';
+        'BLOQUEO DE SEGURIDAD: K⁺ < 3.5 mEq/L. NO iniciar insulina todavía. Administrar KCl IV (10–20 mEq/h por vía periférica o hasta 20–40 mEq/h solo por acceso venoso central con monitorización ECG continua) hasta K⁺ ≥ 3.5 mEq/L.';
     } else if (potassium <= 5.0) {
       kRule =
-        'K⁺ 3.5–5.0 mEq/L: Seguro iniciar insulina IV y añadir 10–20 mEq de KCl por cada litro de solución IV para mantener K⁺ entre 4.0 y 5.0 mEq/L.';
+        'K⁺ 3.5–5.0 mEq/L: Seguro iniciar insulina IV y añadir 10–20 mEq de KCl por cada litro de solución IV (máximo 10–20 mEq/h en vía periférica) para mantener K⁺ entre 4.0 y 5.0 mEq/L.';
     } else {
       kRule =
         'K⁺ > 5.0 mEq/L: Seguro iniciar insulina IV sin añadir potasio inicial en líquidos; reevaluar K⁺ cada 2 horas (descenderá con la insulina).';
     }
 
     const guidance: string[] = [kRule];
-    if (isDka || isHhsPure || isMixed) {
+    if (requiresIvProtocol) {
       guidance.push(
         `Hidratación inicial: cristaloides isotónicos (NaCl 0.9% o Ringer lactato) 500–1000 mL/h durante las primeras 2–4 h según estado hemodinámico y cardiovascular.`,
       );
@@ -306,6 +318,11 @@ export const hyperglycemicCrisesCalculator: CalculatorDefinition = {
       } else {
         guidance.push(
           'Añadir solución glucosada 5–10% cuando la glucemia descienda por debajo de 250 mg/dL, manteniendo insulina hasta resolución de cetosis/acidosis (BHB < 0.6, pH ≥ 7.3, HCO₃⁻ ≥ 18).',
+        );
+      }
+      if (isMixedKetosisAlkalosis) {
+        guidance.push(
+          'Trastorno mixto sospechado: calcular Anion Gap y lactato para confirmar cetoacidosis encubierta por alcalosis metabólica.',
         );
       }
     } else {
@@ -330,6 +347,10 @@ export const hyperglycemicCrisesCalculator: CalculatorDefinition = {
         label: 'Sodio corregido por glucemia (Katz)',
         formattedValue: formatClinicalNumber(correctedNa, 1),
         unit: 'mEq/L',
+        note:
+          glucose > 400
+            ? `Con glucosa > 400 mg/dL, el factor de Hillier (2.4 mEq/L por c/100 mg/dL) estima ${formatClinicalNumber(correctedNaHillier, 1)} mEq/L.`
+            : undefined,
       },
     ];
 
@@ -337,16 +358,16 @@ export const hyperglycemicCrisesCalculator: CalculatorDefinition = {
       primaryResult: {
         label: insulinBlocked
           ? 'Infusión de Insulina IV (DIFERIDA por K⁺ < 3.5)'
-          : isDka || isHhsPure || isMixed
+          : requiresIvProtocol
             ? `Infusión de Insulina Regular IV (${infusionRatePerKg} U/kg/h)`
             : 'Evaluación metabólica aguda',
         value: insulinBlocked ? 0 : insulinUnitsPerHour,
         formattedValue: insulinBlocked
           ? '0 (Diferir)'
-          : isDka || isHhsPure || isMixed
+          : requiresIvProtocol
             ? formatClinicalNumber(insulinUnitsPerHour, 1)
             : 'Sin perfusión IV',
-        unit: insulinBlocked ? 'Reponer K⁺ primero' : isDka || isHhsPure || isMixed ? 'U/hora' : '',
+        unit: insulinBlocked ? 'Reponer K⁺ primero' : requiresIvProtocol ? 'U/hora' : '',
       },
       secondaryResults,
       severity,

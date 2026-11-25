@@ -1441,14 +1441,36 @@ test('Asthma scales: ACT, Pulmonary Score (with GEMA SpO2 override), and Adult C
   assert.equal(psOverride.primaryResult.value, 2);
   assert.equal(psOverride.severity, 'critical');
 
-  // Adult Asthma Crisis: severe feature -> Grave
+  // Adult Asthma Crisis: separate Leve vs Moderada vs Grave vs Riesgo vital
+  const adultMild = asthmaCrisisAdultCalculator.calculate({
+    alteredMental: false,
+    speech: 'paragraphs',
+    respRate: 'lt20',
+    heartRate: 'lt100',
+    spo2: 'gt95',
+    pef: 'gt70',
+  });
+  assert.equal(adultMild.primaryResult.formattedValue, 'Leve');
+  assert.equal(adultMild.severity, 'low');
+
+  const adultModerate = asthmaCrisisAdultCalculator.calculate({
+    alteredMental: false,
+    speech: 'paragraphs',
+    respRate: '20_30',
+    heartRate: 'lt100',
+    spo2: 'gt95',
+    pef: 'gt70',
+  });
+  assert.equal(adultModerate.primaryResult.formattedValue, 'Moderada');
+  assert.equal(adultModerate.severity, 'moderate');
+
   const adultSevere = asthmaCrisisAdultCalculator.calculate({
     alteredMental: false,
     speech: 'words',
     respRate: 'gt30',
     heartRate: '100_120',
     spo2: '90_95',
-    pef: 'gt50',
+    pef: 'gt70',
   });
   assert.equal(adultSevere.primaryResult.formattedValue, 'Grave');
   assert.equal(adultSevere.severity, 'high');
@@ -3480,6 +3502,188 @@ test('Clinical Reference Tables & Formula Verification: valid tables for outpati
     );
   }
 });
+
+test('Medical Safety & Iatrogenesis Prevention Audit: edge cases across emergency, OB/Gyn, pediatrics & internal medicine', () => {
+  // 1. Anaphylaxis Adrenaline: prepubertal 40 kg capped at 0.30 mg vs adult 60 kg capped at 0.50 mg
+  const anaphPed = anaphylaxisAdrenalineCalculator.calculate({
+    patientGroup: 'pediatric',
+    weight: { value: '40', unitId: 'kg' },
+    criterion1: true,
+    criterion2: false,
+    criterion3: false,
+  });
+  assert.equal(anaphPed.primaryResult.value, 0.3);
+  assert.equal(anaphPed.severity, 'critical');
+
+  // 2. Inpatient Basal-Bolus: frail 45 kg sensitive patient avoids forced +1/+2/+3 U floor & normoglycemia warns against empirical start
+  const frailInsulin = inpatientBasalBolusCalculator.calculate({
+    weight: { value: '45', unitId: 'kg' },
+    glucose: { value: '122', unitId: 'mg_dl' },
+    clinicalProfile: 'very_sensitive',
+    oralIntake: 'eating',
+  });
+  assert.ok(frailInsulin.riskClassification.includes('Normoglucemia'));
+  assert.ok(frailInsulin.guidance?.some((g) => g.includes('NO iniciar')));
+  const fsiNote = frailInsulin.secondaryResults?.find((r) => r.label.includes('sensibilidad'))?.note ?? '';
+  assert.ok(fsiNote.includes('Sensibilidad alta'));
+  assert.ok(!fsiNote.includes('+3 U (>280)'));
+
+  // 3. Burns Parkland: late arrival at 7.5 h triggers fluid-overload / fluid-creep warning
+  const lateBurn = burnsWallaceParklandCalculator.calculate({
+    weight: { value: '70', unitId: 'kg' },
+    hoursElapsed: { value: '7.5', unitId: 'h' },
+    head: '0',
+    antTrunk: '18',
+    postTrunk: '9',
+    rightArm: '0',
+    leftArm: '0',
+    rightLeg: '0',
+    leftLeg: '0',
+    perineum: '0',
+  });
+  assert.ok(lateBurn.guidance?.some((g) => g.includes('SOBRECARGA HÍDRICA')));
+
+  // 4. Infusion Calculator: extreme pump rate (> 250 mL/h or < 0.5 mL/h) triggers high-severity verification alert
+  const extremeInfusion = infusionCalculator.calculate({
+    direction: 'dose_to_rate',
+    doseUnit: 'mcg_kg_min',
+    drugAmountMg: { value: '200', unitId: 'mcg' }, // 200 mcg vs 200 mg mismatch -> 525 mL/h!
+    volumeMl: { value: '250', unitId: 'ml' },
+    weight: { value: '70', unitId: 'kg' },
+    desiredDose: { value: '0.1', unitId: 'dose' },
+    pumpRate: { value: '', unitId: 'ml_h' },
+  });
+  assert.equal(extremeInfusion.severity, 'high');
+  assert.ok(extremeInfusion.guidance?.some((g) => g.includes('DOBLE VERIFICACIÓN')));
+
+  // 5. Hyperglycemic Crises: mixed DKA + vomiting alkalosis (pH 7.36, HCO3 22, positive ketones, gluc 650) is NOT treated as pure HHS
+  const mixedAlkalosis = hyperglycemicCrisesCalculator.calculate({
+    weight: { value: '70', unitId: 'kg' },
+    glucose: { value: '650', unitId: 'mg_dl' },
+    priorDiabetes: true,
+    ph: { value: '7.36', unitId: 'ph' },
+    hco3: { value: '22', unitId: 'meq_l' },
+    ketones: 'positive',
+    sodium: { value: '132', unitId: 'meq_l' },
+    potassium: { value: '4.1', unitId: 'meq_l' },
+    mentalStatus: 'alert',
+  });
+  assert.equal(mixedAlkalosis.primaryResult.value, 7); // 0.1 U/kg/h, NOT 0.05 U/kg/h
+  assert.equal(mixedAlkalosis.severity, 'critical');
+  assert.ok(mixedAlkalosis.riskClassification.includes('Mixto'));
+  assert.ok(mixedAlkalosis.guidance?.some((g) => g.includes('vía periférica')));
+
+  // 6. Hypertension: target-organ damage with BP 148/94 (< 160/100) still escalates to critical urgent evaluation
+  const htnTodModerateBp = hypertensionClassificationCalculator.calculate({
+    sbp: { value: '148', unitId: 'mmhg' },
+    dbp: { value: '94', unitId: 'mmhg' },
+    targetOrganSymptoms: true,
+  });
+  assert.equal(htnTodModerateBp.severity, 'critical');
+  assert.ok(htnTodModerateBp.riskClassification.includes('DAÑO AGUDO A ÓRGANO DIANA'));
+
+  // 7. Oxygenation: impossible PaO2 = 220 mmHg at FiO2 = 21% throws FiO2 verification error
+  assert.throws(() => {
+    oxygenationPafiSafiAaCalculator.calculate({
+      pao2: { value: '220', unitId: 'mmhg' },
+      fio2: { value: '21', unitId: 'percent' },
+      paco2: { value: '40', unitId: 'mmhg' },
+      age: { value: '45', unitId: 'years' },
+      spo2: { value: '', unitId: 'pct' },
+      patm: { value: '760', unitId: 'mmhg' },
+    });
+  }, /Inconsistencia fisiológica/);
+
+  // 8. Ganzoni Iron Deficit: Hb >= target warns against empirical IV iron without ferritin confirmation
+  const ganzNoHbDeficit = ganzoniIronDeficitCalculator.calculate({
+    weight: { value: '65', unitId: 'kg' },
+    hbActual: { value: '14.2', unitId: 'g_dl' },
+    hbTarget: { value: '13.5', unitId: 'g_dl' },
+    storesMode: 'standard',
+  });
+  assert.ok(ganzNoHbDeficit.riskClassification.includes('Hb en meta'));
+  assert.ok(ganzNoHbDeficit.clinicalInterpretation.includes('ferritina'));
+
+  // 9. PSA Density: 0.149 displays as 0.149 (3 decimals) under < 0.150 tier
+  const psadBorderline = psaDensityCalculator.calculate({
+    totalPsa: { value: '5.96', unitId: 'ng_ml' },
+    prostateVolume: { value: '40', unitId: 'cm3' },
+    freePsa: { value: '', unitId: 'ng_ml' },
+  });
+  assert.equal(psadBorderline.primaryResult.value, 0.149);
+  assert.equal(psadBorderline.primaryResult.formattedValue, '0.149');
+  assert.equal(psadBorderline.severity, 'moderate');
+
+  // 10. Preeclampsia/HELLP: normotensive pregnant patient with pulmonary edema or plt 70 escalates (never normal)
+  const normotensiveOrganPe = preeclampsiaHellpCalculator.calculate({
+    gestationalContext: 'ge20_new',
+    sbp: { value: '126', unitId: 'mmhg' },
+    dbp: { value: '78', unitId: 'mmhg' },
+    proteinuria: 'negative',
+    platelets: { value: '185', unitId: 'k_ul' },
+    astAltMax: { value: '30', unitId: 'ul' },
+    ldh: { value: '240', unitId: 'ul' },
+    creatinine: { value: '0.7', unitId: 'mg_dl' },
+    creatinineDoubled: false,
+    hemolysisEvidence: false,
+    neuroVisualSymptoms: false,
+    epigastricPain: false,
+    pulmonaryEdema: true,
+    eclampsiaSeizures: false,
+  });
+  assert.equal(normotensiveOrganPe.severity, 'high');
+  assert.equal(normotensiveOrganPe.primaryResult.formattedValue, 'Disfunción Orgánica');
+
+  // 11. Gestational Diabetes: Carpenter-Coustan 100 g with fasting >= 126 gives overt diabetes guidance even if only 1 value elevated
+  const ccOvert = gestationalDiabetesCalculator.calculate({
+    protocol: 'carpenter_coustan_100g',
+    fastingGlucose: { value: '134', unitId: 'mg_dl' },
+    glucose1h: { value: '165', unitId: 'mg_dl' },
+    glucose2h: { value: '138', unitId: 'mg_dl' },
+    glucose3h: { value: '115', unitId: 'mg_dl' },
+  });
+  assert.equal(ccOvert.primaryResult.formattedValue, 'DM Manifiesta');
+  assert.equal(ccOvert.severity, 'high');
+  assert.ok(ccOvert.clinicalInterpretation.includes('diabetes manifiesta'));
+  assert.ok(ccOvert.guidance?.some((g) => g.includes('HbA1c')));
+
+  // 12. Pediatric Dehydration: weight loss < 3% yields 0 mL deficit and normal severity
+  const noDeh = pediatricDehydrationCalculator.calculate({
+    mode: 'weight_loss',
+    ageGroup: 'infant',
+    clinicalGrade: 'mild',
+    currentWeight: { value: '9.9', unitId: 'kg' },
+    previousWeight: { value: '10.0', unitId: 'kg' },
+    bolusGiven: { value: '0', unitId: 'ml' },
+  });
+  assert.equal(noDeh.primaryResult.value, 0);
+  assert.equal(noDeh.severity, 'normal');
+
+  // 13. Acute Diarrhea Plan C in adult >= 50 kg / >= 15 years warns about cardiorenal fluid overload
+  const adultPlanC = acuteDiarrheaPlanCalculator.calculate({
+    ageMonths: { value: '420', unitId: 'months' },
+    weight: { value: '75', unitId: 'kg' },
+    generalState: 'lethargic',
+    eyes: 'deeply_sunken',
+    thirst: 'poor',
+    skinPinch: 'very_slow',
+    mucousMembranes: 'dry',
+    tears: 'absent',
+    stoolType: 'watery',
+    persistentVomiting: true,
+    highFeverSepsis: false,
+    severeMalnutrition: false,
+  });
+  assert.equal(adultPlanC.primaryResult.formattedValue, 'Plan C');
+  assert.ok(adultPlanC.guidance?.some((g) => g.includes('ADOLESCENTES/ADULTOS')));
+
+  // 14. Wood-Downes-Ferres boundary labels are continuous
+  const rrOpts = woodDownesFerresCalculator.fields.find((f) => f.id === 'respRate');
+  const hrOpts = woodDownesFerresCalculator.fields.find((f) => f.id === 'heartRate');
+  assert.ok(rrOpts?.type === 'select' && rrOpts.options[0].label.includes('≤ 30'));
+  assert.ok(hrOpts?.type === 'select' && hrOpts.options[0].label.includes('≤ 120'));
+});
+
 
 
 

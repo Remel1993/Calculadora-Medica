@@ -436,8 +436,9 @@ const tthNoAggravationField: BooleanFieldDef = {
 
 const tthNoNauseaField: BooleanFieldDef = {
   id: 'tthNoNausea',
-  label: 'D1. Sin náuseas moderadas/severas ni vómitos (en episódica, sin ninguna náusea)',
-  helpText: 'En 2.1/2.2 se exige ausencia total de náuseas y vómitos; en 2.3 crónica se tolera náusea leve aislada si no hay fotofobia ni fonofobia.',
+  label: 'D1. Sin náuseas moderadas/severas ni vómitos (en 2.1/2.2 episódica, sin ninguna náusea)',
+  helpText:
+    'En 2.1/2.2 se exige ausencia total de náuseas y vómitos; en 2.3 crónica se admite como máximo UNO de los tres: náusea leve, fotofobia O fonofobia (sin náuseas moderadas/severas ni vómitos).',
   type: 'boolean',
   trueLabel: 'Cumple',
   falseLabel: 'No cumple',
@@ -447,7 +448,9 @@ const tthNoNauseaField: BooleanFieldDef = {
 
 const tthPhotoPhonoMaxOneField: BooleanFieldDef = {
   id: 'tthPhotoPhonoMaxOne',
-  label: 'D2. Máximo uno entre fotofobia o fonofobia (nunca ambas)',
+  label: 'D2. Máximo uno entre fotofobia o fonofobia (y en 2.3 crónica, no concurrente con náusea leve)',
+  helpText:
+    'ICHD-3 2.1/2.2: máximo uno entre fotofobia o fonofobia. ICHD-3 2.3 crónica: como máximo UNO en total entre fotofobia, fonofobia o náusea leve.',
   type: 'boolean',
   trueLabel: 'Cumple',
   falseLabel: 'No cumple',

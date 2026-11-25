@@ -167,10 +167,17 @@ export const pediatricDehydrationCalculator: CalculatorDefinition = {
     let riskClassification = '';
     let guidance: string[] = [];
 
+    const isNoDehydration = mode === 'weight_loss' && pctRounded < 3;
     const isMild = mode === 'clinical' ? inputs.clinicalGrade === 'mild' : pctRounded < 5;
     const isModerate = mode === 'clinical' ? inputs.clinicalGrade === 'moderate' : pctRounded < 10;
 
-    if (isMild) {
+    if (isNoDehydration) {
+      severity = 'normal';
+      riskClassification = `Sin deshidratación clínica significativa (< 3 %: ${pctRounded.toFixed(1)} %)`;
+      guidance = [
+        'Pérdida ponderal < 3 % (sin deshidratación clínica establecida): mantener alimentación habitual, líquidos orales a libre demanda y reposición de pérdidas continuas (Plan A si gastroenteritis).',
+      ];
+    } else if (isMild) {
       severity = 'low';
       riskClassification = `Deshidratación leve (${pctRounded.toFixed(1)} %)`;
       guidance = [
@@ -198,8 +205,8 @@ export const pediatricDehydrationCalculator: CalculatorDefinition = {
     return {
       primaryResult: {
         label: 'Déficit estimado de líquidos',
-        value: totalDeficitMl,
-        formattedValue: formatClinicalNumber(totalDeficitMl, 0),
+        value: isNoDehydration ? 0 : totalDeficitMl,
+        formattedValue: formatClinicalNumber(isNoDehydration ? 0 : totalDeficitMl, 0),
         unit: 'mL totales',
       },
       secondaryResults: [
@@ -215,18 +222,20 @@ export const pediatricDehydrationCalculator: CalculatorDefinition = {
         },
         {
           label: 'Pauta IV orientativa: primeras 8 horas (50 % déficit neto + 1/3 mant.)',
-          formattedValue: `${formatClinicalNumber(first8hTotal, 0)} mL (${formatClinicalNumber(rateFirst8h, 1)} mL/h)`,
+          formattedValue: `${formatClinicalNumber(isNoDehydration ? roundClinical(maintenance24h / 3, 0) : first8hTotal, 0)} mL (${formatClinicalNumber(isNoDehydration ? roundClinical(maintenance24h / 24, 1) : rateFirst8h, 1)} mL/h)`,
           unit: '',
         },
         {
           label: 'Pauta IV orientativa: siguientes 16 horas (50 % déficit neto + 2/3 mant.)',
-          formattedValue: `${formatClinicalNumber(next16hTotal, 0)} mL (${formatClinicalNumber(rateNext16h, 1)} mL/h)`,
+          formattedValue: `${formatClinicalNumber(isNoDehydration ? roundClinical((maintenance24h * 2) / 3, 0) : next16hTotal, 0)} mL (${formatClinicalNumber(isNoDehydration ? roundClinical(maintenance24h / 24, 1) : rateNext16h, 1)} mL/h)`,
           unit: '',
         },
       ],
       severity,
       riskClassification,
-      clinicalInterpretation: `Déficit total calculado de ${totalDeficitMl} mL (${pctRounded.toFixed(1)} % del peso corporal)${bolus > 0 ? `; déficit residual tras descontar ${bolus} mL de bolos = ${netDeficitMl} mL` : ''}.`,
+      clinicalInterpretation: isNoDehydration
+        ? `Variación ponderal mínima (${pctRounded.toFixed(1)} % < 3 %): no configura déficit clínico de deshidratación que requiera reposición específica.`
+        : `Déficit total calculado de ${totalDeficitMl} mL (${pctRounded.toFixed(1)} % del peso corporal)${bolus > 0 ? `; déficit residual tras descontar ${bolus} mL de bolos = ${netDeficitMl} mL` : ''}.`,
       guidance,
       guidanceDisclaimer: 'En hipernatremia (> 150 mEq/L) extender la corrección del déficit a 48–72 h.',
       formulaUsed: 'Déficit (mL) = % deshidratación × 10 × Peso (kg)',

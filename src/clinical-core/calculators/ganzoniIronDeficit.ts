@@ -56,7 +56,7 @@ const hbTargetField: NumberFieldDef = {
   min: 8,
   max: 17,
   placeholder: '15.0',
-  helpText: 'Clásicamente 15 g/dL en adultos (13 g/dL en < 35 kg o según meta clínica individual).',
+  helpText: 'Referencia orientativa: 13–14 g/dL en mujeres, 15 g/dL en varones adultos y 12–13 g/dL en < 35 kg (ajustar a meta clínica).',
 };
 
 const storesModeField: SelectFieldDef = {
@@ -125,6 +125,11 @@ export const ganzoniIronDeficitCalculator: CalculatorDefinition = {
       severity = 'normal';
       riskClassification = 'Sin déficit calculado de Hb (0 mg)';
       clinicalInterpretation = 'La Hb actual alcanza o supera la Hb objetivo configurada.';
+    } else if (hbGap <= 0) {
+      severity = 'low';
+      riskClassification = `Hb en meta o superior (solo depósitos teóricos: ${totalMg} mg)`;
+      clinicalInterpretation =
+        'No existe déficit eritrocitario de hemoglobina (0 mg). NO administrar hierro IV de forma empírica salvo ferropenia no anémica confirmada bioquímicamente (ferritina < 30 ng/mL o < 100 ng/mL en inflamación/IC e IST < 20 %), para evitar sobrecarga férrica.';
     } else if (totalMg < 1000) {
       severity = 'low';
       riskClassification = `Déficit leve-moderado (${totalMg} mg de hierro elemental)`;

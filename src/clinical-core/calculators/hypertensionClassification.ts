@@ -129,6 +129,14 @@ export const hypertensionClassificationCalculator: CalculatorDefinition = {
       clinicalInterpretation =
         'Elevación marcada de presión arterial con clínica de daño orgánico agudo; requiere monitorización intensiva y descenso titulado intravenoso (habitualmente no > 25 % en la 1.ª hora, salvo disección aórtica/EAP/ictus).';
       guidance = ['Atención en área de reanimación/urgencias: ECG, troponinas, función renal, fondo de ojo y neuroimagen según clínica; evitar descenso brusco con nifedipino sublingual.'];
+    } else if (tod) {
+      severity = sbp >= 140 || dbp >= 90 ? 'critical' : 'high';
+      riskClassification = `DAÑO AGUDO A ÓRGANO DIANA REPORTADO (${sbp}/${dbp} mmHg) — Urgencia prioritaria`;
+      clinicalInterpretation =
+        'Aunque las cifras tensionales no alcanzan ≥ 160/100 mmHg, la presencia de signos o síntomas agudos de daño orgánico (dolor torácico, disnea/EAP, déficit neurológico, papiledema u oliguria) obliga a descartar de inmediato emergencia vascular, síndrome coronario agudo, ictus, disección o preeclampsia atípica.';
+      guidance = [
+        'Evaluación urgente en área de urgencias/reanimación (ECG, troponinas, neuroimagen, función renal y biomarcadores según órgano afectado); priorizar el protocolo de la patología aguda sobre la cifra tensional aislada.',
+      ];
     } else if (sbp >= 180 || dbp >= 120) {
       severity = 'high';
       riskClassification = `Elevación grave sin daño orgánico referido (${sbp}/${dbp} mmHg)`;

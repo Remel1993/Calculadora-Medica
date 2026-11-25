@@ -38,7 +38,7 @@ const rrField: SelectFieldDef = {
   type: 'select',
   defaultValue: '0',
   options: [
-    { value: '0', label: '< 30 rpm (0)', points: 0 },
+    { value: '0', label: '≤ 30 rpm (0)', points: 0 },
     { value: '1', label: '31 – 45 rpm (+1)', points: 1 },
     { value: '2', label: '46 – 60 rpm (+2)', points: 2 },
     { value: '3', label: '> 60 rpm (+3)', points: 3 },
@@ -51,7 +51,7 @@ const hrField: SelectFieldDef = {
   type: 'select',
   defaultValue: '0',
   options: [
-    { value: '0', label: '< 120 lpm (0)', points: 0 },
+    { value: '0', label: '≤ 120 lpm (0)', points: 0 },
     { value: '1', label: '> 120 lpm (+1)', points: 1 },
   ],
 };

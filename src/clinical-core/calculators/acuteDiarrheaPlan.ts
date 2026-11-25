@@ -434,6 +434,11 @@ export const acuteDiarrheaPlanCalculator: CalculatorDefinition = {
           },
         );
         guidance.push(
+          ...(ageMonths >= 180 || weightKg >= 50
+            ? [
+                'PRECAUCIÓN EN ADOLESCENTES/ADULTOS (≥ 15 años o ≥ 50 kg) y comorbilidad cardiorrenal: el esquema OMS de 100 mL/kg rápidos se diseñó para diarrea secretora severa (p. ej. cólera); en adultos o pacientes con cardiopatía/nefropatía administrar cargas fraccionadas (250–500 mL o 10–20 mL/kg) reevaluando congestión pulmonar y perfusión tras cada bolo.',
+              ]
+            : []),
           `Iniciar inmediatamente acceso IV (o intraóseo si choque sin vena): Ringer Lactato o NaCl 0.9 %: Fase 1 = ${planCPhase1Ml} mL en ${planCPhase1Time}; continuar con Fase 2 = ${planCPhase2Ml} mL en ${planCPhase2Time} (${planCPhase2Rate} mL/h).`,
           'Reevaluar cada 15–30 minutos pulso radial, llenado capilar y estado de alerta; si persiste pulso débil tras la Fase 1, repetir 30 mL/kg.',
           `Apenas el paciente pueda beber (habitualmente tras 3–4 h en lactantes o 1–2 h en mayores), ofrecer SRO a 5 mL/kg/h (${roundClinical(5 * weightKg, 0)} mL/h) mientras completa la hidratación.`,

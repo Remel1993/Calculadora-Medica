@@ -181,17 +181,22 @@ export const inpatientBasalBolusCalculator: CalculatorDefinition = {
     const effectiveTdd = basalUnits + perMealUnits * 3;
     const estimatedFsi = roundClinical(1800 / fullTdd, 0);
 
-    // Simple corrective scale when BG > 180 mg/dL (starting above target 140-180)
+    // Simple corrective scale when BG > 180 mg/dL without unsafe forced 1 U floor in sensitive/frail patients
+    const isHighSensitivity = estimatedFsi > 66;
     const corrStep = Math.max(1, Math.round(50 / estimatedFsi));
-    const corr180 = corrStep;
-    const corr230 = corrStep * 2;
-    const corr280 = corrStep * 3;
+    const roundHalf = (val: number) => roundClinical(Math.round(val * 2) / 2, 1);
+    const corr180 = isHighSensitivity ? roundClinical(Math.floor((60 / estimatedFsi) * 2) / 2, 1) : corrStep;
+    const corr230 = isHighSensitivity ? roundHalf(110 / estimatedFsi) : corrStep * 2;
+    const corr280 = isHighSensitivity ? Math.max(1, roundHalf(160 / estimatedFsi)) : corrStep * 3;
+    const correctionNote = isHighSensitivity
+      ? `Sensibilidad alta (FSI ${estimatedFsi} mg/dL/U): usar incrementos pequeños (+${formatClinicalNumber(corr180, 1)} U en 181–230; +${formatClinicalNumber(corr230, 1)} U en 231–280; +${formatClinicalNumber(corr280, 1)} U si >280 — considerar pluma de 0.5 U u omitir si < 200).`
+      : `Corrección orientativa si >180: +${corr180} U (181–230), +${corr230} U (231–280), +${corr280} U (>280)`;
 
     let severity: SeverityLevel = 'normal';
     let riskClassification = '';
     if (glucose < 140) {
       severity = 'low';
-      riskClassification = 'Glucemia en rango normal/objetivo (< 140 mg/dL)';
+      riskClassification = 'Normoglucemia (< 140 mg/dL) — NO iniciar RABBIT-2 sin hiperglucemia previa';
     } else if (glucose <= 200) {
       severity = 'moderate';
       riskClassification = `Hiperglucemia hospitalaria leve-moderada (${factor} U/kg/día)`;
@@ -218,14 +223,19 @@ export const inpatientBasalBolusCalculator: CalculatorDefinition = {
         label: 'Factor de sensibilidad estimado (Regla 1800)',
         formattedValue: `1 U por ${estimatedFsi} mg/dL`,
         unit: '',
-        note: `Corrección orientativa si >180: +${corr180} U (181–230), +${corr230} U (231–280), +${corr280} U (>280)`,
+        note: correctionNote,
       },
     ];
 
     const guidance: string[] = [];
     if (glucose < 140) {
       guidance.push(
-        'Con glucemia < 140 mg/dL sin tratamiento previo agresivo, valorar monitorización capilar preprandial antes de iniciar dosis fijas completas.',
+        'PRECAUCIÓN DE SEGURIDAD: con glucemia actual < 140 mg/dL (70–139 mg/dL), NO iniciar empíricamente dosis fijas de RABBIT-2 si no existe hiperglucemia hospitalaria documentada (≥ 140–180 mg/dL); indicar monitorización capilar antes de prescribir insulina basal-bolo.',
+      );
+    }
+    if (isHighSensitivity) {
+      guidance.push(
+        `Paciente con alta sensibilidad estimada a insulina (FSI = ${estimatedFsi} mg/dL/U): iniciar de forma conservadora y evitar correcciones fijas ≥ 1 U por cada 50 mg/dL por riesgo de hipoglucemia iatrogénica.`,
       );
     }
     if (intake === 'npo') {
@@ -246,9 +256,11 @@ export const inpatientBasalBolusCalculator: CalculatorDefinition = {
     return {
       primaryResult: {
         label:
-          intake === 'eating'
-            ? `Dosis Diaria Total Inicial (${factor} U/kg/día)`
-            : `Dosis Basal Inicial en NPO (50% de ${fullTdd} U)`,
+          glucose < 140
+            ? 'Dosis teórica de referencia (NO iniciar sin hiperglucemia ≥ 140)'
+            : intake === 'eating'
+              ? `Dosis Diaria Total Inicial (${factor} U/kg/día)`
+              : `Dosis Basal Inicial en NPO (50% de ${fullTdd} U)`,
         value: intake === 'eating' ? effectiveTdd : basalUnits,
         formattedValue: String(intake === 'eating' ? effectiveTdd : basalUnits),
         unit: 'U/día',
@@ -257,9 +269,11 @@ export const inpatientBasalBolusCalculator: CalculatorDefinition = {
       severity,
       riskClassification,
       clinicalInterpretation:
-        intake === 'eating'
-          ? `Esquema Basal-Bolo: ${basalUnits} U de insulina basal + ${perMealUnits} U de análogo rápido antes de desayuno, comida y cena (total ${effectiveTdd} U/día).`
-          : `Esquema Basal-Plus (NPO): ${basalUnits} U de insulina basal al día + escala de corrección subcutánea cada 6 horas sin dosis prandiales fijas.`,
+        glucose < 140
+          ? `La glucemia actual (${glucose} mg/dL) está por debajo de 140 mg/dL; el ensayo RABBIT-2 se validó en hiperglucemia ≥ 140 mg/dL. Las cifras mostradas (${intake === 'eating' ? effectiveTdd : basalUnits} U/día) son solo teóricas si posteriormente confirma hiperglucemia sostenida.`
+          : intake === 'eating'
+            ? `Esquema Basal-Bolo: ${basalUnits} U de insulina basal + ${perMealUnits} U de análogo rápido antes de desayuno, comida y cena (total ${effectiveTdd} U/día).`
+            : `Esquema Basal-Plus (NPO): ${basalUnits} U de insulina basal al día + escala de corrección subcutánea cada 6 horas sin dosis prandiales fijas.`,
       guidance,
       guidanceDisclaimer: 'Ajustar dosis diariamente según controles capilares y cambios en ingesta o función renal.',
       formulaUsed: `DDT = Peso × ${factor} U/kg/día; Basal = 50% DDT; Prandial = 50% DDT ÷ 3 (si vía oral)`,

@@ -398,6 +398,16 @@ export const preeclampsiaHellpCalculator: CalculatorDefinition = {
         'Reevaluar semanalmente tensión arterial, proteinuria, plaquetas, enzimas hepáticas y creatinina para vigilar evolución a preeclampsia.',
         'Educar sobre signos de alarma (cefalea intensa, fosfenos, epigastralgia, edema súbito o disminución de movimientos fetales).',
       );
+    } else if (severityFeatures.length > 0) {
+      badge = 'Disfunción Orgánica';
+      severity = 'high';
+      riskClassification =
+        'Disfunción orgánica o signos de alarma SIN hipertensión actual (descartar preeclampsia atípica / imitadores)';
+      clinicalInterpretation = `Presenta ${severityFeatures.length} criterio(s) grave(s) (${severityFeatures.join('; ')}) con cifras de PA < 140/90 mmHg. Aunque los criterios clásicos exigen hipertensión, existen presentaciones normotensivas/atípicas, pródromos de HELLP o diagnósticos diferenciales críticos (AFLP, PTT/SHU, sepsis o cardiopatía periparto).`;
+      guidance.push(
+        'Valoración obstétrica urgente presencial, monitorización tensional seriada y perfil completo (plaquetas, transaminasas, LDH, bilirrubina, fibrinógeno/TP, creatinina y ácido úrico).',
+        'Descartar hígado graso agudo del embarazo (AFLP), microangiopatías trombóticas (PTT/SHU) o edema pulmonar cardiogénico/tocolítico.',
+      );
     } else if (hasProteinuria) {
       badge = 'Proteinuria Aislada';
       severity = 'low';

@@ -133,7 +133,7 @@ export const psaDensityCalculator: CalculatorDefinition = {
 
     if (psad < 0.1) {
       severity = 'low';
-      riskClassification = 'PSAD baja (< 0.10 ng/mL/cm³)';
+      riskClassification = 'PSAD baja (< 0.100 ng/mL/cm³)';
       clinicalInterpretation =
         'Baja densidad de PSA; en ausencia de tacto rectal sospechoso o lesión PI-RADS ≥ 3, sugiere elevación explicada por volumen prostático (HPB).';
       guidance.push(
@@ -141,23 +141,23 @@ export const psaDensityCalculator: CalculatorDefinition = {
       );
     } else if (psad < 0.15) {
       severity = 'moderate';
-      riskClassification = 'PSAD intermedia / indeterminada (0.10–0.14 ng/mL/cm³)';
+      riskClassification = 'PSAD intermedia / indeterminada (0.100–0.149 ng/mL/cm³)';
       clinicalInterpretation =
         'Zona intermedia; riesgo moderado que requiere integrar tacto rectal, edad, antecedentes familiares y hallazgos en RM multiparamétrica.';
       guidance.push(
-        'En PI-RADS 3, el umbral ≥ 0.15 (o ≥ 0.10 en protocolos conservadores) ayuda a decidir necesidad de biopsia prostática.',
+        'En PI-RADS 3, el umbral ≥ 0.150 (o ≥ 0.100 en protocolos conservadores) ayuda a decidir necesidad de biopsia prostática.',
       );
     } else if (psad < 0.2) {
       severity = 'high';
-      riskClassification = 'PSAD elevada (≥ 0.15 ng/mL/cm³)';
+      riskClassification = 'PSAD elevada (0.150–0.199 ng/mL/cm³)';
       clinicalInterpretation =
-        'Supera el punto de corte clásico de 0.15 ng/mL/cm³, asociándose a mayor probabilidad de adenocarcinoma prostático clínicamente significativo.';
+        'Supera el punto de corte clásico de 0.150 ng/mL/cm³, asociándose a mayor probabilidad de adenocarcinoma prostático clínicamente significativo.';
       guidance.push(
         'Valoración urológica preferente para RM multiparamétrica y eventual biopsia prostática si no existe causa inflamatoria reversible.',
       );
     } else {
       severity = 'critical';
-      riskClassification = 'PSAD muy elevada (≥ 0.20 ng/mL/cm³)';
+      riskClassification = 'PSAD muy elevada (≥ 0.200 ng/mL/cm³)';
       clinicalInterpretation =
         'Densidad de PSA marcadamente elevada; alta sospecha clínica si se han descartado prostatitis o retención urinaria reciente.';
       guidance.push(
@@ -194,7 +194,7 @@ export const psaDensityCalculator: CalculatorDefinition = {
       primaryResult: {
         label: 'Densidad de PSA (PSAD)',
         value: psad,
-        formattedValue: formatClinicalNumber(psad, 2),
+        formattedValue: formatClinicalNumber(psad, 3),
         unit: 'ng/mL/cm³',
       },
       secondaryResults,

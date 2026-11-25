@@ -244,6 +244,16 @@ export const burnsWallaceParklandCalculator: CalculatorDefinition = {
       ];
     }
 
+    if (tbsa >= 15 && hours < 8 && (hours >= 6 || first8Rate >= 1500)) {
+      guidance.unshift(
+        `ALERTA DE SOBRECARGA HÍDRICA / LLEGADA TARDÍA (${hours} h desde el accidente → ritmo teórico ${first8Rate} mL/h): NO administrar en bolo rápido ni intentar "recuperar" precipitadamente horas previas sin descontar líquidos ya infundidos; riesgo grave de edema pulmonar, síndrome compartimental abdominal y de extremidades ("fluid creep"). Iniciar o ajustar estrictamente por perfusión y diuresis horaria (0.5 mL/kg/h).`,
+      );
+    } else if (tbsa >= 15 && hours >= 8) {
+      guidance.unshift(
+        `VENTANA DE PRIMERAS 8 h SUPERADA (${hours} h desde la quemadura): descontar volumen ya administrado desde la hora 0; si está hemodinámicamente estable y con diuresis adecuada, continuar directamente con la fase de las siguientes 16 h (≈ ${next16Rate} mL/h) titulando según diuresis.`,
+      );
+    }
+
     return {
       primaryResult: {
         label: 'Volumen Parkland 24 h (4 mL/kg/%SCQ)',
@@ -257,6 +267,10 @@ export const burnsWallaceParklandCalculator: CalculatorDefinition = {
           label: hours < 8 ? `Primeras 8 h (50 % en ${roundClinical(8 - hours, 1)} h rest.)` : 'Ventana de primeras 8 h superada',
           formattedValue: hours < 8 && tbsa > 0 ? `${half24h} mL (${first8Rate} mL/h)` : `${half24h} mL`,
           unit: '',
+          note:
+            tbsa >= 15 && hours < 8 && (hours >= 6 || first8Rate >= 1500)
+              ? 'Precaución: tasa calculada muy alta por ventana corta; descontar fluidos previos y titular por diuresis.'
+              : undefined,
         },
         { label: `Siguientes 16 h (50 % en ${next16HoursRemaining} h)`, formattedValue: tbsa > 0 ? `${half24h} mL (${next16Rate} mL/h)` : '0 mL', unit: '' },
         { label: 'Referencia inicial ABA/ATLS (2 mL/kg/%SCQ)', formattedValue: tbsa > 0 ? `${abaLow24h} mL / 24 h` : '0 mL', unit: '' },

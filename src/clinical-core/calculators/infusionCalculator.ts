@@ -199,6 +199,7 @@ export const infusionCalculator: CalculatorDefinition = {
 
       const rateRounded = roundClinical(mlPerHour, 2);
       const mgPerHour = roundClinical(rateRounded * concMgPerMl, 2);
+      const isExtremeRate = rateRounded > 250 || rateRounded < 0.5;
 
       return {
         primaryResult: {
@@ -219,10 +220,17 @@ export const infusionCalculator: CalculatorDefinition = {
             unit: 'mg/h',
           },
         ],
-        severity: 'info',
-        riskClassification: `Concentración: ${roundClinical(concMcgPerMl, 1)} mcg/mL`,
+        severity: isExtremeRate ? 'high' : 'info',
+        riskClassification: isExtremeRate
+          ? `ALERTA DE VERIFICACIÓN: velocidad extrema (${formatClinicalNumber(rateRounded, 2)} mL/h)`
+          : `Concentración: ${roundClinical(concMcgPerMl, 1)} mcg/mL`,
         clinicalInterpretation: `Para administrar ${dose} ${UNIT_LABELS[doseUnit]} con una mezcla de ${drugMg} mg en ${volumeMl} mL se requieren ${rateRounded.toFixed(2)} mL/h.`,
         guidance: [
+          ...(isExtremeRate
+            ? [
+                `DOBLE VERIFICACIÓN OBLIGATORIA: una velocidad de ${formatClinicalNumber(rateRounded, 2)} mL/h es inusualmente ${rateRounded > 250 ? 'alta (> 250 mL/h)' : 'baja (< 0.5 mL/h)'} para una perfusión continua estándar. Confirmar mg vs mcg, peso del paciente, volumen de dilución y unidad de dosis antes de iniciar la bomba.`,
+              ]
+            : []),
           'Confirmar la concentración exacta programada en la bomba inteligente y la permeabilidad de la vía (vía central para vasopresores según protocolo).',
         ],
         formulaUsed: 'Velocidad (mL/h) = Flujo horario requerido de fármaco / Concentración (mg o mcg por mL)',
@@ -246,6 +254,7 @@ export const infusionCalculator: CalculatorDefinition = {
     }
 
     const doseRounded = roundClinical(calcDose, 3);
+    const isExtremeReverse = rate > 250 || doseRounded === 0;
 
     return {
       primaryResult: {
@@ -261,9 +270,16 @@ export const infusionCalculator: CalculatorDefinition = {
           unit: `(${formatClinicalNumber(roundClinical(concMgPerMl, 3), 3)} mg/mL)`,
         },
       ],
-      severity: 'info',
-      riskClassification: `${doseRounded.toFixed(3)} ${UNIT_LABELS[doseUnit]}`,
+      severity: isExtremeReverse ? 'high' : 'info',
+      riskClassification: isExtremeReverse
+        ? `ALERTA DE VERIFICACIÓN: ${doseRounded.toFixed(3)} ${UNIT_LABELS[doseUnit]}`
+        : `${doseRounded.toFixed(3)} ${UNIT_LABELS[doseUnit]}`,
       clinicalInterpretation: `A ${rate} mL/h de una dilución de ${drugMg} mg en ${volumeMl} mL, el paciente recibe ${doseRounded.toFixed(3)} ${UNIT_LABELS[doseUnit]}.`,
+      guidance: isExtremeReverse
+        ? [
+            'DOBLE VERIFICACIÓN OBLIGATORIA: velocidad de bomba muy elevada (> 250 mL/h) o dosis resultante cercana a cero; confirmar unidades (mg vs mcg) y concentración real de la mezcla.',
+          ]
+        : undefined,
       formulaUsed: 'Dosis = [Velocidad (mL/h) × Concentración] / Factor tiempo-peso',
       inputsSummary: `${drugMg} mg / ${volumeMl} mL · Bomba: ${rate} mL/h${needsWeight ? ` · Peso: ${weightKg} kg` : ''}`,
     };

@@ -10,9 +10,30 @@ import type {
   CalculatorInputsState,
   NumberFieldDef,
   NumberInputValue,
+  SelectFieldDef,
   SeverityLevel,
 } from '../types/clinical.ts';
 import { WEIGHT_UNITS_KG } from '../units/converters.ts';
+
+const patientGroupField: SelectFieldDef = {
+  id: 'patientGroup',
+  label: 'Grupo etario / madurez puberal',
+  type: 'select',
+  required: false,
+  defaultValue: 'adult_adolescent',
+  options: [
+    {
+      value: 'adult_adolescent',
+      label: 'Adulto o adolescente puberal (≥ 12 años · tope 0.50 mg/dosis)',
+      description: 'EAACI / WAO / Resuscitation Council UK: 0.01 mg/kg hasta un máximo de 0.50 mg IM.',
+    },
+    {
+      value: 'pediatric',
+      label: 'Pediátrico prepuberal (< 12 años · tope 0.30 mg/dosis)',
+      description: 'AAP / EAACI / WAO: 0.01 mg/kg hasta un máximo de 0.30 mg IM en niños prepuberales.',
+    },
+  ],
+};
 
 const weightField: NumberFieldDef = {
   id: 'weight',
@@ -87,13 +108,15 @@ export const anaphylaxisAdrenalineCalculator: CalculatorDefinition = {
       year: 2006,
     },
   ],
-  fields: [weightField, crit1Field, crit2Field, crit3Field],
+  fields: [patientGroupField, weightField, crit1Field, crit2Field, crit3Field],
   calculate: (inputs: CalculatorInputsState) => {
     const errors = validateCalculatorInputs(anaphylaxisAdrenalineCalculator, inputs);
     if (errors.length > 0) {
       throw new Error(errors[0].message);
     }
 
+    const patientGroup = inputs.patientGroup === 'pediatric' ? 'pediatric' : 'adult_adolescent';
+    const isPediatric = patientGroup === 'pediatric';
     const weight = getCanonicalNumberValue(weightField, inputs.weight as NumberInputValue).canonicalValue!;
     const metCount =
       Number(Boolean(inputs.criterion1)) +
@@ -101,10 +124,10 @@ export const anaphylaxisAdrenalineCalculator: CalculatorDefinition = {
       Number(Boolean(inputs.criterion3));
     const isAnaphylaxis = metCount >= 1;
 
-    const maxAdultOrPed = weight >= 50 ? 0.5 : 0.3;
+    const maxDoseMg = isPediatric ? 0.3 : 0.5;
     const rawMg = weight * 0.01;
-    const doseMg = roundClinical(Math.min(0.5, rawMg), 2);
-    const pedCappedMg = roundClinical(Math.min(maxAdultOrPed, rawMg), 2);
+    const doseMg = roundClinical(Math.min(maxDoseMg, rawMg), 2);
+    const pedCappedMg = roundClinical(Math.min(0.3, rawMg), 2);
     const volumeMl = formatClinicalNumber(doseMg, 2);
 
     const autoinjector =
@@ -121,13 +144,26 @@ export const anaphylaxisAdrenalineCalculator: CalculatorDefinition = {
         label: 'Dosis Adrenalina IM (1:1000 = 1 mg/mL)',
         value: doseMg,
         formattedValue: `${formatClinicalNumber(doseMg, 2)} mg (${volumeMl} mL)`,
-        unit: 'IM muslo anterolateral',
+        unit: isPediatric ? 'IM muslo (tope pediátrico 0.30 mg)' : 'IM muslo anterolateral',
       },
       secondaryResults: [
         { label: 'Criterios clínicos WAO cumplidos', formattedValue: `${metCount} / 3`, unit: isAnaphylaxis ? 'ANAFILAXIA CONFIRMADA' : 'No cumple criterios' },
         { label: 'Equivalente autoinyector', formattedValue: autoinjector, unit: '' },
-        ...(weight < 50 && doseMg > pedCappedMg
-          ? [{ label: 'Tope pediátrico prepuberal habitual', formattedValue: `${formatClinicalNumber(pedCappedMg, 2)} mg`, unit: '(máx 0.30 mg en niños)' }]
+        ...(!isPediatric && weight < 50 && doseMg > pedCappedMg
+          ? [{
+              label: 'Tope pediátrico prepuberal (< 12 años)',
+              formattedValue: `${formatClinicalNumber(pedCappedMg, 2)} mg`,
+              unit: '(máx. 0.30 mg)',
+              note: 'Si el paciente es niño prepuberal (< 12 años), selecciona grupo Pediátrico para aplicar tope de 0.30 mg.',
+            }]
+          : []),
+        ...(isPediatric && rawMg > 0.3
+          ? [{
+              label: 'Nota de tope máximo aplicado',
+              formattedValue: '0.30 mg / dosis',
+              unit: '',
+              note: 'Dosis teórica 0.01 mg/kg limitada a 0.30 mg para niño prepuberal (en adolescentes puberales ≥ 12 años y ≥ 50 kg puede usarse hasta 0.50 mg según guía EAACI/RCUK).',
+            }]
           : []),
       ],
       severity,

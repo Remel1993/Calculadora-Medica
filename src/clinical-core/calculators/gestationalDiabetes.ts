@@ -362,19 +362,26 @@ export const gestationalDiabetesCalculator: CalculatorDefinition = {
           : singleAbnormal
             ? 'Intolerancia gestacional con 1 valor alterado (no cumple ≥ 2 criterios Carpenter-Coustan)'
             : 'PTOG 100 g normal (0/4 valores alterados)',
-      clinicalInterpretation: isDmg
-        ? `Cumple ≥ 2 valores iguales o superiores a los puntos de corte de Carpenter-Coustan (${altered.join(', ')} mg/dL), confirmando Diabetes Mellitus Gestacional.`
-        : singleAbnormal
-          ? `Solo 1 valor alterado (${altered[0]} mg/dL). Aunque no cumple diagnóstico clásico de ≥ 2 puntos, ACOG señala mayor riesgo de macrosomía e intolerancia metabólica y sugiere vigilancia nutricional.`
-          : 'Los 4 valores de la curva de 100 g están dentro de rango normal.',
-      guidance: isDmg
+      clinicalInterpretation: overtDiabetes
+        ? 'Glucemia basal ≥ 126 mg/dL sugiere diabetes manifiesta pregestacional (confirmar sin sobrecarga adicional si no se ha hecho). Requiere manejo especializado temprano, HbA1c, evaluación renal/oftalmológica y tamizaje fetal.'
+        : isDmg
+          ? `Cumple ≥ 2 valores iguales o superiores a los puntos de corte de Carpenter-Coustan (${altered.join(', ')} mg/dL), confirmando Diabetes Mellitus Gestacional.`
+          : singleAbnormal
+            ? `Solo 1 valor alterado (${altered[0]} mg/dL). Aunque no cumple diagnóstico clásico de ≥ 2 puntos, ACOG señala mayor riesgo de macrosomía e intolerancia metabólica y sugiere vigilancia nutricional.`
+            : 'Los 4 valores de la curva de 100 g están dentro de rango normal.',
+      guidance: overtDiabetes
         ? [
-            'Iniciar plan nutricional, actividad física supervisada y automonitoreo glucémico diario (metas ACOG: ayuno < 95, 1 h < 140, 2 h < 120 mg/dL).',
-            'Valorar insulina como fármaco de elección si no alcanza metas con medidas higiénico-dietéticas.',
+            'Priorizar evaluación médica/endocrinológica inmediata para manejo intensivo de hiperglucemia manifiesta en el embarazo (plan nutricional, automonitoreo estricto y valoración temprana de insulinoterapia).',
+            'Solicitar HbA1c basal, evaluación de fondo de ojo/función renal y seguimiento ecográfico fetal estrecho.',
           ]
-        : singleAbnormal
-          ? ['Orientación nutricional preventiva y considerar repetir valoración si crecimiento fetal acelerado o polihidramnios.']
-          : ['Continuar control prenatal habitual.'],
+        : isDmg
+          ? [
+              'Iniciar plan nutricional, actividad física supervisada y automonitoreo glucémico diario (metas ACOG: ayuno < 95, 1 h < 140, 2 h < 120 mg/dL).',
+              'Valorar insulina como fármaco de elección si no alcanza metas con medidas higiénico-dietéticas.',
+            ]
+          : singleAbnormal
+            ? ['Orientación nutricional preventiva y considerar repetir valoración si crecimiento fetal acelerado o polihidramnios.']
+            : ['Continuar control prenatal habitual.'],
       formulaUsed: 'Criterios Carpenter-Coustan / ACOG PB 190 (PTOG 100 g: ≥ 95 / ≥ 180 / ≥ 155 / ≥ 140 mg/dL, ≥ 2 alterados)',
       inputsSummary: `PTOG 100 g · 0 h ${roundClinical(fasting, 0)} · 1 h ${roundClinical(g1h, 0)} · 2 h ${roundClinical(g2h, 0)} · 3 h ${roundClinical(g3h, 0)} mg/dL`,
     };
