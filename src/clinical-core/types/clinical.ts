@@ -12,6 +12,7 @@ export type SpecialtyId =
   | 'nefrologia'
   | 'neumologia'
   | 'neurologia'
+  | 'oncologia'
   | 'pediatria'
   | 'psiquiatria'
   | 'traumatologia'

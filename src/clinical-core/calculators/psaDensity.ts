@@ -67,7 +67,7 @@ export const psaDensityCalculator: CalculatorDefinition = {
   name: 'Densidad de PSA (PSAD) y Relación PSA Libre/Total',
   shortName: 'Densidad de PSA (PSAD)',
   primarySpecialty: 'urologia',
-  secondarySpecialties: ['medicina-interna'],
+  secondarySpecialties: ['oncologia', 'medicina-interna'],
   subcategory: 'formulas',
   keywords: [
     'psa',

@@ -166,6 +166,22 @@ import { pediatricBloodPressureCalculator } from '../calculators/pediatricBloodP
 import { targetHeightVelocityCalculator } from '../calculators/targetHeightVelocity.ts';
 import { mchatRCalculator } from '../calculators/mchatR.ts';
 import { vppbManipulationCalculator } from '../calculators/vppbManipulation.ts';
+import { dripRateIvCalculator } from '../calculators/dripRateIv.ts';
+import { nursingDilutionCalculator } from '../calculators/nursingDilution.ts';
+import { acrTiradsCalculator } from '../calculators/acrTirads.ts';
+import { radsInterpreterCalculator } from '../calculators/radsInterpreter.ts';
+import { cervicalPapBethesdaCalculator } from '../calculators/cervicalPapBethesda.ts';
+import { ovarianRmiRomaCalculator } from '../calculators/ovarianRmiRoma.ts';
+import { ecogKarnofskyCalculator } from '../calculators/ecogKarnofsky.ts';
+import { masccFebrileNeutropeniaCalculator } from '../calculators/masccFebrileNeutropenia.ts';
+import { calvertCarboplatinCalculator } from '../calculators/calvertCarboplatin.ts';
+import { hivCdcCd4ProphylaxisCalculator } from '../calculators/hivCdcCd4Prophylaxis.ts';
+import { hivPepPrepCalculator } from '../calculators/hivPepPrep.ts';
+import { hivOpportunisticArtTimingCalculator } from '../calculators/hivOpportunisticArtTiming.ts';
+import { immunizationMinsaNicaraguaCalculator } from '../calculators/immunizationMinsaNicaragua.ts';
+import { pediatricBroselowResuscitationCalculator } from '../calculators/pediatricBroselowResuscitation.ts';
+import { neonatalPhototherapyExchangeAap2022Calculator } from '../calculators/neonatalPhototherapyExchangeAap2022.ts';
+import { dailyDrugConvertersCalculator } from '../calculators/dailyDrugConverters.ts';
 import type { CalculatorDefinition, SpecialtyId } from '../types/clinical.ts';
 import { SPECIALTY_MAP } from './specialties.ts';
 
@@ -345,6 +361,22 @@ export const CALCULATOR_CATALOG: CalculatorDefinition[] = [
   mchatRCalculator,
   hintsPlusVertigoCalculator,
   vppbManipulationCalculator,
+  dripRateIvCalculator,
+  nursingDilutionCalculator,
+  acrTiradsCalculator,
+  radsInterpreterCalculator,
+  cervicalPapBethesdaCalculator,
+  ovarianRmiRomaCalculator,
+  ecogKarnofskyCalculator,
+  masccFebrileNeutropeniaCalculator,
+  calvertCarboplatinCalculator,
+  hivCdcCd4ProphylaxisCalculator,
+  hivPepPrepCalculator,
+  hivOpportunisticArtTimingCalculator,
+  immunizationMinsaNicaraguaCalculator,
+  pediatricBroselowResuscitationCalculator,
+  neonatalPhototherapyExchangeAap2022Calculator,
+  dailyDrugConvertersCalculator,
 ].sort(compareCalculatorsAlphabetically);
 
 export const CALCULATOR_BY_ID: Record<string, CalculatorDefinition> = CALCULATOR_CATALOG.reduce(

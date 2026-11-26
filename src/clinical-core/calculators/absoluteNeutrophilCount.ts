@@ -57,7 +57,7 @@ export const absoluteNeutrophilCountCalculator: CalculatorDefinition = {
   name: 'Recuento Absoluto de Neutrófilos (RAN / ANC)',
   shortName: 'RAN / ANC (Neutrófilos)',
   primarySpecialty: 'hematologia',
-  secondarySpecialties: ['infectologia', 'medicina-interna', 'urgencias', 'pediatria'],
+  secondarySpecialties: ['oncologia', 'infectologia', 'medicina-interna', 'urgencias', 'pediatria'],
   subcategory: 'formulas',
   keywords: ['ran', 'anc', 'neutropenia', 'neutrofilos', 'neutropenia febril', 'quimioterapia', 'hemograma'],
   description:

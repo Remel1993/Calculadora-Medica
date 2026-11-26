@@ -1891,4 +1891,721 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
       },
     ],
   },
+  {
+    id: 'rads-classifications-table',
+    title: 'Sistemas RADS en Oncología e Imagen Diagnóstica (BI-RADS, TI-RADS, PI-RADS, O-RADS, LI-RADS)',
+    shortTitle: 'Sistemas RADS (BI/TI/PI/O/LI)',
+    specialty: 'oncologia',
+    secondarySpecialties: ['gineco-obstetricia', 'urologia', 'endocrinologia', 'medicina-interna'],
+    setting: 'ambos',
+    guidelineVersion: 'ACR BI-RADS 5.ª ed. · TI-RADS 2017 · PI-RADS v2.1 · O-RADS US v2022 · LI-RADS',
+    summary:
+      'Resumen comparativo de categorías radiológicas estandarizadas, riesgo de malignidad y conducta clínica (biopsia vs. vigilancia vs. referencia oncológica).',
+    columns: [
+      'Sistema y Categoría',
+      'Riesgo de malignidad / Definición',
+      'Conducta recomendada en consulta',
+    ],
+    rows: [
+      [
+        { text: 'BI-RADS 0 / 1 / 2 (Mama)', tone: 'normal', emphasize: true },
+        '0: Incompleta · 1: Negativo (0 %) · 2: Benigno (~0 %)',
+        'BI-RADS 0: completar con proyecciones/ecografía. BI-RADS 1 y 2: continuar tamizaje rutinario anual/bienal (si hay masa palpable nueva en mama densa, solicitar ecografía).',
+      ],
+      [
+        { text: 'BI-RADS 3 vs. 4A / 4B / 4C vs. 5 (Mama)', tone: 'high', emphasize: true },
+        '3: ≤ 2 % · 4A: > 2–10 % · 4B: > 10–50 % · 4C: > 50–< 95 % · 5: ≥ 95 %',
+        'BI-RADS 3: control de imagen a los 6, 12 y 24 meses. BI-RADS 4A/4B/4C y 5: BIOPSIA percutánea con aguja gruesa (tru-cut/vacío) + correlación radio-patológica; en 5 derivación inmediata a Oncología/Mastología.',
+      ],
+      [
+        { text: 'ACR TI-RADS TR1–TR5 (Nódulo Tiroideo)', tone: 'moderate', emphasize: true },
+        'TR1 (0 pts, ≤ 2 %) · TR2 (2 pts, ≤ 2 %) · TR3 (3 pts, ~4.8 %) · TR4 (4–6 pts, ~9.1 %) · TR5 (≥ 7 pts, ~35 %)',
+        'PAAF indicada según tamaño: TR1–TR2 sin PAAF · TR3: PAAF ≥ 25 mm (seguimiento 15–24 mm) · TR4: PAAF ≥ 15 mm (seguimiento 10–14 mm) · TR5: PAAF ≥ 10 mm (seguimiento 5–9 mm).',
+      ],
+      [
+        { text: 'PI-RADS v2.1 Cat 1–5 (RM Próstata)', tone: 'high', emphasize: true },
+        '1–2: Ca significativo improbable · 3: Equívoco (~15 %) · 4: Probable (~50 %) · 5: Muy probable (≥ 75–90 %)',
+        'PI-RADS 1–2: vigilancia con PSA/PSAD. PI-RADS 3: decidir biopsia según Densidad de PSA (PSAD ≥ 0.15 ng/mL² favorece biopsia). PI-RADS 4–5: biopsia dirigida (fusión) + sistemática.',
+      ],
+      [
+        { text: 'O-RADS US v2022 (Masa Anexial / Ovario)', tone: 'high', emphasize: true },
+        '1: Normal (0 %) · 2: Benigno (< 1 %) · 3: Bajo (1–< 10 %) · 4: Intermedio (10–< 50 %) · 5: Alto (≥ 50 %)',
+        'O-RADS 1–2: conservador. O-RADS 3: manejo ginecológico. O-RADS 4: interconsulta con Ginecólogo Oncólogo o RM O-RADS + CA-125/ROMA. O-RADS 5: derivación directa a Ginecología Oncológica.',
+      ],
+      [
+        { text: 'LI-RADS LR-1 a LR-5 / LR-M (Hígado en cirrosis/VHB)', tone: 'critical', emphasize: true },
+        'LR-1/2: Benigno/Prob. benigno · LR-3: ~38 % CHC · LR-4: ~74 % CHC · LR-5: ~94 % CHC definitivo · LR-M: Maligno no CHC',
+        'LR-1/2: vigilancia c/6 m. LR-3: control 3–6 m. LR-4: comité multidisciplinario (valorar biopsia). LR-5: diagnóstico no invasivo de CHC sin necesidad habitual de biopsia. LR-M: biopsia recomendada.',
+      ],
+    ],
+    keyManagementPearls: [
+      'LI-RADS solo es aplicable en pacientes con cirrosis hepática, infección crónica por VHB o antecedente de hepatocarcinoma; en hígado sano requiere diagnóstico histológico.',
+      'En BI-RADS 1 o 2 con nódulo mamario palpable clínicamente nuevo o telorrea sanguinolenta unilateral, prevalece la sospecha clínica: realizar ecografía dirigida y biopsia.',
+    ],
+    references: [
+      {
+        citation:
+          'American College of Radiology (ACR). BI-RADS Atlas 5th ed., TI-RADS 2017, PI-RADS v2.1 (2019), O-RADS US v2022 (Radiology 2023), CT/MRI LI-RADS v2018.',
+        year: 2023,
+      },
+    ],
+  },
+  {
+    id: 'cervical-pap-asccp-table',
+    title: 'Manejo de PAP Alterado (Bethesda 2014) y Prueba de VPH (ASCCP 2019 / OMS)',
+    shortTitle: 'PAP Alterado y VPH (ASCCP)',
+    specialty: 'oncologia',
+    secondarySpecialties: ['gineco-obstetricia', 'medicina-interna'],
+    setting: 'consulta-externa',
+    guidelineVersion: 'ASCCP Risk-Based Consensus 2019 · OMS 2021',
+    summary:
+      'Conducta diagnóstica inmediata ante citología cervical anormal según edad, prueba de VPH-AR y precauciones obligatorias en embarazo.',
+    columns: [
+      'Resultado PAP (Bethesda) + VPH',
+      'Población / Riesgo NIC 3+',
+      'Conducta clínica recomendada',
+    ],
+    rows: [
+      [
+        { text: 'NILM + VPH 16 o VPH 18 (+)', tone: 'high', emphasize: true },
+        'Citología normal pero genotipo de máximo riesgo oncogénico',
+        'COLPOSCOPIA inmediata (independiente de citología normal). En embarazo: colposcopia sin legrado endocervical (LEC).',
+      ],
+      [
+        { text: 'NILM + Otros VPH-AR (+)', tone: 'moderate', emphasize: true },
+        'Riesgo inmediato NIC 3+ < 4 % (en inmunocompetentes)',
+        'Repetir cotest (VPH + PAP) en 12 meses; derivar a colposcopia si persiste VPH (+) o aparece citología ≥ ASC-US. (En VIH/inmunosupresión: umbral bajo para colposcopia).',
+      ],
+      [
+        { text: 'ASC-US (con VPH-AR)', tone: 'moderate', emphasize: true },
+        '≥ 25 años vs. < 25 años',
+        '≥ 25 años: si VPH (-) -> control en 3 años; si VPH (+) -> Colposcopia (en embarazo puede diferirse a 6 sem posparto); si VPH desconocido -> solicitar VPH reflejo. En < 25 años: repetir citología en 12 meses (sin colposcopia inmediata).',
+      ],
+      [
+        { text: 'LSIL (NIC 1 / efecto VPH)', tone: 'high', emphasize: true },
+        '≥ 25 años vs. < 25 años',
+        '< 25 años: repetir citología en 12 meses (alta regresión espontánea). ≥ 25 años: si VPH (-) en cotest -> repetir VPH/cotest en 1 año; si VPH (+) o desconocido -> Colposcopia (diferible al posparto si embarazada).',
+      ],
+      [
+        { text: 'ASC-H (No se descarta HSIL)', tone: 'high', emphasize: true },
+        'Riesgo significativo de NIC 2/3 oculta',
+        'Colposcopia inmediata (si VPH positivo o desconocido). Solo si VPH (-) documentado sin historial de alto riesgo previo puede vigilarse con cotest/VPH a 1 año según ASCCP 2019.',
+      ],
+      [
+        { text: 'HSIL (NIC 2 / NIC 3)', tone: 'critical', emphasize: true },
+        'Alto riesgo inmediato de NIC 3+ (25–60 %)',
+        '≥ 25 años no gestante: Colposcopia con biopsia O tratamiento escisional acelerado (LEEP) en casos seleccionados. < 25 años: colposcopia + biopsia (evitar see-and-treat). EMBARAZO: colposcopia sin LEC y diferir cono/LEEP al posparto salvo invasión.',
+      ],
+      [
+        { text: 'AGC / AIS (Células glandulares atípicas)', tone: 'critical', emphasize: true },
+        'Riesgo de adenocarcinoma endocervical, endometrial o NIC 2/3',
+        'Colposcopia inmediata (sin importar VPH) + Legrado Endocervical (LEC) + Biopsia Endometrial si edad ≥ 35 años, sangrado anormal o células endometriales atípicas. En EMBARAZO: colposcopia únicamente (PROHIBIDO LEC y biopsia endometrial).',
+      ],
+    ],
+    keyManagementPearls: [
+      'Ante lesión cervical macroscópica exofítica, ulcerada o friable, realizar biopsia directa de la lesión y derivar a Ginecología Oncológica sin esperar resultado citológico (el PAP tiene falsos negativos por necrosis/sangre).',
+      'En mujeres embarazadas está estrictamente CONTRAINDICADO el legrado endocervical (LEC); si se requiere escisión, solo se indica ante sospecha o confirmación de carcinoma microinvasor/invasor.',
+    ],
+    references: [
+      {
+        citation:
+          'Perkins RB, Guido RS, Castle PE, et al. 2019 ASCCP Risk-Based Management Consensus Guidelines for Abnormal Cervical Cancer Screening Tests and Cancer Precursors. J Low Genit Tract Dis. 2020;24(2):102-131.',
+        year: 2020,
+      },
+      {
+        citation:
+          'World Health Organization. WHO guideline for screening and treatment of cervical pre-cancer lesions for cervical cancer prevention, 2nd ed. 2021.',
+        year: 2021,
+      },
+    ],
+  },
+  {
+    id: 'gynecologic-oncology-figo-screening-table',
+    title: 'Tamizaje Gineco-Oncológico, Sangrado Posmenopáusico y Estadificación FIGO Esencial',
+    shortTitle: 'Gineco-Oncología: Tamizaje y FIGO',
+    specialty: 'oncologia',
+    secondarySpecialties: ['gineco-obstetricia', 'medicina-interna'],
+    setting: 'consulta-externa',
+    guidelineVersion: 'FIGO 2018 (Cérvix) · FIGO 2023 (Endometrio) · USPSTF / ACOG / ESGO',
+    summary:
+      'Criterios de sospecha y tamizaje en cáncer de mama, cérvix, endometrio y ovario, con umbrales ecográficos endometriales y esquema básico FIGO.',
+    columns: [
+      'Órgano / Escenario clínico',
+      'Umbral diagnóstico / Tamizaje',
+      'Evaluación y Estadificación FIGO esencial',
+    ],
+    rows: [
+      [
+        { text: 'Cáncer de Cérvix (Tamizaje y FIGO 2018)', tone: 'high', emphasize: true },
+        'Tamizaje: Citología c/3 años (21–29 a) · VPH primario c/5 años o cotest c/5 años (30–65 a)',
+        'FIGO I: confinado a cérvix (IA microscópico ≤ 5 mm profundidad; IB > 5 mm / visible) · FIGO II: rebasa útero sin pared pélvica ni 1/3 inf vagina · FIGO III: 1/3 inf vagina, pared pélvica, hidronefrosis o ganglios (IIIC1 pélvicos, IIIC2 paraaórticos) · FIGO IV: vejiga/recto o metástasis.',
+      ],
+      [
+        { text: 'Sangrado Posmenopáusico y Endometrio', tone: 'critical', emphasize: true },
+        'Eco transvaginal en sangrado posmenopáusico sin TRH: grosor endometrial ≤ 4 mm tiene VPN > 99 %; > 4 mm (o sangrado persistente/recurrente) -> BIOPSIA',
+        'Biopsia endometrial ambulatoria (Pipelle) o histeroscopia + biopsia. En mujer posmenopáusica SIN sangrado, no realizar biopsia solo por endometrio incidental < 11 mm sin otros factores de riesgo (evaluar individualmente).',
+      ],
+      [
+        { text: 'Masa Anexial / Cáncer de Ovario (FIGO)', tone: 'high', emphasize: true },
+        'NO existe tamizaje efectivo poblacional en bajo riesgo (CA-125 + eco no reducen mortalidad)',
+        'Ante masa sospechosa usar O-RADS US, RMI I (≥ 200) o ROMA. Estadificación quirúrgica/FIGO: I (limitado a ovarios/trompas), II (extensión pélvica), III (peritoneal extrapélvica o ganglios retroperitoneales), IV (derrame pleural positivo o metástasis parenquimatosas).',
+      ],
+      [
+        { text: 'Cáncer de Mama (Tamizaje y Banderas Rojas)', tone: 'moderate', emphasize: true },
+        'USPSTF 2024: mamografía bienal desde los 40 a 74 años (NCCN/ACR recomiendan anual desde 40 años; alto riesgo/BRCA inicia antes con RM)',
+        'Toda masa palpable sólida nueva, retracción cutánea/pezón, piel de naranja o telorrea sanguinolenta unilateral requiere mamografía diagnóstica + ecografía + biopsia tru-cut aunque haya tenido tamizaje reciente negativo.',
+      ],
+    ],
+    keyManagementPearls: [
+      'Todo sangrado uterino posmenopáusico debe investigarse hasta descartar carcinoma endometrial; un grosor endometrial ≤ 4 mm en ecografía transvaginal adecuada permite conducta expectante solo si el episodio cede y no recurre.',
+      'El cáncer de cuello uterino estadio IB3 (≥ 4 cm) a IVA se trata habitualmente con quimiorradioterapia concurrente (cisplatino) más braquiterapia, evitando histerectomía radical primaria con alta morbilidad añadida.',
+    ],
+    references: [
+      {
+        citation:
+          'Bhatla N, Aoki D, Sharma DN, Sankaranarayanan R. Cancer of the cervix uteri: 2021 update (FIGO Cancer Report). Int J Gynaecol Obstet. 2021;155 Suppl 1:28-44.',
+        year: 2021,
+      },
+      {
+        citation:
+          'ACOG Committee Opinion No. 734: The Role of Transvaginal Ultrasonography in Evaluating the Endometrium of Women With Postmenopausal Bleeding. Obstet Gynecol. 2018;131(5):e124-e129.',
+        year: 2018,
+      },
+    ],
+  },
+  {
+    id: 'oncologic-emergencies-table',
+    title: 'Urgencias Oncológicas Críticas en Guardia (Neutropenia Febril, Lisis Tumoral, Compresión Medular, VCS e Hipercalcemia)',
+    shortTitle: 'Urgencias Oncológicas en Guardia',
+    specialty: 'oncologia',
+    secondarySpecialties: ['urgencias', 'hematologia', 'medicina-interna'],
+    setting: 'urgencias',
+    guidelineVersion: 'ASCO / IDSA · NCCN · ESMO Oncologic Emergencies',
+    summary:
+      'Criterios diagnósticos y acciones terapéuticas inmediatas de las cinco principales emergencias oncológicas en Urgencias.',
+    columns: [
+      'Urgencia Oncológica',
+      'Criterio diagnóstico en Urgencias',
+      'Conducta inmediata y metas críticas',
+    ],
+    rows: [
+      [
+        { text: 'Neutropenia Febril', tone: 'critical', emphasize: true },
+        'Fiebre ≥ 38.3 °C única (o ≥ 38.0 °C por ≥ 1 h) + RAN < 500 cél/µL (o < 1,000 con caída esperada < 500)',
+        'Antibiótico IV antipseudomónico en ≤ 60 min (Cefepima 2 g c/8 h, Piperacilina-tazobactam 4.5 g c/6 h o Meropenem 1 g c/8 h) tras 2 hemocultivos. Aplicar Índice MASCC para estratificar riesgo.',
+      ],
+      [
+        { text: 'Síndrome de Lisis Tumoral (Cairo-Bishop)', tone: 'critical', emphasize: true },
+        '≥ 2 criterios de laboratorio (± 3 días antes a +7 d tras QT): Ác. úrico ≥ 8 mg/dL, K⁺ ≥ 6.0 mEq/L, Fósforo ≥ 4.5 mg/dL (≥ 6.5 en niños) o Calcio ≤ 7.0 mg/dL (o ↓ ≥ 25 %); SLT clínico si añade LRA, arritmia o convulsión',
+        'Hidratación IV agresiva (2.5–3 L/m²/día, meta diuresis ≥ 100 mL/m²/h; SIN potasio ni calcio profiláctico). Alopurinol (profilaxis/bajo riesgo) o Rasburicasa (0.2 mg/kg IV dosis única si ácido úrico elevado / alto riesgo; descartar déficit G6PD). Tratar hiperpotasemia de inmediato.',
+      ],
+      [
+        { text: 'Compresión Medular Maligna', tone: 'critical', emphasize: true },
+        'Dolor dorsal/lumbar nuevo o progresivo en paciente con cáncer + debilidad de extremidades, nivel sensitivo o disfunción esfinteriana',
+        'Dexametasona IV inmediata sin esperar imagen (carga estándar 10–16 mg IV seguida de 4 mg IV/VO c/6 h) + RM de columna COMPLETA urgente (< 24 h; inmediata si déficit motor progresivo) + interconsulta urgente a Radioterapia / Neurocirugía.',
+      ],
+      [
+        { text: 'Síndrome de Vena Cava Superior (VCS)', tone: 'high', emphasize: true },
+        'Edema facial/cuello/brazos, plétora facial, circulación colateral torácica; emergencia vital si estridor, edema laríngeo o edema cerebral',
+        'Elevar cabecera 30–45°, O₂ si hipoxemia, TC torácica con contraste. Si obstrucción de vía aérea o edema cerebral (Grado 4): stent endovascular urgente + corticoides/radioterapia. En paciente estable SIN diagnóstico histológico previo: obtener biopsia antes de iniciar corticoides/QT si sospecha de linfoma.',
+      ],
+      [
+        { text: 'Hipercalcemia Maligna (Ca²⁺ corregido > 12–14 mg/dL)', tone: 'high', emphasize: true },
+        'Poliuria, deshidratación, somnolencia/confusión, estreñimiento, QT corto; frecuente en mieloma, mama, pulmón escamoso y renal',
+        '1) Hidratación intensa con SS 0.9 % (200–300 mL/h inicial ajustado a volemia para lograr diuresis 100–150 mL/h; evitar furosemida salvo sobrecarga hídrica). 2) Bifosfonato IV (Ácido zoledrónico 4 mg IV en 15 min) o Denosumab (si LRA/refractaria). 3) Calcitonina (4 UI/kg c/12 h × 48 h) si grave/sintomática para descenso rápido.',
+      ],
+    ],
+    keyManagementPearls: [
+      'En neutropenia febril NO realizar tacto rectal ni colocar supositorios/enemas ni tomar temperatura rectal por riesgo de translocación bacteriana y sepsis por anaerobios/gramnegativos.',
+      'En sospecha de linfoma mediastínico con síndrome de VCS estable (sin estridor ni compromiso neurológico), evitar administrar corticoides antes de la biopsia porque pueden lisar las células y hacer indistinguible el diagnóstico histológico.',
+    ],
+    references: [
+      {
+        citation:
+          'Coiffier B, Altman A, Pui CH, Younes A, Cairo MS. Guidelines for the management of pediatric and adult tumor lysis syndrome: an evidence-based review. J Clin Oncol. 2008;26(16):2767-2778.',
+        year: 2008,
+      },
+      {
+        citation:
+          'Lawton AJ, Lee KA, Cheville AL, et al. Assessment and Management of Patients With Metastatic Spinal Cord Compression: A Multidisciplinary Review. J Clin Oncol. 2019;37(1):61-71.',
+        year: 2019,
+      },
+    ],
+  },
+  {
+    id: 'hiv-diagnosis-cdc-staging-table',
+    title: 'VIH/SIDA: Algoritmo Diagnóstico, Estadificación CDC/OMS y Paquete de Enfermedad Avanzada',
+    shortTitle: 'VIH: Diagnóstico, Estadios CDC y EAV',
+    specialty: 'infectologia',
+    secondarySpecialties: ['medicina-interna', 'urgencias'],
+    setting: 'ambos',
+    guidelineVersion: 'CDC HIV Case Definition 2014 · CDC Diagnostic Algorithm · OMS AHD 2021–2024',
+    summary:
+      'Criterios de diagnóstico serológico/virológico, clasificación por CD4+ (Estadios 1–3), paquete obligatorio de Enfermedad Avanzada (CD4 < 200) y metas de carga viral (I=I).',
+    columns: [
+      'Etapa / Parámetro clínico',
+      'Criterio objetivo de laboratorio / clínico',
+      'Interpretación y conducta inicial',
+    ],
+    rows: [
+      [
+        { text: 'Tamizaje y Confirmación Diagnóstica (CDC)', tone: 'neutral', emphasize: true },
+        '1) Inmunoensayo Ag/Ac de 4.ª generación (detecta Ac VIH-1/2 + Ag p24; ventana ~18–45 d). 2) Si reactivo: diferenciación Ac VIH-1/VIH-2. 3) Si negativo o indeterminado: ARN-VIH cuantitativo (PCR)',
+        'Si síndrome retroviral agudo (fiebre, exantema, faringitis, adenopatías tras exposición en últimas 2–4 semanas) y 4.ª generación negativa: solicitar ARN-VIH directamente (carga viral suele ser muy alta > 100,000 copias/mL).',
+      ],
+      [
+        { text: 'Estadio CDC 1 (≥ 6 años y adultos)', tone: 'normal', emphasize: true },
+        'CD4 ≥ 500 cél/µL (o ≥ 26 % si falta recuento absoluto) y SIN condición definitoria de SIDA',
+        'Iniciar TAR inmediato (mismo día o ≤ 7 días). Tamizaje de ITS, VHB, VHC, TB latente (IGRA/PPD) y vacunación (VHB, VPH, neumococo, influenza).',
+      ],
+      [
+        { text: 'Estadio CDC 2 (≥ 6 años y adultos)', tone: 'moderate', emphasize: true },
+        'CD4 200 – 499 cél/µL (o 14–25 % si falta absoluto) y SIN condición definitoria de SIDA',
+        'Iniciar TAR inmediato. Evaluar adherencia, función renal/hepática, comorbilidades cardiovasculares y tamizaje cervical/anal según protocolo.',
+      ],
+      [
+        { text: 'Estadio CDC 3 / SIDA y Enfermedad Avanzada (OMS)', tone: 'critical', emphasize: true },
+        'CD4 < 200 cél/µL (o < 14 % si falta absoluto) O ≥ 1 condición definitoria de SIDA (PCP, TB extrapulmonar/diseminada, criptococosis extrapulmonar, toxoplasmosis cerebral, candidiasis esofágica, Kaposi, CMV visceral, LMP)',
+        'Paquete OMS de Enfermedad Avanzada: 1) Tamizaje de TB (síntomas + LF-LAM urinario / Xpert MTB/RIF). 2) Antígeno criptocócico sérico (CrAg) si CD4 < 100–200. 3) Profilaxis TMP-SMX. 4) Inicio rápido de TAR salvo meningitis criptocócica o TB meníngea.',
+      ],
+      [
+        { text: 'Metas de Carga Viral (ARN-VIH) y Criterio I=I', tone: 'low', emphasize: true },
+        'Supresión virológica clínica: < 50 copias/mL (indetectable) · Criterio Indetectable = Intransmisible (I=I / U=U): < 200 copias/mL sostenido en TAR',
+        'Control de carga viral a las 4–8 semanas de iniciar TAR, luego c/3–6 meses hasta supresión sostenida y posteriormente c/6 meses. Con ARN-VIH < 200 copias/mL sostenido y buena adherencia, el riesgo de transmisión sexual es CERO.',
+      ],
+    ],
+    keyManagementPearls: [
+      'Una prueba rápida reactiva NUNCA confirma por sí sola el diagnóstico definitivo: debe completarse el algoritmo con segunda prueba / diferenciación VIH-1/2 o carga viral antes de emitir diagnóstico definitivo.',
+      'La vacuna contra fiebre amarilla y otras vacunas de virus vivos atenuados (SRP/triple viral, varicela) están CONTRAINDICADAS cuando los CD4 son < 200 cél/µL (< 15 %).',
+    ],
+    references: [
+      {
+        citation:
+          'Centers for Disease Control and Prevention (CDC). Revised Surveillance Case Definition for HIV Infection — United States, 2014. MMWR Recomm Rep. 2014;63(RR-03):1-10.',
+        year: 2014,
+      },
+      {
+        citation:
+          'World Health Organization. Consolidated guidelines on HIV prevention, testing, treatment, service delivery and monitoring. Geneva: WHO; 2021.',
+        year: 2021,
+      },
+    ],
+  },
+  {
+    id: 'hiv-art-regimens-interactions-table',
+    title: 'Terapia Antirretroviral (TAR) de Primera Línea, Poblaciones Especiales e Interacciones Críticas',
+    shortTitle: 'VIH: Esquemas TAR e Interacciones',
+    specialty: 'infectologia',
+    secondarySpecialties: ['medicina-interna', 'gineco-obstetricia', 'urgencias'],
+    setting: 'ambos',
+    guidelineVersion: 'NIH/DHHS ART Guidelines 2024 · WHO 2021–2024 · EACS',
+    summary:
+      'Esquemas preferidos de inicio rápido (INSTI de 2.ª generación), ajustes obligatorios en embarazo, coinfección por VHB/TB, daño renal e interacciones farmacológicas peligrosas.',
+    columns: [
+      'Escenario clínico / Esquema',
+      'Composición y Dosis estándar adulto',
+      'Requisitos, ajustes y alertas críticas',
+    ],
+    rows: [
+      [
+        { text: '1.ª Línea Universal (OMS TLD y DHHS)', tone: 'normal', emphasize: true },
+        'TDF 300 mg + 3TC 300 mg (o FTC 200 mg) + Dolutegravir (DTG) 50 mg VO c/24 h · O BIC 50 mg / FTC 200 mg / TAF 25 mg (Biktarvy) 1 comp VO c/24 h',
+        'Alta barrera genética a resistencia y excelente tolerancia. TLD (TDF/3TC/DTG) requiere ClCr ≥ 50–60 mL/min; BIC/FTC/TAF requiere ClCr ≥ 30 mL/min. Ambos tratan coinfección por VHB.',
+      ],
+      [
+        { text: 'Régimen Dual (DTG / 3TC — Solo casos seleccionados)', tone: 'moderate', emphasize: true },
+        'Dolutegravir 50 mg + Lamivudina 300 mg VO c/24 h (Dovato)',
+        'NO usar en inicio rápido sin resultados basales. Requisitos obligatorios DHHS: ARN-VIH < 500,000 copias/mL, HBsAg NEGATIVO (no cubre VHB) y ausencia de resistencia conocida a 3TC/INSTI.',
+      ],
+      [
+        { text: 'Coinfección VIH + Tuberculosis con Rifampicina', tone: 'high', emphasize: true },
+        'TDF/3TC (o TDF/FTC) + Dolutegravir 50 mg CADA 12 HORAS (dosis doble) · O TDF/FTC + Efavirenz 600 mg/noche',
+        'Rifampicina reduce niveles de inhibidores de integrasa: duplicar DTG a 50 mg c/12 h (hasta 2 sem tras fin de rifampicina). CONTRAINDICADO usar BIC/FTC/TAF estándar o inhibidores de proteasa potenciados con rifampicina.',
+      ],
+      [
+        { text: 'Embarazo / Deseo gestacional / Coinfección VHB', tone: 'low', emphasize: true },
+        'Preferido DHHS/OMS: TDF/FTC (o TAF/FTC) + Dolutegravir 50 mg VO c/24 h (alternativa Raltegravir 400 mg c/12 h o Darunavir/ritonavir)',
+        'Los datos actuales (Tsepamo actualizado) respaldan DTG como seguro y preferido en todos los trimestres del embarazo. Si hay coinfección por VHB (HBsAg +), el esquema DEBE contener TDF o TAF + 3TC/FTC (nunca suspender abruptamente por riesgo de falla hepática fulminante).',
+      ],
+      [
+        { text: 'Interacciones Críticas en Urgencias / Consulta', tone: 'critical', emphasize: true },
+        'Cationes polivalentes (Fe, Ca, Mg, Al, sucralfato) · Metformina · Estatinas/Corticoides inhalados con Ritonavir/Cobicistat',
+        'Cationes (antiácidos, hierro, calcio) quelan DTG/BIC y anulan absorción: separar DTG 2 h antes o 6 h después (BIC 2 h antes/después con comida). Con DTG limitar metformina a ≤ 1,000 mg/día. Con Ritonavir/Cobicistat CONTRAINDICADAS simvastatina, lovastatina, fluticasona/budesonida inhalada (riesgo de síndrome de Cushing iatrogénico) y midazolam oral.',
+      ],
+    ],
+    keyManagementPearls: [
+      'Antes de prescribir Abacavir (ABC/3TC/DTG) es OBLIGATORIO disponer de prueba HLA-B*5701 negativa por riesgo de reacción de hipersensibilidad potencialmente mortal.',
+      'El inicio rápido de TAR el mismo día está indicado en pacientes motivados sin síntomas meníngeos; ante cefalea, rigidez de nuca o fiebre alta en CD4 bajos, descartar primero meningitis criptocócica o tuberculosa.',
+    ],
+    references: [
+      {
+        citation:
+          'Panel on Antiretroviral Guidelines for Adults and Adolescents. Guidelines for the Use of Antiretroviral Agents in Adults and Adolescents with HIV (DHHS). 2024.',
+        year: 2024,
+      },
+      {
+        citation:
+          'Liverpool HIV Drug Interactions Database & World Health Organization Consolidated HIV Guidelines. 2024.',
+        year: 2024,
+      },
+    ],
+  },
+  {
+    id: 'hiv-opportunistic-infections-table',
+    title: 'Infecciones Oportunistas en VIH/SIDA: Diagnóstico, Tratamiento Agudo y Profilaxis por CD4',
+    shortTitle: 'VIH: Infecciones Oportunistas (CD4)',
+    specialty: 'infectologia',
+    secondarySpecialties: ['urgencias', 'medicina-interna', 'neurologia'],
+    setting: 'ambos',
+    guidelineVersion: 'NIH / CDC / HIVMA-IDSA OI Guidelines 2024 · AMBITION-cm',
+    summary:
+      'Guía rápida por umbral de CD4 para el diagnóstico, tratamiento agudo de primera línea, uso exacto de corticoides y prevención de SIRI.',
+    columns: [
+      'Infección Oportunista y Umbral CD4',
+      'Cuadro clínico y diagnóstico clave',
+      'Tratamiento agudo y profilaxis secundaria/primaria',
+    ],
+    rows: [
+      [
+        { text: 'Neumonía por Pneumocystis jirovecii (PCP) · CD4 < 200', tone: 'high', emphasize: true },
+        'Disnea subaguda progresiva, tos seca, fiebre, hipoxemia en esfuerzo, LDH elevada, infiltrados intersticiales bilaterales ("vidrio deslustrado")',
+        '1.ª línea: TMP-SMX 15–20 mg/kg/día (componente TMP) IV/VO dividido c/6–8 h × 21 días. AÑADIR PREDNISONA (40 mg c/12 h × 5 d → 40 mg/d × 5 d → 20 mg/d × 11 d) si PaO₂ < 70 mmHg o gradiente A-a ≥ 35 mmHg. Profilaxis primaria (< 200): TMP-SMX 160/800 mg VO/día.',
+      ],
+      [
+        { text: 'Toxoplasmosis Cerebral · CD4 < 100', tone: 'critical', emphasize: true },
+        'Cefalea, focalidad neurológica, convulsiones, fiebre; RM/TC con múltiples lesiones en anillo en ganglios basales/unión corticosubcortical + IgG Toxoplasma (+)',
+        '1.ª línea: Pirimetamina (carga 200 mg → 50–75 mg/d) + Sulfadiazina (1,000–1,500 mg c/6 h) + Ácido folínico (leucovorina 10–25 mg/d) × ≥ 6 sem (alternativa equivalente en muchos centros: TMP-SMX 5 mg/kg TMP IV/VO c/12 h). Corticoides SOLO si efecto de masa/edema grave.',
+      ],
+      [
+        { text: 'Meningitis Criptocócica · CD4 < 100', tone: 'critical', emphasize: true },
+        'Cefalea subaguda intensa, fiebre, parálisis de VI par, alteración visual; LCR con presión de apertura > 20–25 cmH₂O, CrAg (+) en suero/LCR y tinta china',
+        'Inducción AMBITION/OMS: Anfotericina B liposomal 10 mg/kg IV dosis única + Flucitosina 100 mg/kg/d + Fluconazol 1,200 mg/d × 14 días (luego consolidación Fluconazol 800 mg/d × 8 sem → 200 mg/d). Punciones lumbares evacuadoras diarias si PIC ≥ 25 cmH₂O. DIFERIR TAR 4–6 SEMANAS (evitar SIRI mortal).',
+      ],
+      [
+        { text: 'Tuberculosis (Pulmonar / Extrapulmonar / Meníngea) · Cualquier CD4', tone: 'high', emphasize: true },
+        'Tos ≥ 2 sem, fiebre vespertina, pérdida de peso, adenopatías; baciloscopia/GeneXpert MTB/RIF, LF-LAM urinario en CD4 < 100–200',
+        'Esquema estándar HRZE (2 m HRZE + 4 m HR; 9–12 m si SNC/ósea). Si TB NO meníngea y CD4 < 50: TAR en ≤ 2 sem (si CD4 ≥ 50: 2–8 sem). Si MENINGITIS TB: Dexametasona inmediata + DIFERIR TAR 4–8 semanas. Duplicar DTG (50 mg c/12 h) con rifampicina.',
+      ],
+      [
+        { text: 'Complejo Mycobacterium avium (MAC) y CMV · CD4 < 50', tone: 'high', emphasize: true },
+        'MAC: fiebre persistente, sudoración, diarrea, anemia, fosfatasa alcalina ↑, hemocultivo micobacteriano (+). CMV: retinitis ("pizza con queso y kétchup"), esofagitis/colitis con úlceras',
+        'MAC tratamiento: Claritromicina 500 mg c/12 h (o Azitromicina 500–600 mg/d) + Etambutol 15 mg/kg/d (± Rifabutina). Profilaxis primaria MAC ya NO rutinaria si inicia TAR inmediato. CMV retinitis: Valganciclovir 900 mg VO c/12 h (o Ganciclovir IV 5 mg/kg c/12 h) × 14–21 días + TAR en 1–2 sem.',
+      ],
+    ],
+    keyManagementPearls: [
+      'Ante lesión focal cerebral en paciente con VIH y CD4 < 100 e IgG Toxoplasma (+), si no hay efecto de masa crítico ni sospecha inmediata de absceso bacteriano, suele iniciarse prueba terapéutica anti-Toxoplasma durante 10–14 días con control clínico/imagenológico antes de biopsia cerebral (diagnóstico diferencial principal: linfoma primario del SNC).',
+      'En meningitis criptocócica NO usar dexametasona ni manitol de rutina: el control de la hipertensión intracraneal se realiza mediante drenaje mecánico de LCR (punción lumbar evacuadora diaria hasta estabilizar presión < 20 cmH₂O).',
+    ],
+    references: [
+      {
+        citation:
+          'Panel on Opportunistic Infections in Adults and Adolescents with HIV. Guidelines for the Prevention and Treatment of Opportunistic Infections in Adults and Adolescents with HIV (NIH/CDC/IDSA). 2024.',
+        year: 2024,
+      },
+      {
+        citation:
+          'Jarvis JN, Lawrence DS, Meya DB, et al. Single-Dose Liposomal Amphotericin B Treatment for Cryptococcal Meningitis (AMBITION-cm). N Engl J Med. 2022;386(12):1109-1120.',
+        year: 2022,
+      },
+    ],
+  },
+  {
+    id: 'hiv-pep-prep-prevention-table',
+    title: 'Prevención de VIH: PEP (Post-Exposición ≤ 72 h), PrEP y Control de Exposición Ocupacional/Sexual',
+    shortTitle: 'VIH: PEP ≤ 72 h y PrEP',
+    specialty: 'infectologia',
+    secondarySpecialties: ['urgencias', 'medicina-interna', 'gineco-obstetricia'],
+    setting: 'ambos',
+    guidelineVersion: 'CDC PEP 2025 · CDC PrEP 2021 · OMS Prevention 2024',
+    summary:
+      'Criterios de urgencia en exposiciones biológicas o sexuales, pautas farmacológicas completas de PEP (28 días) y modalidades aprobadas de PrEP.',
+    columns: [
+      'Estrategia preventiva',
+      'Criterios e indicaciones exactas',
+      'Esquema farmacológico y seguimiento',
+    ],
+    rows: [
+      [
+        { text: 'PEP — Profilaxis Post-Exposición (URGENCIA ≤ 72 h)', tone: 'critical', emphasize: true },
+        'Exposición percutánea/mucosa con sangre/semen/secreciones vaginales/LCR de fuente VIH+ detectable o desconocida de alto riesgo, dentro de las ≤ 72 horas (óptimo ≤ 2 h)',
+        'Iniciar inmediatamente 3 fármacos × 28 DÍAS: TDF/FTC 300/200 mg VO c/24 h + Dolutegravir 50 mg VO c/24 h (alternativas: BIC/FTC/TAF c/24 h o TDF/FTC + Raltegravir 400 mg c/12 h). Si ClCr < 60: evitar TDF (usar TAF/FTC + DTG).',
+      ],
+      [
+        { text: 'Exposición SIN riesgo / Criterio I=I', tone: 'normal', emphasize: true },
+        'Piel íntegra, saliva sin sangre, orina/heces sin sangre, lágrimas; O exposición sexual exclusiva con fuente VIH+ en TAR y carga viral < 200 copias/mL confirmada',
+        'NO requiere PEP por riesgo nulo de transmisión sexual (Indetectable = Intransmisible). Si existe duda sobre adherencia de la fuente, agresión sexual o exposición laboral punzocortante, valorar PEP por precaución.',
+      ],
+      [
+        { text: 'Seguimiento Post-Exposición y Otras Infecciones', tone: 'moderate', emphasize: true },
+        'Todo paciente evaluado por accidente biológico o exposición sexual de riesgo',
+        'Basal: VIH 4.ª gen, HBsAg/anti-HBs, VHC, sífilis, creatinina/PFH, test embarazo. Repetir VIH a las 4–6 semanas y 12 semanas (6 meses si fuente VHC+ y coinfección). En accidente laboral sin inmunidad VHB: vacuna + gammaglobulina anti-VHB (HBIG).',
+      ],
+      [
+        { text: 'PrEP Oral Diaria / A Demanda (2-1-1) / Inyectable', tone: 'low', emphasize: true },
+        'Personas VIH negativas (4.ª generación negativa reciente sin síntomas agudos) con riesgo sexual o uso de drogas inyectables',
+        'Oral diaria: TDF/FTC 300/200 mg VO/día (ClCr ≥ 60) o TAF/FTC 25/200 mg/día (ClCr ≥ 30, solo HSH/trans). Esquema 2-1-1 (solo HSH sexo anal sin VHB): 2 comp 2–24 h antes → 1 a las 24 h → 1 a las 48 h. Inyectable donde disponible: Cabotegravir 600 mg IM c/2 meses. Control VIH c/3 meses.',
+      ],
+    ],
+    keyManagementPearls: [
+      'En Urgencias, la primera dosis de PEP NO debe retrasarse esperando resultados de serología de la fuente ni bioquímica basal: administrar de inmediato dentro de las primeras horas.',
+      'Nunca prescribir PrEP (2 fármacos) si existe sospecha clínica de infección aguda por VIH (síndrome mononucleósido tras exposición reciente) o prueba positiva/indeterminada.',
+    ],
+    references: [
+      {
+        citation:
+          'Centers for Disease Control and Prevention (CDC). Antiretroviral Postexposure Prophylaxis Guidelines (oPEP/nPEP) & Preexposure Prophylaxis for HIV Prevention.',
+        year: 2025,
+      },
+      {
+        citation:
+          'World Health Organization. Guidelines on long-acting injectable cabotegravir for HIV prevention & Consolidated HIV Guidelines.',
+        year: 2022,
+      },
+    ],
+  },
+  {
+    id: 'minsa-nicaragua-immunization-table',
+    title: 'Esquema Nacional de Vacunación MINSA Nicaragua (PAI — Norma Técnica 121) y Profilaxis Tétanos / Rabia',
+    shortTitle: 'Vacunas MINSA Nicaragua + Tétanos/Rabia',
+    specialty: 'infectologia',
+    secondarySpecialties: ['pediatria', 'medicina-interna', 'gineco-obstetricia', 'urgencias'],
+    setting: 'ambos',
+    guidelineVersion: 'Norma Técnica de Inmunizaciones (Norma 121) PAI MINSA Nicaragua · OMS',
+    summary:
+      'Calendario oficial por edad y grupo de riesgo en Nicaragua (BCG, Hep B, Pentavalente, Neumococo 13v/23v, Rotavirus, fIPV/bOPV, SRP/MMR, DPT, VPH, dT e Influenza) junto con conducta antitetánica y antirrábica en urgencias.',
+    columns: [
+      'Edad o grupo objetivo',
+      'Biológicos / Vacunas del esquema',
+      'Vía, dosis y reglas críticas de seguridad',
+    ],
+    rows: [
+      [
+        { text: 'Recién nacido (< 24 h)', tone: 'high', emphasize: true },
+        'BCG (dosis única) + Hepatitis B pediátrica (dosis al nacer)',
+        'BCG: intradérmica deltoides izquierdo (SOLO si peso ≥ 2,000 g; si < 2,000 g diferir hasta alcanzar 2 kg). Hep B: 0.5 mL IM muslo derecho en primeras 24 h.',
+      ],
+      [
+        { text: '2, 4 y 6 meses (Esquema primario)', tone: 'neutral', emphasize: true },
+        '2 m: Pentavalente 1 + Neumococo 13v 1 + Polio (fIPV/IPV) 1 + Rotavirus 1. 4 m: 2.ª dosis de cada una. 6 m: Pentavalente 3 + Neumococo 13v 3 + bOPV 3 (+ Influenza 6–23 m)',
+        'Pentavalente y Neumococo: 0.5 mL IM profunda en muslos separados. bOPV: 2 gotas VO. LÍMITE ROTAVIRUS: 1.ª dosis ≤ 15 semanas; última dosis antes de cumplir 8 meses (7 m 29 d).',
+      ],
+      [
+        { text: '12 y 18 meses · 6 años (Refuerzos)', tone: 'moderate', emphasize: true },
+        '12 m: SRP/MMR 1 + Neumococo 13v refuerzo. 18 m: DPT 1.er refuerzo + bOPV refuerzo + SRP/MMR 2.ª dosis. 6 años: DPT 2.º refuerzo escolar',
+        'SRP: 0.5 mL SC brazo (virus vivos: contraindicada en inmunosupresión grave). DPT: 0.5 mL IM (no aplicar DPT en ≥ 7 años; usar dT).',
+      ],
+      [
+        { text: '9 – 14 años · Embarazadas · Adultos ≥ 50 años', tone: 'low', emphasize: true },
+        '9–14 años: VPH (2 dosis, intervalo 6 meses) + dT a los 10 años. Embarazadas: dT (esquema según antecedente) + Influenza estacional. Adulto ≥ 50 años/crónico: Neumococo 23v + Influenza anual + dT',
+        'Sin esquema previo de dT en adulto/embarazada: 5 dosis MINSA (0, 1 mes, 6 meses, 1 año, 1 año). SRP contraindicada en embarazo.',
+      ],
+      [
+        { text: 'Heridas (Tétanos) y Mordeduras (Rabia) en Urgencias', tone: 'critical', emphasize: true },
+        'Herida sucia con < 3 dosis o desconocido: dT + TIG 250 UI IM. Mordedura Categoría III (transdérmica/mucosa/murciélago): Vacuna antirrábica + RIG',
+        'Toda mordedura exige lavado inmediato ≥ 15 min con agua y jabón. Inmunoglobulinas (TIG o RIG) SIEMPRE en sitio anatómico distinto a la vacuna.',
+      ],
+    ],
+    keyManagementPearls: [
+      'El peso mínimo de 2,000 g aplica estrictamente para BCG; un prematuro estable < 2,000 g debe recibir su dosis de Hepatitis B dentro de las primeras 24 horas y la BCG al alcanzar los 2,000 g.',
+      'La fiebre leve, infección respiratoria alta sin gravedad o tratamiento antibiótico NO contraindican posponer las vacunas del esquema PAI.',
+    ],
+    references: [
+      {
+        citation:
+          'Ministerio de Salud de Nicaragua (MINSA). Norma Técnica de Inmunizaciones (Norma 121) y Esquema Nacional de Vacunación PAI. Managua: MINSA.',
+        year: 2023,
+      },
+      {
+        citation:
+          'World Health Organization (WHO). Rabies & Tetanus vaccines: WHO position papers. Weekly Epidemiological Record.',
+        year: 2018,
+      },
+    ],
+  },
+  {
+    id: 'pediatric-broselow-pals-table',
+    title: 'Reanimación Pediátrica Tipo Cinta de Broselow (Zonas de Color, Vía Aérea, Desfibrilación y Fármacos PALS)',
+    shortTitle: 'Broselow: Vía Aérea y Dosis PALS',
+    specialty: 'pediatria',
+    secondarySpecialties: ['urgencias', 'cirugia-general'],
+    setting: 'urgencias',
+    guidelineVersion: 'Sistema Broselow-Luten · AHA PALS 2020',
+    summary:
+      'Referencia inmediata por talla (46–146 cm) y franja de color con calibre de tubo endotraqueal (con y sin balón), profundidad, laringoscopio, energía de desfibrilación y adrenalina IV/IO.',
+    columns: [
+      'Color Broselow · Talla y Peso',
+      'Vía aérea (TET con/sin balón · Prof. · Hoja)',
+      'Desfibrilación (2 → 4 J/kg) y Adrenalina 1:10,000 (0.1 mL/kg)',
+    ],
+    rows: [
+      [
+        { text: 'Gris · 46–59 cm (3–5 kg · ref. 4 kg)', tone: 'high', emphasize: true },
+        'TET con balón 3.0 / sin balón 3.0–3.5 mm · Prof. 9–10 cm · Miller 0',
+        'Desfib: 8 → 16 J · Adrenalina 1:10,000: 0.4 mL (0.04 mg) · Bolo SSN: 80 mL',
+      ],
+      [
+        { text: 'Rosa · 60–65 cm (6–7 kg · ref. 6.5 kg)', tone: 'high', emphasize: true },
+        'TET con balón 3.0 / sin balón 3.5 mm · Prof. 10.5–11 cm · Miller 1',
+        'Desfib: 13 → 26 J · Adrenalina 1:10,000: 0.65 mL (0.065 mg) · Bolo SSN: 130 mL',
+      ],
+      [
+        { text: 'Rojo · 66–73 cm (8–9 kg · ref. 8.5 kg)', tone: 'critical', emphasize: true },
+        'TET con balón 3.5 / sin balón 3.5–4.0 mm · Prof. 11.5–12 cm · Miller 1 / Mac 1',
+        'Desfib: 17 → 34 J · Adrenalina 1:10,000: 0.85 mL (0.085 mg) · Bolo SSN: 170 mL',
+      ],
+      [
+        { text: 'Morado · 74–82 cm (10–11 kg · ref. 10.5 kg)', tone: 'moderate', emphasize: true },
+        'TET con balón 3.5 / sin balón 4.0 mm · Prof. 12.5–13 cm · Miller 1 / Mac 2',
+        'Desfib: 21 → 42 J · Adrenalina 1:10,000: 1.05 mL (0.105 mg) · Bolo SSN: 210 mL',
+      ],
+      [
+        { text: 'Amarillo · 83–93 cm (12–14 kg · ref. 13 kg)', tone: 'moderate', emphasize: true },
+        'TET con balón 4.0 / sin balón 4.5 mm · Prof. 13.5–14 cm · Mac 2 / Miller 2',
+        'Desfib: 26 → 52 J · Adrenalina 1:10,000: 1.3 mL (0.13 mg) · Bolo SSN: 260 mL',
+      ],
+      [
+        { text: 'Blanco · 94–107 cm (15–18 kg · ref. 16.5 kg)', tone: 'neutral', emphasize: true },
+        'TET con balón 4.5 / sin balón 5.0 mm · Prof. 14.5–15 cm · Mac 2 / Miller 2',
+        'Desfib: 33 → 66 J · Adrenalina 1:10,000: 1.65 mL (0.165 mg) · Bolo SSN: 330 mL',
+      ],
+      [
+        { text: 'Azul · 108–118 cm (19–23 kg · ref. 21 kg)', tone: 'neutral', emphasize: true },
+        'TET con balón 5.0 / sin balón 5.5 mm · Prof. 16–16.5 cm · Mac 2–3',
+        'Desfib: 42 → 84 J · Adrenalina 1:10,000: 2.1 mL (0.21 mg) · Bolo SSN: 420 mL',
+      ],
+      [
+        { text: 'Naranja · 119–132 cm (24–29 kg · ref. 26.5 kg)', tone: 'low', emphasize: true },
+        'TET con balón 5.5 / sin balón 6.0 mm · Prof. 17–18 cm · Mac 2–3',
+        'Desfib: 53 → 106 J · Adrenalina 1:10,000: 2.65 mL (0.265 mg) · Bolo SSN: 530 mL',
+      ],
+      [
+        { text: 'Verde · 133–146 cm (30–36 kg · ref. 33 kg)', tone: 'low', emphasize: true },
+        'TET con balón 6.0 / sin balón 6.5 mm · Prof. 19 cm · Mac 3',
+        'Desfib: 66 → 132 J · Adrenalina 1:10,000: 3.3 mL (0.33 mg) · Bolo SSN: 660 mL',
+      ],
+    ],
+    keyManagementPearls: [
+      'Reglas rápidas PALS: Adrenalina paro IV/IO = 0.01 mg/kg (0.1 mL/kg de 1:10,000, máx 1 mg); Amiodarona = 5 mg/kg (máx 300 mg); Adenosina = 0.1 mg/kg (máx 6 mg) y 2.ª dosis 0.2 mg/kg (máx 12 mg).',
+      'En niños > 36 kg o > 146 cm emplear dosificación de adulto con topes máximos.',
+    ],
+    references: [
+      {
+        citation:
+          'Topjian AA, Raymond TT, Atkins D, et al. Pediatric Basic and Advanced Life Support: 2020 AHA Guidelines. Circulation. 2020;142(16_suppl_2):S469-S523.',
+        year: 2020,
+      },
+      {
+        citation:
+          'Luten RC, Wears RL, Broselow J, et al. Length-based endotracheal tube and emergency equipment in pediatrics. Ann Emerg Med. 1992;21(8):900-904.',
+        year: 1992,
+      },
+    ],
+  },
+  {
+    id: 'neonatal-hyperbilirubinemia-aap2022-table',
+    title: 'Hiperbilirrubinemia Neonatal (≥ 35 semanas): Fototerapia, Escalada y Exanguinotransfusión (AAP 2022)',
+    shortTitle: 'Neonatología: Fototerapia y Exanguino (AAP 2022)',
+    specialty: 'pediatria',
+    secondarySpecialties: ['gineco-obstetricia', 'urgencias'],
+    setting: 'ambos',
+    guidelineVersion: 'AAP Clinical Practice Guideline Revision (Kemper et al., Pediatrics 2022)',
+    summary:
+      'Puntos de corte horarios de BST (mg/dL) para fototerapia, Zona de Escalada de Cuidados (≤ 2 mg/dL bajo exanguino), exanguinotransfusión y relación Bilirrubina/Albúmina.',
+    columns: [
+      'Perfil clínico / Edad gestacional',
+      'Fototerapia BST (24 h / 48 h / 72 h / 96 h)',
+      'Exanguinotransfusión, Escalada y Relación B/A',
+    ],
+    rows: [
+      [
+        { text: '≥ 38–40 sem SIN factores de riesgo de neurotoxicidad', tone: 'low', emphasize: true },
+        '38 sem: 12.3 / 16.0 / 18.8 / 20.7 mg/dL · 40 sem: 13.3 / 17.0 / 19.8 / 21.8 mg/dL',
+        'Exanguino ≥ 38 sem (sin FR): 17.7 / 20.1 / 22.1 / 23.5 mg/dL. Relación B/A corte ≥ 8.0.',
+      ],
+      [
+        { text: '35 – 37 sem SIN factores adicionales de neurotoxicidad', tone: 'moderate', emphasize: true },
+        '35 sem: 10.6 / 14.2 / 16.8 / 18.6 mg/dL · 36 sem: 11.2 / 14.8 / 17.5 / 19.3 · 37 sem: 11.7 / 15.4 / 18.1 / 20.0 mg/dL',
+        'Exanguino 35 sem (sin FR): 16.1 / 18.5 / 20.1 / 21.1 mg/dL. Relación B/A corte ≥ 7.2.',
+      ],
+      [
+        { text: '≥ 38 sem CON factores de riesgo de neurotoxicidad', tone: 'high', emphasize: true },
+        '38–40 sem: 10.5 / 14.0 / 16.6 / 18.2 mg/dL',
+        'FR: hemólisis isoinmune (Coombs+), G6PD, sepsis, inestabilidad < 24 h o albúmina < 3.0 g/dL. Umbral exanguino desciende ~2–4 mg/dL. Corte B/A ≥ 7.2.',
+      ],
+      [
+        { text: '35 – 37 sem CON factores de riesgo de neurotoxicidad', tone: 'critical', emphasize: true },
+        '35 sem: 8.9 / 12.2 / 14.6 / 16.1 mg/dL · 36 sem: 9.4 / 12.8 / 15.4 / 16.9 · 37 sem: 10.0 / 13.5 / 16.1 / 17.6 mg/dL',
+        'Grupo de máximo riesgo de neurotoxicidad: exanguino más precoz (~2–4 mg/dL bajo curva sin FR) y corte B/A ≥ 6.8.',
+      ],
+      [
+        { text: 'Escalada de Cuidados, EBA y Suspensión', tone: 'critical', emphasize: true },
+        'Suspender fototerapia cuando BST descienda ≥ 2.0 mg/dL por debajo del umbral con el que se inició',
+        'ESCALADA: BST dentro de 2 mg/dL bajo el umbral de exanguino → UCIN + fototerapia intensiva múltiple + hidratación IV + pruebas cruzadas. Signos de EBA → EXANGUINOTRANSFUSIÓN INMEDIATA.',
+      ],
+    ],
+    keyManagementPearls: [
+      'Usar SIEMPRE Bilirrubina Sérica Total (BST): nunca restar la bilirrubina directa/conjugada al tomar decisiones en las curvas AAP 2022.',
+      'Toda ictericia visible en las primeras 24 horas de vida es patológica hasta demostrar lo contrario y exige descartar incompatibilidad ABO/Rh, déficit G6PD y sepsis.',
+    ],
+    references: [
+      {
+        citation:
+          'Kemper AR, Newman TB, Slaughter JL, et al. Clinical Practice Guideline Revision: Management of Hyperbilirubinemia in the Newborn Infant 35 or More Weeks of Gestation. Pediatrics. 2022;150(3):e2022058859.',
+        year: 2022,
+      },
+    ],
+  },
+  {
+    id: 'daily-pharmacology-converters-table',
+    title: 'Conversores Farmacológicos Diarios: Corticosteroides Sistémicos y Rotación de Opioides (MME CDC)',
+    shortTitle: 'Conversores: Corticoides y Opioides (MME)',
+    specialty: 'medicina-interna',
+    secondarySpecialties: ['urgencias', 'oncologia', 'geriatria', 'cirugia-general'],
+    setting: 'ambos',
+    guidelineVersion: 'CDC Clinical Practice Guideline for Opioids 2022 · Tablas Glucocorticoides',
+    summary:
+      'Equipotencia antiinflamatoria, actividad mineralocorticoide y vida media de corticoides sistémicos, más factores MME CDC y regla de seguridad en rotación opioide.',
+    columns: [
+      'Fármaco y grupo',
+      'Equivalencia / Factor MME estándar',
+      'Seguridad clínica y notas clave de prescripción',
+    ],
+    rows: [
+      [
+        { text: 'Corticoides: Hidrocortisona · Prednisona / Prednisolona', tone: 'neutral', emphasize: true },
+        'Hidrocortisona 20 mg (Gluco 1× · Mineralo 1.0 · 8–12 h) ≡ Prednisona/Prednisolona 5 mg (Gluco 4× · Mineralo 0.8 · 12–36 h)',
+        'Hidrocortisona es de elección en insuficiencia suprarrenal primaria y choque séptico refractario por su efecto mineralocorticoide.',
+      ],
+      [
+        { text: 'Corticoides: Metilprednisolona · Dexametasona · Betametasona', tone: 'moderate', emphasize: true },
+        'Metilprednisolona 4 mg (Gluco 5× · Mineralo 0.5 · 12–36 h) ≡ Dexametasona 0.75 mg (Gluco 25× · Mineralo 0 · 36–72 h) ≡ Betametasona 0.6 mg',
+        'Dexametasona carece de efecto mineralocorticoide (preferida en edema cerebral, compresión medular y COVID-19/meningitis). Evitar suspensión brusca si > 2–3 sem.',
+      ],
+      [
+        { text: 'Opioides VO: Morfina · Tramadol · Codeína · Oxicodona · Hidromorfona', tone: 'high', emphasize: true },
+        'Morfina VO: 1.0 · Tramadol VO: 0.1 · Codeína VO: 0.15 · Hidrocodona VO: 1.0 · Oxicodona VO: 1.5 · Hidromorfona VO: 5.0 · Morfina IV/SC: 3.0',
+        'MME/día = Dosis diaria × Factor MME. Tramadol máx 400 mg/día. Alerta CDC: ≥ 50 MME/día duplica riesgo de sobredosis; ≥ 90 MME/día riesgo muy alto.',
+      ],
+      [
+        { text: 'Rotación segura (Tolerancia cruzada incompleta) y Fentanilo TD', tone: 'critical', emphasize: true },
+        'Reducir 25 % – 50 % la dosis equianalgésica teórica del opioide destino (50 % en ancianos/ERC/fragilidad)',
+        'Parche Fentanilo 25 mcg/h ≈ 60–90 MME/día (EXCLUSIVO en pacientes ya tolerantes). NUNCA usar factores MME simples para convertir a Metadona.',
+      ],
+    ],
+    keyManagementPearls: [
+      'En enfermedad renal crónica (TFG < 30 mL/min) evitar morfina, codeína y tramadol por acumulación de metabolitos neurotóxicos (M3G/M6G); preferir fentanilo o buprenorfina con titulación cautelosa.',
+    ],
+    references: [
+      {
+        citation:
+          'Dowell D, Ragan KR, Jones CM, Baldwin GT, Chou R. CDC Clinical Practice Guideline for Prescribing Opioids for Pain — United States, 2022. MMWR Recomm Rep. 2022;71(3):1-95.',
+        year: 2022,
+      },
+      {
+        citation:
+          'Liu D, Ahmet A, Ward L, et al. A practical guide to the monitoring and management of the complications of systemic corticosteroid therapy. Allergy Asthma Clin Immunol. 2013;9(1):30.',
+        year: 2013,
+      },
+    ],
+  },
 ];

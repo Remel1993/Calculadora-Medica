@@ -483,6 +483,28 @@ const UrologyIcon: React.FC<{ className?: string }> = ({ className }) => {
   );
 };
 
+const OncologyIcon: React.FC<{ className?: string }> = ({ className }) => {
+  const maskId = useSafeMaskId('onco');
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <defs>
+        <mask id={maskId}>
+          <rect width="24" height="24" fill="white" />
+          <path
+            d="M12 5.4c-1.4 0-2.3 1-2.3 2.5 0 1.4 1 2.9 2.3 4.1 1.3-1.2 2.3-2.7 2.3-4.1 0-1.5-.9-2.5-2.3-2.5Z"
+            fill="black"
+          />
+        </mask>
+      </defs>
+      <path
+        d="M12 2.8c-3.1 0-5.1 2-5.1 5 0 2.5 1.7 5 3.6 6.8l-3.4 4.8a1.4 1.4 0 0 0 .3 1.9 1.4 1.4 0 0 0 2-.3l2.6-3.7 2.6 3.7a1.4 1.4 0 0 0 2 .3 1.4 1.4 0 0 0 .3-1.9l-3.4-4.8c1.9-1.8 3.6-4.3 3.6-6.8 0-3-2-5-5.1-5Z"
+        fill="currentColor"
+        mask={`url(#${maskId})`}
+      />
+    </svg>
+  );
+};
+
 export interface SpecialtyVisual {
   id: SpecialtyId;
   shortLabel: string;
@@ -637,6 +659,14 @@ export const SPECIALTY_VISUALS: Record<SpecialtyId, SpecialtyVisual> = {
     iconClass: 'text-blue-700 dark:text-sky-300',
     renderIcon: (cls) => <UrologyIcon className={cls} />,
   },
+  oncologia: {
+    id: 'oncologia',
+    shortLabel: 'Oncología',
+    bgClass: 'bg-rose-50/95 border-pink-200/90 dark:bg-rose-950/45 dark:border-pink-800/70',
+    badgeBgClass: 'bg-pink-100/90 dark:bg-pink-950/70',
+    iconClass: 'text-pink-700 dark:text-pink-300',
+    renderIcon: (cls) => <OncologyIcon className={cls} />,
+  },
 };
 
 export const HOME_SPECIALTY_ORDER: SpecialtyId[] = [
@@ -644,6 +674,7 @@ export const HOME_SPECIALTY_ORDER: SpecialtyId[] = [
   'cardiologia',
   'pediatria',
   'gineco-obstetricia',
+  'oncologia',
   'neurologia',
   'nefrologia',
   'endocrinologia',

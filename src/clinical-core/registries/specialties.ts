@@ -53,7 +53,7 @@ export const SPECIALTIES: SpecialtyMeta[] = [
     id: 'infectologia',
     name: 'Infectología',
     shortName: 'Infectología',
-    description: 'Faringoamigdalitis, rinosinusitis aguda (IDSA/EPOS), neumonía, dengue, sepsis e infecciones graves.',
+    description: 'VIH/SIDA (CD4, TAR, PEP/PrEP, oportunistas), faringoamigdalitis, rinosinusitis, neumonía, dengue y sepsis.',
   },
   {
     id: 'medicina-interna',
@@ -78,6 +78,12 @@ export const SPECIALTIES: SpecialtyMeta[] = [
     name: 'Neurología',
     shortName: 'Neurología',
     description: 'Nivel de conciencia, ictus, cefaleas/migrañas (ICHD-3), banderas rojas (SNNOOP10), debilidad (MRC) y dolor neuropático.',
+  },
+  {
+    id: 'oncologia',
+    name: 'Oncología y Gineco-Oncología',
+    shortName: 'Oncología',
+    description: 'Sistemas RADS (BI/TI/PI/O/LI/Lung-RADS), PAP alterado y VPH (ASCCP), RMI/ROMA ovárico, ECOG/Karnofsky, MASCC y Calvert AUC.',
   },
   {
     id: 'pediatria',

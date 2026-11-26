@@ -146,6 +146,22 @@ import {
   searchCalculatorsInSpecialty,
 } from '../registries/catalog.ts';
 import { SPECIALTIES } from '../registries/specialties.ts';
+import { dripRateIvCalculator } from '../calculators/dripRateIv.ts';
+import { nursingDilutionCalculator } from '../calculators/nursingDilution.ts';
+import { acrTiradsCalculator } from '../calculators/acrTirads.ts';
+import { radsInterpreterCalculator } from '../calculators/radsInterpreter.ts';
+import { cervicalPapBethesdaCalculator } from '../calculators/cervicalPapBethesda.ts';
+import { ovarianRmiRomaCalculator } from '../calculators/ovarianRmiRoma.ts';
+import { ecogKarnofskyCalculator } from '../calculators/ecogKarnofsky.ts';
+import { masccFebrileNeutropeniaCalculator } from '../calculators/masccFebrileNeutropenia.ts';
+import { calvertCarboplatinCalculator } from '../calculators/calvertCarboplatin.ts';
+import { hivCdcCd4ProphylaxisCalculator } from '../calculators/hivCdcCd4Prophylaxis.ts';
+import { hivPepPrepCalculator } from '../calculators/hivPepPrep.ts';
+import { hivOpportunisticArtTimingCalculator } from '../calculators/hivOpportunisticArtTiming.ts';
+import { immunizationMinsaNicaraguaCalculator } from '../calculators/immunizationMinsaNicaragua.ts';
+import { pediatricBroselowResuscitationCalculator } from '../calculators/pediatricBroselowResuscitation.ts';
+import { neonatalPhototherapyExchangeAap2022Calculator } from '../calculators/neonatalPhototherapyExchangeAap2022.ts';
+import { dailyDrugConvertersCalculator } from '../calculators/dailyDrugConverters.ts';
 import {
   computeHadlockEfw1985,
   evaluateFetalWeight,
@@ -2948,8 +2964,20 @@ test('Consulta Externa Expansion (18 tools): Geriatrics, Cardio/Lipids, Hepato/G
   assert.equal(mchatMod.severity, 'moderate');
 });
 
-test('Catalog: 168 deduplicated tools, cross-specialty tagging, and accent-insensitive search', () => {
-  assert.equal(CALCULATOR_CATALOG.length, 168);
+test('Catalog: 184 deduplicated tools, cross-specialty tagging, and accent-insensitive search', () => {
+  assert.equal(CALCULATOR_CATALOG.length, 184);
+
+  const oncoCalcs = getCalculatorsBySpecialty('oncologia');
+  assert.ok(oncoCalcs.some((c) => c.id === 'acr-tirads-thyroid'));
+  assert.ok(oncoCalcs.some((c) => c.id === 'rads-imaging-interpreter'));
+  assert.ok(oncoCalcs.some((c) => c.id === 'cervical-pap-asccp'));
+  assert.ok(oncoCalcs.some((c) => c.id === 'ovarian-roma-rmi'));
+  assert.ok(oncoCalcs.some((c) => c.id === 'oncology-ecog-karnofsky'));
+  assert.ok(oncoCalcs.some((c) => c.id === 'mascc-febrile-neutropenia'));
+  assert.ok(oncoCalcs.some((c) => c.id === 'calvert-carboplatin-auc'));
+  assert.ok(oncoCalcs.some((c) => c.id === 'anc-ran'));
+  assert.ok(oncoCalcs.some((c) => c.id === 'bsa-mosteller'));
+  assert.ok(oncoCalcs.some((c) => c.id === 'psa-density'));
 
   const endoCalcs = getCalculatorsBySpecialty('endocrinologia');
   assert.ok(endoCalcs.some((c) => c.id === 'homa-ir-b'));
@@ -2969,6 +2997,9 @@ test('Catalog: 168 deduplicated tools, cross-specialty tagging, and accent-insen
   assert.ok(idCalcs.some((c) => c.id === 'centor-mcisaac'));
   assert.ok(idCalcs.some((c) => c.id === 'psi-port'));
   assert.ok(idCalcs.some((c) => c.id === 'dengue-oms'));
+  assert.ok(idCalcs.some((c) => c.id === 'hiv-cdc-cd4-prophylaxis'));
+  assert.ok(idCalcs.some((c) => c.id === 'hiv-pep-prep'));
+  assert.ok(idCalcs.some((c) => c.id === 'hiv-opportunistic-art-timing'));
 
   const neuroCalcs = getCalculatorsBySpecialty('neurologia');
   assert.ok(neuroCalcs.some((c) => c.id === 'glasgow'));
@@ -3683,6 +3714,489 @@ test('Medical Safety & Iatrogenesis Prevention Audit: edge cases across emergenc
   assert.ok(rrOpts?.type === 'select' && rrOpts.options[0].label.includes('≤ 30'));
   assert.ok(hrOpts?.type === 'select' && hrOpts.options[0].label.includes('≤ 120'));
 });
+
+test('Nursing IV Drip/Microdrip & Drug Dilution (Rule of Three): exact drop rates, duration, dilutions & safety alerts', () => {
+  // 1. Macrodrip 20 gts/mL: 1000 mL over 8 hours = 125 mL/h = 41.67 -> 42 drops/min
+  const macro = dripRateIvCalculator.calculate({
+    mode: 'vol_time_to_drops',
+    dropFactor: '20',
+    volumeMl: { value: '1000', unitId: 'ml' },
+    infusionTime: { value: '8', unitId: 'h' },
+  });
+  assert.equal(macro.primaryResult.value, 42);
+  assert.equal(macro.primaryResult.unit, 'gotas/min');
+  assert.equal(macro.severity, 'info');
+
+  // 2. Microdrip 60 mcgts/mL: 250 mL over 5 hours = 50 mL/h = 50 microdrops/min
+  const micro = dripRateIvCalculator.calculate({
+    mode: 'vol_time_to_drops',
+    dropFactor: '60',
+    volumeMl: { value: '250', unitId: 'ml' },
+    infusionTime: { value: '5', unitId: 'h' },
+  });
+  assert.equal(micro.primaryResult.value, 50);
+  assert.equal(micro.primaryResult.unit, 'microgotas/min');
+
+  // 3. Drops to time: 500 mL at 25 drops/min (20 gts/mL) = 400 min = 6 h 40 min
+  const duration = dripRateIvCalculator.calculate({
+    mode: 'drops_to_time',
+    dropFactor: '20',
+    volumeMl: { value: '500', unitId: 'ml' },
+    dropsPerMin: { value: '25', unitId: 'gts_min' },
+  });
+  assert.equal(duration.primaryResult.formattedValue, '6 h 40 min');
+  assert.equal(duration.primaryResult.value, 6.67);
+
+  // 4. Slow macrodrip (< 5 drops/min) triggers moderate microdrip/pump recommendation
+  const slowDrip = dripRateIvCalculator.calculate({
+    mode: 'rate_to_drops',
+    dropFactor: '20',
+    pumpRateMlH: { value: '10', unitId: 'ml_h' },
+  });
+  assert.equal(slowDrip.primaryResult.value, 3);
+  assert.equal(slowDrip.severity, 'moderate');
+
+  // 5. Rule of three (mass): 750 mg from 1 g in 10 mL -> 7.5 mL, diluted to 100 mL
+  const massDilution = nursingDilutionCalculator.calculate({
+    unitFamily: 'mass',
+    prescribedMass: { value: '750', unitId: 'mg' },
+    vialAmountMass: { value: '1', unitId: 'g' },
+    vialVolumeMl: { value: '10', unitId: 'ml' },
+    finalDilutionMl: { value: '100', unitId: 'ml' },
+  });
+  assert.equal(massDilution.primaryResult.value, 7.5);
+  assert.equal(massDilution.primaryResult.formattedValue, '7.50');
+  assert.ok(massDilution.secondaryResults?.some((r) => r.label.includes('Diluyente adicional') && r.formattedValue === '92.5'));
+
+  // 6. Rule of three (UI): 5000 UI from 25000 UI in 5 mL -> 1.00 mL
+  const uiDilution = nursingDilutionCalculator.calculate({
+    unitFamily: 'iu',
+    prescribedIu: { value: '5000', unitId: 'ui' },
+    vialAmountIu: { value: '25000', unitId: 'ui' },
+    vialVolumeMl: { value: '5', unitId: 'ml' },
+    finalDilutionMl: { value: '', unitId: 'ml' },
+  });
+  assert.equal(uiDilution.primaryResult.value, 1);
+
+  // 7. Tiny draw volume (< 0.1 mL) raises high precision alert
+  const tinyDraw = nursingDilutionCalculator.calculate({
+    unitFamily: 'mass',
+    prescribedMass: { value: '0.2', unitId: 'mg' },
+    vialAmountMass: { value: '10', unitId: 'mg' },
+    vialVolumeMl: { value: '2', unitId: 'ml' },
+    finalDilutionMl: { value: '', unitId: 'ml' },
+  });
+  assert.equal(tinyDraw.primaryResult.value, 0.04);
+  assert.equal(tinyDraw.severity, 'high');
+
+  // 8. Final dilution smaller than draw volume throws clear error
+  assert.throws(
+    () =>
+      nursingDilutionCalculator.calculate({
+        unitFamily: 'mass',
+        prescribedMass: { value: '500', unitId: 'mg' },
+        vialAmountMass: { value: '500', unitId: 'mg' },
+        vialVolumeMl: { value: '10', unitId: 'ml' },
+        finalDilutionMl: { value: '5', unitId: 'ml' },
+      }),
+    /no puede ser menor que el volumen a cargar/,
+  );
+});
+
+test('Oncology & Gyneco-Oncology: ACR TI-RADS, RADS systems, abnormal Pap/ASCCP, RMI/ROMA, ECOG, MASCC, Calvert AUC & tables', () => {
+  // 1. ACR TI-RADS: spongiform nodule forces TR1 (0 pts) regardless of size; solid+hypoechoic+taller+punctate = 2+2+3+3 = 10 (TR5) >= 10mm -> FNA
+  const spongiformTr1 = acrTiradsCalculator.calculate({
+    composition: 'spongiform',
+    echogenicity: 'hypoechoic',
+    shape: 'wider',
+    margin: 'smooth',
+    fociMacro: false,
+    fociRim: false,
+    fociPunctate: true,
+    noduleSizeMm: { value: '32', unitId: 'mm' },
+  });
+  assert.equal(spongiformTr1.primaryResult.value, 0);
+  assert.ok(spongiformTr1.primaryResult.formattedValue.startsWith('TR1'));
+  assert.equal(spongiformTr1.severity, 'normal');
+
+  const tr5Fna = acrTiradsCalculator.calculate({
+    composition: 'solid',
+    echogenicity: 'hypoechoic',
+    shape: 'taller',
+    margin: 'smooth',
+    fociMacro: false,
+    fociRim: false,
+    fociPunctate: true,
+    noduleSizeMm: { value: '12', unitId: 'mm' },
+  });
+  assert.equal(tr5Fna.primaryResult.value, 10);
+  assert.ok(tr5Fna.primaryResult.formattedValue.startsWith('TR5'));
+  assert.equal(tr5Fna.severity, 'critical');
+  assert.ok(tr5Fna.clinicalInterpretation.includes('PAAF'));
+
+  const tr4Follow = acrTiradsCalculator.calculate({
+    composition: 'solid',
+    echogenicity: 'hypoechoic',
+    shape: 'wider',
+    margin: 'smooth',
+    fociMacro: false,
+    fociRim: false,
+    fociPunctate: false,
+    noduleSizeMm: { value: '1.2', unitId: 'cm' }, // 12 mm -> 4 pts TR4 follow-up
+  });
+  assert.equal(tr4Follow.primaryResult.value, 4);
+  assert.ok(tr4Follow.primaryResult.formattedValue.startsWith('TR4'));
+  assert.equal(tr4Follow.severity, 'moderate');
+
+  // 2. RADS Interpreter: BI-RADS 5, O-RADS 4, LI-RADS LR-5
+  const birads5 = radsInterpreterCalculator.calculate({
+    ...createInitialInputs(radsInterpreterCalculator),
+    radsSystem: 'birads',
+    biradsCat: '5',
+  });
+  assert.equal(birads5.primaryResult.formattedValue, 'BI-RADS 5');
+  assert.equal(birads5.severity, 'critical');
+
+  const orads4 = radsInterpreterCalculator.calculate({
+    ...createInitialInputs(radsInterpreterCalculator),
+    radsSystem: 'orads',
+    oradsCat: '4',
+  });
+  assert.equal(orads4.primaryResult.formattedValue, 'O-RADS 4');
+  assert.equal(orads4.severity, 'high');
+
+  const lirads5 = radsInterpreterCalculator.calculate({
+    ...createInitialInputs(radsInterpreterCalculator),
+    radsSystem: 'lirads',
+    liradsCat: 'LR-5',
+  });
+  assert.equal(lirads5.primaryResult.formattedValue, 'LI-RADS 5');
+  assert.equal(lirads5.severity, 'critical');
+
+  // 3. Abnormal PAP (Bethesda + HPV + Pregnancy guard)
+  const agcPregnant = cervicalPapBethesdaCalculator.calculate({
+    ageGroup: '30_65',
+    cytology: 'agc',
+    hpvStatus: 'unknown',
+    isPregnant: true,
+    immunosuppressed: false,
+  });
+  assert.equal(agcPregnant.severity, 'critical');
+  assert.ok(agcPregnant.guidance?.some((g) => g.includes('CONTRAINDICADO el legrado endocervical')));
+
+  const lsilYoung = cervicalPapBethesdaCalculator.calculate({
+    ageGroup: 'lt25',
+    cytology: 'lsil',
+    hpvStatus: 'other_hr',
+    isPregnant: false,
+    immunosuppressed: false,
+  });
+  assert.ok(lsilYoung.primaryResult.formattedValue.includes('12 meses'));
+  assert.equal(lsilYoung.severity, 'moderate');
+
+  const nilmHpv16 = cervicalPapBethesdaCalculator.calculate({
+    ageGroup: '30_65',
+    cytology: 'nilm',
+    hpvStatus: 'hpv16_18',
+    isPregnant: false,
+    immunosuppressed: false,
+  });
+  assert.ok(nilmHpv16.primaryResult.formattedValue.includes('Colposcopia'));
+  assert.equal(nilmHpv16.severity, 'high');
+
+  // 4. Ovarian RMI I & ROMA
+  const rmiHigh = ovarianRmiRomaCalculator.calculate({
+    mode: 'rmi',
+    menopausalStatus: 'post',
+    ultrasoundFeatures: '3',
+    ca125: { value: '50', unitId: 'u_ml' },
+    he4: { value: '95', unitId: 'pmol_l' },
+  });
+  // 3 * 3 * 50 = 450 >= 200
+  assert.equal(rmiHigh.primaryResult.value, 450);
+  assert.equal(rmiHigh.severity, 'critical');
+
+  const romaPost = ovarianRmiRomaCalculator.calculate({
+    mode: 'roma',
+    menopausalStatus: 'post',
+    ultrasoundFeatures: '3',
+    ca125: { value: '120', unitId: 'u_ml' },
+    he4: { value: '210', unitId: 'pmol_l' },
+  });
+  assert.ok(romaPost.primaryResult.value > 50);
+  assert.equal(romaPost.severity, 'high');
+
+  // 5. ECOG / Karnofsky
+  const ecog3 = ecogKarnofskyCalculator.calculate({ ecogGrade: '3' });
+  assert.equal(ecog3.primaryResult.formattedValue, 'ECOG 3');
+  assert.equal(ecog3.severity, 'high');
+  assert.ok(ecog3.secondaryResults?.some((r) => r.formattedValue.includes('40 %')));
+
+  // 6. MASCC Febrile Neutropenia: max = 26 (low risk) vs < 21 (high risk)
+  const masccLow = masccFebrileNeutropeniaCalculator.calculate(
+    createInitialInputs(masccFebrileNeutropeniaCalculator),
+  );
+  assert.equal(masccLow.primaryResult.value, 26);
+  assert.equal(masccLow.severity, 'moderate');
+
+  const masccHigh = masccFebrileNeutropeniaCalculator.calculate({
+    diseaseBurden: 'moderate', // 3
+    noHypotension: false,     // 0
+    noCopd: true,             // 4
+    solidOrNoFungal: true,    // 4
+    noDehydration: false,     // 0
+    outpatientOnset: true,    // 3
+    ageUnder60: false,        // 0 => 14 < 21
+  });
+  assert.equal(masccHigh.primaryResult.value, 14);
+  assert.equal(masccHigh.severity, 'critical');
+
+  // 7. Calvert Carboplatin AUC: GFR 85, AUC 5 -> 5*(85+25) = 550 mg; GFR 160 capped at 125 -> 5*(125+25) = 750 mg
+  const calvertStd = calvertCarboplatinCalculator.calculate({
+    targetAuc: { value: '5', unitId: 'auc' },
+    gfr: { value: '85', unitId: 'ml_min' },
+  });
+  assert.equal(calvertStd.primaryResult.value, 550);
+
+  const calvertCapped = calvertCarboplatinCalculator.calculate({
+    targetAuc: { value: '5', unitId: 'auc' },
+    gfr: { value: '160', unitId: 'ml_min' },
+  });
+  assert.equal(calvertCapped.primaryResult.value, 750);
+  assert.equal(calvertCapped.severity, 'high');
+  assert.ok(calvertCapped.clinicalInterpretation.includes('125 mL/min'));
+
+  // 8. Reference tables include all 4 Oncology & Gyneco-Oncology tables
+  const oncoTables = CLINICAL_REFERENCE_TABLES.filter(
+    (t) => t.specialty === 'oncologia' || t.secondarySpecialties?.includes('oncologia'),
+  );
+  assert.ok(oncoTables.some((t) => t.id === 'rads-classifications-table'));
+  assert.ok(oncoTables.some((t) => t.id === 'cervical-pap-asccp-table'));
+  assert.ok(oncoTables.some((t) => t.id === 'gynecologic-oncology-figo-screening-table'));
+  assert.ok(oncoTables.some((t) => t.id === 'oncologic-emergencies-table'));
+});
+
+test('HIV/AIDS (VIH/SIDA): CDC staging & OI prophylaxis, PEP/PrEP, ART timing/IRIS & reference tables', () => {
+  // 1. CDC Stage 3 with CD4 45 -> critical, PCP + Toxo + CrAg + MAC/CMV guidance
+  const stage3Low = hivCdcCd4ProphylaxisCalculator.calculate({
+    cd4Count: { value: '45', unitId: 'cells_ul' },
+    cd4Percent: { value: '', unitId: 'pct' },
+    hasStage3Oi: false,
+    sulfaAllergy: false,
+    isPregnant: false,
+  });
+  assert.equal(stage3Low.primaryResult.value, 3);
+  assert.equal(stage3Low.severity, 'critical');
+  assert.ok(stage3Low.guidance?.some((g) => g.includes('TMP-SMX 160/800')));
+  assert.ok(stage3Low.guidance?.some((g) => g.includes('CrAg')));
+  assert.ok(stage3Low.guidance?.some((g) => g.includes('MAC')));
+
+  // Stage 3 due to defining OI even if CD4 350; sulfa allergy triggers Dapsona/Atovacuona
+  const stage3Oi = hivCdcCd4ProphylaxisCalculator.calculate({
+    cd4Count: { value: '180', unitId: 'cells_ul' },
+    cd4Percent: { value: '', unitId: 'pct' },
+    hasStage3Oi: true,
+    sulfaAllergy: true,
+    isPregnant: true,
+  });
+  assert.equal(stage3Oi.primaryResult.value, 3);
+  assert.ok(stage3Oi.guidance?.some((g) => g.includes('Dapsona')));
+  assert.ok(stage3Oi.guidance?.some((g) => g.includes('EMBARAZO')));
+
+  // 2. PEP <= 72h vs > 72h vs U=U vs PrEP
+  const pepUrgent = hivPepPrepCalculator.calculate({
+    mode: 'pep',
+    hoursSinceExposure: { value: '18', unitId: 'h' },
+    exposureRisk: 'high',
+    prepProfile: 'daily_general',
+    prepHivNegConfirmed: true,
+    renalCrCl: { value: '95', unitId: 'ml_min' },
+  });
+  assert.equal(pepUrgent.primaryResult.formattedValue, 'INICIAR PEP URGENTE');
+  assert.equal(pepUrgent.severity, 'critical');
+
+  const pepExpired = hivPepPrepCalculator.calculate({
+    mode: 'pep',
+    hoursSinceExposure: { value: '80', unitId: 'h' },
+    exposureRisk: 'high',
+    prepProfile: 'daily_general',
+    prepHivNegConfirmed: true,
+    renalCrCl: { value: '95', unitId: 'ml_min' },
+  });
+  assert.ok(pepExpired.primaryResult.formattedValue.includes('> 72 h'));
+
+  const pepUu = hivPepPrepCalculator.calculate({
+    mode: 'pep',
+    hoursSinceExposure: { value: '6', unitId: 'h' },
+    exposureRisk: 'u_equals_u',
+    prepProfile: 'daily_general',
+    prepHivNegConfirmed: true,
+    renalCrCl: { value: '95', unitId: 'ml_min' },
+  });
+  assert.equal(pepUu.primaryResult.formattedValue, 'NO indicada PEP');
+  assert.equal(pepUu.severity, 'normal');
+
+  const prepBlocked = hivPepPrepCalculator.calculate({
+    mode: 'prep',
+    hoursSinceExposure: { value: '12', unitId: 'h' },
+    exposureRisk: 'high',
+    prepProfile: 'daily_general',
+    prepHivNegConfirmed: false,
+    renalCrCl: { value: '95', unitId: 'ml_min' },
+  });
+  assert.ok(prepBlocked.primaryResult.formattedValue.includes('DIFERIR PrEP'));
+  assert.equal(prepBlocked.severity, 'critical');
+
+  // 3. ART Timing & IRIS: Cryptococcal meningitis defers 4-6 weeks; TB non-meningeal CD4 < 50 <= 2 weeks + DTG 50 mg c/12 h
+  const cryptoTiming = hivOpportunisticArtTimingCalculator.calculate({
+    clinicalScenario: 'cryptococcal_meningitis',
+    onRifampin: false,
+  });
+  assert.ok(cryptoTiming.primaryResult.formattedValue.includes('4–6 semanas'));
+  assert.equal(cryptoTiming.severity, 'critical');
+
+  const tbLowCd4 = hivOpportunisticArtTimingCalculator.calculate({
+    clinicalScenario: 'tb_pulmonary_low_cd4',
+    onRifampin: true,
+  });
+  assert.ok(tbLowCd4.primaryResult.formattedValue.includes('≤ 2 semanas'));
+  assert.ok(tbLowCd4.guidance?.some((g) => g.includes('50 mg cada 12 horas')));
+
+  // 4. All 4 HIV/AIDS clinical reference tables present
+  const hivTableIds = [
+    'hiv-diagnosis-cdc-staging-table',
+    'hiv-art-regimens-interactions-table',
+    'hiv-opportunistic-infections-table',
+    'hiv-pep-prep-prevention-table',
+  ];
+  for (const id of hivTableIds) {
+    assert.ok(
+      CLINICAL_REFERENCE_TABLES.some((t) => t.id === id),
+      `Falta tabla clínica de VIH/SIDA: ${id}`,
+    );
+  }
+});
+
+test('MINSA Nicaragua Immunization, Broselow PALS, AAP 2022 Phototherapy/Exchange & Daily Drug Converters', () => {
+  // 1. MINSA Nicaragua Immunization: RN < 2000 g defers BCG; 2m > 15 sem alerts Rotavirus; dirty wound <3 doses -> dT + TIG; Cat III rabies -> RIG
+  const rnLowWeight = immunizationMinsaNicaraguaCalculator.calculate({
+    ...createInitialInputs(immunizationMinsaNicaraguaCalculator),
+    mode: 'esquema_edad',
+    ageGroup: 'rn',
+    newbornWeightG: { value: '1850', unitId: 'g' },
+  });
+  assert.ok(rnLowWeight.primaryResult.formattedValue.includes('DIFERIR BCG'));
+  assert.equal(rnLowWeight.severity, 'high');
+
+  const rotaLate = immunizationMinsaNicaraguaCalculator.calculate({
+    ...createInitialInputs(immunizationMinsaNicaraguaCalculator),
+    mode: 'esquema_edad',
+    ageGroup: '2_meses',
+    infantAgeWeeks: { value: '17', unitId: 'sem' },
+  });
+  assert.ok(rotaLate.guidance?.some((g) => g.includes('ALERTA ROTAVIRUS')));
+
+  const tetanusDirty = immunizationMinsaNicaraguaCalculator.calculate({
+    ...createInitialInputs(immunizationMinsaNicaraguaCalculator),
+    mode: 'tetanos_herida',
+    woundType: 'dirty',
+    tetanusDoses: 'unknown_lt3',
+  });
+  assert.ok(tetanusDirty.primaryResult.formattedValue.includes('TIG'));
+  assert.equal(tetanusDirty.severity, 'critical');
+
+  const rabiesCat3 = immunizationMinsaNicaraguaCalculator.calculate({
+    ...createInitialInputs(immunizationMinsaNicaraguaCalculator),
+    mode: 'rabia_exposicion',
+    rabiesCategory: 'cat3',
+    animalStatus: 'unobservable',
+    priorRabiesPrep: false,
+  });
+  assert.ok(rabiesCat3.primaryResult.formattedValue.includes('RIG'));
+  assert.equal(rabiesCat3.severity, 'critical');
+
+  // 2. Broselow Pediatric Resuscitation: 88 cm -> Amarillo (13 kg), 26 -> 52 J, 1.3 mL Epi 1:10,000
+  const broselowYellow = pediatricBroselowResuscitationCalculator.calculate({
+    ...createInitialInputs(pediatricBroselowResuscitationCalculator),
+    method: 'by_length',
+    lengthCm: { value: '88', unitId: 'cm' },
+  });
+  assert.ok(broselowYellow.primaryResult.formattedValue.includes('Amarillo'));
+  assert.equal(broselowYellow.primaryResult.value, 13);
+  assert.ok(broselowYellow.secondaryResults?.some((r) => r.formattedValue.includes('4.0 mm')));
+  assert.ok(broselowYellow.secondaryResults?.some((r) => r.formattedValue.includes('1.3 mL')));
+
+  // 3. AAP 2022 Neonatal Hyperbilirubinemia: 38w @ 48h TSB 16.5 >= 16.0 -> Phototherapy; TSB 19.0 -> Escalation of Care (within 2 mg/dL of 20.1); ABE -> Exchange
+  const photoYes = neonatalPhototherapyExchangeAap2022Calculator.calculate({
+    gestationalAgeWeeks: '38',
+    hoursOfLife: { value: '48', unitId: 'h' },
+    tsb: { value: '16.5', unitId: 'mg_dl' },
+    albumin: { value: '3.5', unitId: 'g_dl' },
+    hasNeuroRiskFactors: false,
+    hasAbeSigns: false,
+  });
+  assert.ok(photoYes.riskClassification.includes('FOTOTERAPIA INDICADA'));
+
+  const escalationZone = neonatalPhototherapyExchangeAap2022Calculator.calculate({
+    gestationalAgeWeeks: '38',
+    hoursOfLife: { value: '48', unitId: 'h' },
+    tsb: { value: '19.0', unitId: 'mg_dl' },
+    albumin: { value: '3.5', unitId: 'g_dl' },
+    hasNeuroRiskFactors: false,
+    hasAbeSigns: false,
+  });
+  assert.ok(escalationZone.riskClassification.includes('ESCALADA DE CUIDADOS'));
+  assert.equal(escalationZone.severity, 'critical');
+
+  const abeEmergency = neonatalPhototherapyExchangeAap2022Calculator.calculate({
+    gestationalAgeWeeks: '38',
+    hoursOfLife: { value: '48', unitId: 'h' },
+    tsb: { value: '14.0', unitId: 'mg_dl' },
+    albumin: { value: '', unitId: 'g_dl' },
+    hasNeuroRiskFactors: false,
+    hasAbeSigns: true,
+  });
+  assert.ok(abeEmergency.riskClassification.includes('EXANGUINOTRANSFUSIÓN INMEDIATA'));
+
+  // 4. Daily Drug Converters: 40 mg Prednisone -> 6 mg Dexamethasone; 200 mg Tramadol -> 20 MME -> 14 mg Morphine (-30%)
+  const steroidConv = dailyDrugConvertersCalculator.calculate({
+    ...createInitialInputs(dailyDrugConvertersCalculator),
+    converterMode: 'corticoides',
+    sourceSteroid: 'prednisone',
+    targetSteroid: 'dexamethasone',
+    steroidDoseMg: { value: '40', unitId: 'mg' },
+  });
+  assert.equal(steroidConv.primaryResult.value, 6);
+
+  const opioidConv = dailyDrugConvertersCalculator.calculate({
+    ...createInitialInputs(dailyDrugConvertersCalculator),
+    converterMode: 'opioides',
+    sourceOpioid: 'tramadol_po',
+    opioidDailyDoseMg: { value: '200', unitId: 'mg_d' },
+    targetOpioid: 'morphine_po',
+    crossTolerancePct: '30',
+  });
+  assert.equal(opioidConv.primaryResult.value, 14);
+
+  // 5. All 4 new reference tables registered (44 total)
+  const newTableIds = [
+    'minsa-nicaragua-immunization-table',
+    'pediatric-broselow-pals-table',
+    'neonatal-hyperbilirubinemia-aap2022-table',
+    'daily-pharmacology-converters-table',
+  ];
+  for (const id of newTableIds) {
+    assert.ok(
+      CLINICAL_REFERENCE_TABLES.some((t) => t.id === id),
+      `Falta tabla clínica nueva: ${id}`,
+    );
+  }
+  assert.equal(CLINICAL_REFERENCE_TABLES.length, 44);
+});
+
+
+
+
 
 
 

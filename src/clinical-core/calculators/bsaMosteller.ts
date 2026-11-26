@@ -41,7 +41,7 @@ export const bsaMostellerCalculator: CalculatorDefinition = {
   name: 'Superficie Corporal (Mosteller, Haycock y Du Bois)',
   shortName: 'Superficie Corporal',
   primarySpecialty: 'pediatria',
-  secondarySpecialties: ['medicina-interna', 'urgencias'],
+  secondarySpecialties: ['oncologia', 'medicina-interna', 'urgencias'],
   subcategory: 'formulas',
   keywords: ['superficie corporal', 'bsa', 'sc', 'mosteller', 'haycock', 'dubois', 'pediatria', 'quimioterapia'],
   description:
