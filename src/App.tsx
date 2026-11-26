@@ -32,6 +32,7 @@ import {
 import { CalculatorView } from './ui/components/CalculatorView.tsx';
 import { ExitConfirmModal } from './ui/components/ExitConfirmModal.tsx';
 import { OfflineIndicator } from './ui/components/PWAControls.tsx';
+import { TranslucentPageScroller } from './ui/components/TranslucentPageScroller.tsx';
 import { FavoritesView } from './ui/views/FavoritesView.tsx';
 import { HomeView } from './ui/views/HomeView.tsx';
 import { HistoryView } from './ui/views/HistoryView.tsx';
@@ -341,11 +342,11 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-[#0B111A] dark:text-slate-100">
       {/* Top Bar: 3-zone contract on desktop, compact 48px bar on mobile subviews */}
       <header
-        className={`sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/90 ${
+        className={`sticky top-0 z-40 border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 ${
           isMobileHomeHero ? 'hidden md:block' : ''
         }`}
       >
-        <div className="mx-auto flex h-12 max-w-6xl items-center justify-between gap-4 px-4 sm:gap-8 sm:px-6 md:h-14">
+        <div className="mx-auto flex h-12 max-w-7xl items-center justify-between gap-4 px-3 sm:gap-8 sm:px-6 md:h-14">
           {/* Zone 1: Single-line Brand Wordmark */}
           <button
             type="button"
@@ -412,7 +413,7 @@ export default function App() {
 
       {/* Main Content */}
       <main
-        className={`mx-auto w-full min-w-0 max-w-6xl overflow-x-clip px-3.5 pt-3.5 sm:px-6 sm:pt-6 md:pb-12 ${
+        className={`mx-auto w-full min-w-0 max-w-7xl overflow-x-clip px-2.5 pt-3 sm:px-6 sm:pt-5 lg:px-7 md:pb-12 ${
           isKeyboardOpen ? 'pb-6' : 'pb-20'
         }`}
       >
@@ -502,6 +503,13 @@ export default function App() {
           })}
         </div>
         </nav>
+      )}
+
+      {!isKeyboardOpen && !showExitConfirm && !hasExitedWebSession && (
+        <TranslucentPageScroller
+          viewKey={`${activeTab}-${selectedSpecialty ?? ''}-${selectedCalculatorId ?? ''}-${showReferences ? 'refs' : 'main'}`}
+          hasBottomNav={!isKeyboardOpen}
+        />
       )}
 
       <ExitConfirmModal

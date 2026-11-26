@@ -55,7 +55,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
           {history.map((entry) => (
             <div
               key={entry.id}
-              className="flex w-full min-w-0 items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white p-3.5 sm:gap-3 sm:p-4 dark:border-slate-800 dark:bg-slate-900"
+              className="-mx-2.5 flex min-w-0 items-center justify-between gap-2 rounded-none border-x-0 border-y border-slate-200 bg-white px-3.5 py-3 sm:mx-0 sm:gap-3 sm:rounded-xl sm:border sm:p-4 dark:border-slate-800 dark:bg-slate-900"
             >
               <button
                 type="button"
@@ -96,7 +96,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
           ))}
         </div>
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center dark:border-slate-800 dark:bg-slate-900">
+        <div className="-mx-2.5 rounded-none border-x-0 border-y border-slate-200 bg-white p-6 text-center sm:mx-0 sm:rounded-2xl sm:border sm:p-8 dark:border-slate-800 dark:bg-slate-900">
           <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 ring-1 ring-sky-200/80 dark:bg-sky-950/60 dark:text-sky-400 dark:ring-sky-800/60">
             <ClinicalHistoryIcon className="h-6 w-6" />
           </span>

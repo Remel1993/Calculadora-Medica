@@ -1134,7 +1134,7 @@ const GuideShell: React.FC<{
   hint: string;
   children: React.ReactNode;
 }> = ({ title, hint, children }) => (
-  <section className="w-full min-w-0 rounded-xl border border-sky-200/90 bg-sky-50/45 p-3 sm:rounded-2xl sm:p-4 dark:border-sky-900/60 dark:bg-sky-950/20">
+  <section className="-mx-3.5 min-w-0 border-y border-sky-200/80 bg-sky-50/25 px-3.5 py-3 sm:mx-0 sm:rounded-xl sm:border sm:px-3.5 sm:py-3.5 dark:border-sky-900/50 dark:bg-sky-950/15">
     <div className="mb-2.5 flex items-start gap-2">
       <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-900/70 dark:text-sky-300">
         <Eye className="h-3.5 w-3.5" aria-hidden="true" />

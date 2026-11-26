@@ -1745,8 +1745,50 @@ test('Pediatrics & Neonatology (Group 6): Westley, Wood-Downes-Ferres, Kramer, W
   const wfaRows = getWhoReferenceTableRows('wfa', 'female');
   assert.equal(wfaRows[0].ageMonths, 0);
   assert.equal(wfaRows[0].p50, 3.2);
+  assert.equal(wfaRows[wfaRows.length - 1].ageMonths, 120);
   const lhfaRows = getWhoReferenceTableRows('lhfa', 'male');
   assert.equal(lhfaRows[lhfaRows.length - 1].ageMonths, 228);
+
+  // Boundary P2.3-P3 (-2.00 <= Z < -1.88): never claim "entre P3 y P97" when percentile is P2
+  const lhfaBorderLow = evaluateWhoIndicator('lhfa', 'male', 36, 88.75);
+  assert.ok(lhfaBorderLow);
+  assert.ok(lhfaBorderLow.zScore >= -2 && lhfaBorderLow.zScore < -1.88);
+  assert.ok(lhfaBorderLow.percentile < 3);
+  assert.ok(!lhfaBorderLow.parentExplanation.includes('entre P3 y P97'));
+  assert.ok(lhfaBorderLow.classification.includes('límite inferior'));
+
+  // Boundary P97-P97.7 (+1.88 < Z <= +2.00): never claim "entre P3 y P97" when percentile is P98
+  const lhfaBorderHigh = evaluateWhoIndicator('lhfa', 'male', 36, 103.5);
+  assert.ok(lhfaBorderHigh);
+  assert.ok(lhfaBorderHigh.zScore > 1.88 && lhfaBorderHigh.zScore <= 2);
+  assert.ok(lhfaBorderHigh.percentile > 97);
+  assert.ok(!lhfaBorderHigh.parentExplanation.includes('entre P3 y P97'));
+  assert.ok(lhfaBorderHigh.classification.includes('límite superior'));
+
+  // Manual Z-score with zIndicator = 'hfa' and 'wfa' returns height / weight as primaryResult (not BMI)
+  const whoManualHfa = whoGrowthCalculator.calculate({
+    ageMonths: { value: '36', unitId: 'months' },
+    sex: 'female',
+    weight: { value: '13.9', unitId: 'kg' },
+    height: { value: '86', unitId: 'cm' },
+    zIndicator: 'hfa',
+    zScore: { value: '-2.3', unitId: 'z' },
+  });
+  assert.equal(whoManualHfa.primaryResult.value, 86);
+  assert.equal(whoManualHfa.primaryResult.unit, 'cm');
+  assert.ok(whoManualHfa.primaryResult.label.includes('Talla'));
+
+  const whoManualWfa = whoGrowthCalculator.calculate({
+    ageMonths: { value: '36', unitId: 'months' },
+    sex: 'female',
+    weight: { value: '18.5', unitId: 'kg' },
+    height: { value: '95', unitId: 'cm' },
+    zIndicator: 'wfa',
+    zScore: { value: '2.2', unitId: 'z' },
+  });
+  assert.equal(whoManualWfa.primaryResult.value, 18.5);
+  assert.equal(whoManualWfa.primaryResult.unit, 'kg');
+  assert.equal(whoManualWfa.severity, 'moderate');
 
   // Capurro: 204 + (16+10+10+10+15) = 265 días = 37 sem 6 días
   const capRes = capurroNeonatalCalculator.calculate({

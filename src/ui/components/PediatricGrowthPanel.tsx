@@ -15,6 +15,7 @@ import {
   type WhoEvaluationResult,
 } from '../../clinical-core/math/whoLms.ts';
 import type { CalculatorInputsState, NumberInputValue } from '../../clinical-core/types/clinical.ts';
+import { ScrollableTableShell } from './ScrollableTableShell.tsx';
 
 interface PediatricGrowthPanelProps {
   inputs: CalculatorInputsState;
@@ -27,15 +28,15 @@ type AgeWindow = '0-24' | '24-60' | '60-120' | '120-228';
 function parseNumericInput(raw: NumberInputValue | undefined, factor = 1): number | null {
   if (!raw || typeof raw.value !== 'string') return null;
   const num = parseStrictNumber(raw.value);
-  if (num === null || num < 0) return null;
+  if (num === null) return null;
   return num * factor;
 }
 
 function getCanonicalWeightKg(raw: NumberInputValue | undefined): number | null {
   const num = parseNumericInput(raw, 1);
   if (num === null || num <= 0) return null;
-  if (raw?.unitId === 'lb') return roundClinical(num * 0.45359237, 2);
-  if (raw?.unitId === 'g') return roundClinical(num / 1000, 2);
+  if (raw?.unitId === 'lb') return num * 0.45359237;
+  if (raw?.unitId === 'g') return num / 1000;
   return num;
 }
 
@@ -71,12 +72,12 @@ const PercentileBar: React.FC<{
   icon: React.ReactNode;
   evaluation: WhoEvaluationResult;
 }> = ({ title, icon, evaluation }) => {
-  const clampedPct = Math.max(1.5, Math.min(98.5, evaluation.percentile));
+  const clampedPct = Math.max(0.5, Math.min(99.5, evaluation.percentile));
   const unit = WHO_INDICATOR_META[evaluation.indicator].unit;
   const badgeClass = ZONE_BADGE_COLORS[evaluation.severity] ?? ZONE_BADGE_COLORS.info;
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 sm:p-4 dark:border-slate-800 dark:bg-slate-950/60">
+    <div className="border-b border-slate-200/80 pb-3.5 last:border-b-0 last:pb-0 dark:border-slate-800">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
           <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white text-sky-700 shadow-xs dark:bg-slate-900 dark:text-sky-400">
@@ -154,17 +155,23 @@ export const PediatricGrowthPanel: React.FC<PediatricGrowthPanelProps> = ({
   const rawAge = inputs.ageMonths as NumberInputValue | undefined;
   const ageFactor = rawAge?.unitId === 'years' ? 12 : 1;
   const parsedAge = parseNumericInput(rawAge, ageFactor);
-  const ageMonths = parsedAge !== null ? Math.min(228, Math.max(0, parsedAge)) : null;
+  const isAgeOutOfRange = parsedAge !== null && (parsedAge < 0 || parsedAge > 228);
+  const ageMonths = parsedAge !== null && !isAgeOutOfRange ? parsedAge : null;
 
   const sex: WhoSex = inputs.sex === 'female' ? 'female' : 'male';
   const weightKg = getCanonicalWeightKg(inputs.weight as NumberInputValue | undefined);
   const heightCm = parseNumericInput(inputs.height as NumberInputValue | undefined, 1);
   const headCircCm = parseNumericInput(inputs.headCircumference as NumberInputValue | undefined, 1);
 
-  const bmi =
-    weightKg !== null && heightCm !== null && heightCm > 20
-      ? roundClinical(weightKg / Math.pow(heightCm / 100, 2), 1)
+  const validWeight = weightKg !== null && weightKg >= 1.0 && weightKg <= 180 ? weightKg : null;
+  const validHeight = heightCm !== null && heightCm >= 35 && heightCm <= 210 ? heightCm : null;
+  const validHeadCirc = headCircCm !== null && headCircCm >= 25 && headCircCm <= 62 ? headCircCm : null;
+
+  const bmiExact =
+    validWeight !== null && validHeight !== null
+      ? validWeight / Math.pow(validHeight / 100, 2)
       : null;
+  const bmi = bmiExact !== null ? roundClinical(bmiExact, 1) : null;
 
   const [activeTab, setActiveTab] = useState<PanelTab>('scale');
   const [selectedIndicator, setSelectedIndicator] = useState<WhoIndicatorId>('wfa');
@@ -194,20 +201,20 @@ export const PediatricGrowthPanel: React.FC<PediatricGrowthPanelProps> = ({
   };
 
   const wfaEval =
-    ageMonths !== null && ageMonths <= 120 && weightKg !== null
-      ? evaluateWhoIndicator('wfa', sex, ageMonths, weightKg)
+    ageMonths !== null && ageMonths <= 120 && validWeight !== null
+      ? evaluateWhoIndicator('wfa', sex, ageMonths, validWeight)
       : null;
   const lhfaEval =
-    ageMonths !== null && heightCm !== null && heightCm >= 30 && heightCm <= 220
-      ? evaluateWhoIndicator('lhfa', sex, ageMonths, heightCm)
+    ageMonths !== null && validHeight !== null
+      ? evaluateWhoIndicator('lhfa', sex, ageMonths, validHeight)
       : null;
   const bmiEval =
-    ageMonths !== null && bmi !== null && bmi >= 6 && bmi <= 60
-      ? evaluateWhoIndicator('bmifa', sex, ageMonths, bmi)
+    ageMonths !== null && bmiExact !== null && bmiExact > 0
+      ? evaluateWhoIndicator('bmifa', sex, ageMonths, bmiExact)
       : null;
   const hcfaEval =
-    ageMonths !== null && ageMonths <= 60 && headCircCm !== null && headCircCm >= 20 && headCircCm <= 65
-      ? evaluateWhoIndicator('hcfa', sex, ageMonths, headCircCm)
+    ageMonths !== null && ageMonths <= 60 && validHeadCirc !== null
+      ? evaluateWhoIndicator('hcfa', sex, ageMonths, validHeadCirc)
       : null;
 
   const availableWindows = getAvailableWindows(selectedIndicator);
@@ -240,12 +247,12 @@ export const PediatricGrowthPanel: React.FC<PediatricGrowthPanelProps> = ({
   const childPointValue = useMemo(() => {
     if (ageMonths === null) return null;
     if (ageMonths < currentWindow.min || ageMonths > currentWindow.max) return null;
-    if (selectedIndicator === 'wfa') return weightKg;
-    if (selectedIndicator === 'lhfa') return heightCm;
+    if (selectedIndicator === 'wfa') return validWeight;
+    if (selectedIndicator === 'lhfa') return validHeight;
     if (selectedIndicator === 'bmifa') return bmi;
-    if (selectedIndicator === 'hcfa') return headCircCm;
+    if (selectedIndicator === 'hcfa') return validHeadCirc;
     return null;
-  }, [ageMonths, currentWindow, selectedIndicator, weightKg, heightCm, bmi, headCircCm]);
+  }, [ageMonths, currentWindow, selectedIndicator, validWeight, validHeight, bmi, validHeadCirc]);
 
   const tableRows = useMemo(
     () => getWhoReferenceTableRows(selectedIndicator, sex),
@@ -332,7 +339,7 @@ export const PediatricGrowthPanel: React.FC<PediatricGrowthPanelProps> = ({
   return (
     <section
       id="pediatric-growth-panel"
-      className="w-full min-w-0 overflow-hidden rounded-xl border border-sky-200 bg-white p-3.5 sm:rounded-2xl sm:p-6 dark:border-sky-900/60 dark:bg-slate-900"
+      className="-mx-2.5 min-w-0 overflow-hidden rounded-none border-x-0 border-y border-sky-200 bg-white px-3.5 py-4 sm:mx-0 sm:rounded-2xl sm:border sm:p-6 dark:border-sky-900/60 dark:bg-slate-900"
     >
       {/* Header */}
       <div className="flex flex-col gap-3 border-b border-slate-100 pb-3 sm:flex-row sm:items-center sm:justify-between sm:pb-4 dark:border-slate-800">
@@ -420,7 +427,13 @@ export const PediatricGrowthPanel: React.FC<PediatricGrowthPanelProps> = ({
       {/* TAB 1: PARENT-FRIENDLY PERCENTILE SCALE */}
       {activeTab === 'scale' && (
         <div className="mt-4 space-y-3">
-          {!wfaEval && !lhfaEval && !bmiEval ? (
+          {isAgeOutOfRange ? (
+            <div className="rounded-xl border border-amber-300 bg-amber-50/80 p-4 text-center dark:border-amber-800 dark:bg-amber-950/40">
+              <p className="text-xs font-medium text-amber-900 sm:text-sm dark:text-amber-200">
+                Las curvas de crecimiento OMS cubren de <strong>0 a 19 años (0 a 228 meses)</strong>. Ajusta la edad dentro de ese rango para ver la evaluación de percentiles en tiempo real.
+              </p>
+            </div>
+          ) : !wfaEval && !lhfaEval && !bmiEval ? (
             <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/70 p-4 text-center dark:border-slate-700 dark:bg-slate-950/50">
               <p className="text-xs font-medium text-slate-700 sm:text-sm dark:text-slate-300">
                 Introduce arriba la <strong>edad</strong>, el <strong>peso</strong> y la <strong>talla</strong> de tu hijo para ver su barra visual de percentiles en tiempo real, o cambia a <strong>Gráfica Curvas</strong> / <strong>Tabla Edades</strong> para consultar los valores OMS por edad.
@@ -470,7 +483,7 @@ export const PediatricGrowthPanel: React.FC<PediatricGrowthPanelProps> = ({
                 />
               )}
 
-              <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-[11px] leading-relaxed text-slate-600 sm:text-xs dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400">
+              <div className="border-l-2 border-slate-300 py-1 pl-3 text-[11px] leading-relaxed text-slate-600 sm:text-xs dark:border-slate-700 dark:text-slate-400">
                 <strong>¿Cómo se lee un percentil?</strong> Un percentil no es una calificación escolar ni significa que P90 sea “mejor” que P25. Significa en qué posición se ubica respecto a 100 niños sanos de su misma edad y sexo. Que crezca siguiendo su propio carril (por ejemplo siempre alrededor de P25 o siempre alrededor de P75) suele ser señal de crecimiento sano.
               </div>
             </>
@@ -531,7 +544,7 @@ export const PediatricGrowthPanel: React.FC<PediatricGrowthPanelProps> = ({
                 </div>
               </div>
 
-              <div className="w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-950">
+              <div className="w-full overflow-hidden rounded-lg border border-slate-200 bg-white p-1.5 sm:rounded-xl sm:p-2.5 dark:border-slate-800 dark:bg-slate-950">
                 <svg
                   viewBox={`0 0 ${svgW} ${svgH}`}
                   className="h-auto w-full select-none"
@@ -684,50 +697,96 @@ export const PediatricGrowthPanel: React.FC<PediatricGrowthPanelProps> = ({
                 )}
               </div>
 
-              <div className="max-h-[380px] w-full overflow-x-auto overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800">
-                <table className="w-full min-w-[340px] border-collapse text-left text-[11px] sm:text-xs">
-                  <thead className="sticky top-0 z-10 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+              <ScrollableTableShell
+                compactHeightClass="max-h-[380px]"
+                ariaLabel={`Valores de referencia OMS para ${indicatorMeta.label}`}
+              >
+                <table className="w-full min-w-[440px] border-separate border-spacing-0 text-left text-[11px] sm:text-xs">
+                  <thead className="text-slate-700 dark:text-slate-200">
                     <tr>
-                      <th className="px-2.5 py-2 font-semibold">Edad</th>
-                      <th className="px-2 py-2 text-right font-semibold text-orange-700 dark:text-orange-400">
-                        P3 <span className="hidden sm:inline font-normal">(Bajo)</span>
+                      <th
+                        scope="col"
+                        className="sticky top-0 left-0 z-30 min-w-[96px] border-b border-r border-slate-200 bg-slate-100 px-2.5 py-2 font-semibold dark:border-slate-700 dark:bg-slate-800 group-data-[scrolled-x=true]/scroll:shadow-[4px_0_12px_-4px_rgba(15,23,42,0.14)] dark:group-data-[scrolled-x=true]/scroll:shadow-[4px_0_12px_-4px_rgba(0,0,0,0.5)]"
+                      >
+                        Edad
                       </th>
-                      <th className="px-2 py-2 text-right font-semibold">P15</th>
-                      <th className="px-2 py-2 text-right font-bold text-emerald-700 dark:text-emerald-400">
-                        P50 <span className="hidden sm:inline font-normal">(Prom.)</span>
+                      <th
+                        scope="col"
+                        className="sticky top-0 z-20 border-b border-r border-slate-200 bg-slate-100 px-2 py-2 text-right font-semibold text-orange-700 dark:border-slate-700 dark:bg-slate-800 dark:text-orange-400"
+                      >
+                        P3 <span className="hidden font-normal sm:inline">(Bajo)</span>
                       </th>
-                      <th className="px-2 py-2 text-right font-semibold">P85</th>
-                      <th className="px-2 py-2 text-right font-semibold text-orange-700 dark:text-orange-400">
-                        P97 <span className="hidden sm:inline font-normal">(Alto)</span>
+                      <th
+                        scope="col"
+                        className="sticky top-0 z-20 border-b border-r border-slate-200 bg-slate-100 px-2 py-2 text-right font-semibold dark:border-slate-700 dark:bg-slate-800"
+                      >
+                        P15
+                      </th>
+                      <th
+                        scope="col"
+                        className="sticky top-0 z-20 border-b border-r border-slate-200 bg-slate-100 px-2 py-2 text-right font-bold text-emerald-700 dark:border-slate-700 dark:bg-slate-800 dark:text-emerald-400"
+                      >
+                        P50 <span className="hidden font-normal sm:inline">(Prom.)</span>
+                      </th>
+                      <th
+                        scope="col"
+                        className="sticky top-0 z-20 border-b border-r border-slate-200 bg-slate-100 px-2 py-2 text-right font-semibold dark:border-slate-700 dark:bg-slate-800"
+                      >
+                        P85
+                      </th>
+                      <th
+                        scope="col"
+                        className="sticky top-0 z-20 border-b border-slate-200 bg-slate-100 px-2 py-2 text-right font-semibold text-orange-700 dark:border-slate-700 dark:bg-slate-800 dark:text-orange-400"
+                      >
+                        P97 <span className="hidden font-normal sm:inline">(Alto)</span>
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {tableRows.map((row) => {
+                  <tbody>
+                    {tableRows.map((row, rowIdx) => {
                       const isClosest = closestRowMonth === row.ageMonths;
+                      const isLast = rowIdx === tableRows.length - 1;
+                      const borderRow = isLast ? '' : 'border-b border-slate-100 dark:border-slate-800';
                       return (
                         <tr
                           key={row.ageMonths}
-                          className={
+                          className={`group/row ${
                             isClosest
-                              ? 'bg-sky-50 font-semibold text-sky-950 dark:bg-sky-950/50 dark:text-sky-100'
+                              ? 'bg-sky-50 font-semibold text-sky-950 dark:bg-sky-950/60 dark:text-sky-100'
                               : 'bg-white text-slate-700 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/60'
-                          }
+                          }`}
                         >
-                          <td className="px-2.5 py-2 whitespace-nowrap">{row.ageLabel}</td>
-                          <td className="px-2 py-2 text-right font-mono tabular-nums">{row.p3}</td>
-                          <td className="px-2 py-2 text-right font-mono tabular-nums">{row.p15}</td>
-                          <td className="px-2 py-2 text-right font-mono font-bold tabular-nums text-emerald-700 dark:text-emerald-400">
+                          <th
+                            scope="row"
+                            className={`sticky left-0 z-10 min-w-[96px] border-r border-slate-200 px-2.5 py-2 text-left whitespace-nowrap dark:border-slate-800 group-data-[scrolled-x=true]/scroll:shadow-[4px_0_12px_-4px_rgba(15,23,42,0.12)] dark:group-data-[scrolled-x=true]/scroll:shadow-[4px_0_12px_-4px_rgba(0,0,0,0.45)] ${borderRow} ${
+                              isClosest
+                                ? 'bg-sky-50 font-semibold text-sky-950 dark:bg-sky-950 dark:text-sky-100'
+                                : 'bg-white font-medium text-slate-800 group-hover/row:bg-slate-50 dark:bg-slate-900 dark:text-slate-200 dark:group-hover/row:bg-slate-800'
+                            }`}
+                          >
+                            {row.ageLabel}
+                          </th>
+                          <td className={`border-r border-slate-100 px-2 py-2 text-right font-mono tabular-nums dark:border-slate-800 ${borderRow}`}>
+                            {row.p3}
+                          </td>
+                          <td className={`border-r border-slate-100 px-2 py-2 text-right font-mono tabular-nums dark:border-slate-800 ${borderRow}`}>
+                            {row.p15}
+                          </td>
+                          <td className={`border-r border-slate-100 px-2 py-2 text-right font-mono font-bold tabular-nums text-emerald-700 dark:border-slate-800 dark:text-emerald-400 ${borderRow}`}>
                             {row.p50}
                           </td>
-                          <td className="px-2 py-2 text-right font-mono tabular-nums">{row.p85}</td>
-                          <td className="px-2 py-2 text-right font-mono tabular-nums">{row.p97}</td>
+                          <td className={`border-r border-slate-100 px-2 py-2 text-right font-mono tabular-nums dark:border-slate-800 ${borderRow}`}>
+                            {row.p85}
+                          </td>
+                          <td className={`px-2 py-2 text-right font-mono tabular-nums ${borderRow}`}>
+                            {row.p97}
+                          </td>
                         </tr>
                       );
                     })}
                   </tbody>
                 </table>
-              </div>
+              </ScrollableTableShell>
             </div>
           )}
         </div>

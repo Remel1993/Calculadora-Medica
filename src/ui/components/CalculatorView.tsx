@@ -280,7 +280,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
       </div>
 
       {/* Header & Clinical Context (collapsible on mobile to prioritize input fields) */}
-      <section className="w-full min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-3.5 sm:rounded-2xl sm:p-6 dark:border-slate-800 dark:bg-slate-900">
+      <section className="-mx-2.5 min-w-0 overflow-hidden rounded-none border-x-0 border-y border-slate-200 bg-white px-3.5 py-3 sm:mx-0 sm:rounded-2xl sm:border sm:p-5 dark:border-slate-800 dark:bg-slate-900">
         <div className="flex w-full min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-500 sm:text-xs dark:text-slate-400">
           <span className="font-semibold text-sky-700 dark:text-sky-400">
             {primarySpec.name}
@@ -353,7 +353,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
           ref={formRef}
           onSubmit={handleCalculate}
           noValidate
-          className="w-full min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-3.5 sm:rounded-2xl sm:p-6 lg:col-span-7 dark:border-slate-800 dark:bg-slate-900"
+          className="-mx-2.5 min-w-0 overflow-hidden rounded-none border-x-0 border-y border-slate-200 bg-white px-3.5 py-3.5 sm:mx-0 sm:rounded-2xl sm:border sm:p-5 lg:col-span-7 dark:border-slate-800 dark:bg-slate-900"
         >
           <div className="flex min-w-0 items-center justify-between gap-2 border-b border-slate-100 pb-2.5 sm:pb-4 dark:border-slate-800">
             <h2 className="shrink-0 text-sm font-semibold text-slate-900 sm:text-base dark:text-slate-100">
@@ -746,7 +746,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
           {output && severityStyle && SeverityIcon ? (
             <section
               aria-live="polite"
-              className={`w-full min-w-0 select-text overflow-hidden rounded-xl border p-4 sm:rounded-2xl sm:p-6 ${severityStyle.container}`}
+              className={`-mx-2.5 min-w-0 select-text overflow-hidden rounded-none border-x-0 border-y px-3.5 py-3.5 sm:mx-0 sm:rounded-2xl sm:border sm:p-5 ${severityStyle.container}`}
             >
               {isOutputStale && (
                 <div
@@ -788,11 +788,11 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
               </div>
 
               {output.secondaryResults && output.secondaryResults.length > 0 && (
-                <div className="mt-3.5 min-w-0 space-y-2 border-t border-slate-900/10 pt-3.5 sm:mt-4 sm:pt-4 dark:border-white/10">
+                <div className="mt-3.5 min-w-0 divide-y divide-slate-900/10 border-t border-slate-900/10 pt-2 sm:mt-4 sm:pt-2.5 dark:divide-white/10 dark:border-white/10">
                   {output.secondaryResults.map((item) => (
                     <div
                       key={item.label}
-                      className="flex min-w-0 flex-col gap-0.5 rounded-lg bg-white/70 px-3 py-2 sm:rounded-xl sm:px-3.5 sm:py-2.5 dark:bg-slate-900/60"
+                      className="flex min-w-0 flex-col gap-0.5 py-2 first:pt-1.5 last:pb-0"
                     >
                       <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
                         <span className="min-w-0 break-words text-xs text-slate-600 dark:text-slate-300">
@@ -843,7 +843,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
               </div>
             </section>
           ) : (
-            <section className="w-full min-w-0 rounded-xl border border-dashed border-slate-300 bg-slate-50/70 p-4 text-center sm:rounded-2xl sm:p-6 dark:border-slate-700 dark:bg-slate-900/40">
+            <section className="-mx-2.5 min-w-0 rounded-none border-x-0 border-y border-dashed border-slate-300 bg-slate-50/70 px-3.5 py-4 text-center sm:mx-0 sm:rounded-2xl sm:border sm:p-6 dark:border-slate-700 dark:bg-slate-900/40">
               <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 ring-1 ring-sky-200/70 dark:bg-sky-950/60 dark:text-sky-400 dark:ring-sky-800/60">
                 <ClinicalConsoleIcon className="h-6 w-6" />
               </span>
@@ -857,7 +857,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
           )}
 
           {/* Contraindications, Limitations & References */}
-          <section className="w-full min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-4 sm:rounded-2xl sm:p-6 dark:border-slate-800 dark:bg-slate-900">
+          <section className="-mx-2.5 min-w-0 overflow-hidden rounded-none border-x-0 border-y border-slate-200 bg-white px-3.5 py-3.5 sm:mx-0 sm:rounded-2xl sm:border sm:p-5 dark:border-slate-800 dark:bg-slate-900">
             <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
               <ClinicalSafetyShieldIcon className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
               <span>Cuándo no usar y limitaciones</span>

@@ -60,7 +60,7 @@ export const SpecialtiesView: React.FC<SpecialtiesViewProps> = ({
           <span>Todas las especialidades</span>
         </button>
 
-        <section className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-4 sm:rounded-2xl sm:p-6 dark:border-slate-800 dark:bg-slate-900">
+        <section className="-mx-2.5 min-w-0 rounded-none border-x-0 border-y border-slate-200 bg-white px-3.5 py-4 sm:mx-0 sm:rounded-2xl sm:border sm:p-6 dark:border-slate-800 dark:bg-slate-900">
           <div className="flex items-start gap-3.5">
             <span
               className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ring-1 ring-black/5 dark:ring-white/10 ${visual.badgeBgClass} ${visual.iconClass}`}
@@ -131,7 +131,7 @@ export const SpecialtiesView: React.FC<SpecialtiesViewProps> = ({
         </section>
 
         {items.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center dark:border-slate-800 dark:bg-slate-900">
+          <div className="-mx-2.5 rounded-none border-x-0 border-y border-slate-200 bg-white p-6 text-center sm:mx-0 sm:rounded-2xl sm:border sm:p-8 dark:border-slate-800 dark:bg-slate-900">
             <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-500 ring-1 ring-slate-200/80 dark:bg-slate-800/80 dark:text-slate-400 dark:ring-slate-700">
               <ClinicalFolderIcon className="h-6 w-6" />
             </span>
@@ -155,7 +155,7 @@ export const SpecialtiesView: React.FC<SpecialtiesViewProps> = ({
             ))}
           </div>
         ) : (
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center sm:p-8 dark:border-slate-800 dark:bg-slate-900">
+          <div className="-mx-2.5 rounded-none border-x-0 border-y border-slate-200 bg-white p-6 text-center sm:mx-0 sm:rounded-2xl sm:border sm:p-8 dark:border-slate-800 dark:bg-slate-900">
             <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 ring-1 ring-sky-200/80 dark:bg-sky-950/60 dark:text-sky-400 dark:ring-sky-800/60">
               <ClinicalSearchIcon className="h-6 w-6" />
             </span>

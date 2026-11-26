@@ -48,7 +48,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
           ))}
         </div>
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center dark:border-slate-800 dark:bg-slate-900">
+        <div className="-mx-2.5 rounded-none border-x-0 border-y border-slate-200 bg-white p-6 text-center sm:mx-0 sm:rounded-2xl sm:border sm:p-8 dark:border-slate-800 dark:bg-slate-900">
           <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-500 ring-1 ring-amber-200/80 dark:bg-amber-950/50 dark:text-amber-400 dark:ring-amber-800/60">
             <ClinicalStarIcon className="h-6 w-6" />
           </span>

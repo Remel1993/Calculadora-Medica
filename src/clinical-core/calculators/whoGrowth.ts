@@ -209,13 +209,14 @@ export const whoGrowthCalculator: CalculatorDefinition = {
 
     const ageYears = ageMonths / 12;
     const heightM = heightCm / 100;
-    const bmi = roundClinical(weight / (heightM * heightM), 1);
+    const bmiExact = weight / (heightM * heightM);
+    const bmi = roundClinical(bmiExact, 1);
     const under5 = ageMonths < 60;
 
     // Automatic official WHO LMS calculations
     const wfaEval = ageMonths <= 120 ? evaluateWhoIndicator('wfa', sex, ageMonths, weight) : null;
     const lhfaEval = evaluateWhoIndicator('lhfa', sex, ageMonths, heightCm);
-    const bmiEval = evaluateWhoIndicator('bmifa', sex, ageMonths, bmi);
+    const bmiEval = evaluateWhoIndicator('bmifa', sex, ageMonths, bmiExact);
     const hcfaEval =
       headCirc !== null && ageMonths <= 60
         ? evaluateWhoIndicator('hcfa', sex, ageMonths, headCirc)
@@ -253,9 +254,12 @@ export const whoGrowthCalculator: CalculatorDefinition = {
         } else if (manualZ <= 1) {
           severity = 'normal';
           riskClassification = `Peso adecuado para la edad (Z = ${formatClinicalNumber(manualZ, 1)})`;
-        } else {
+        } else if (manualZ <= 2) {
           severity = 'low';
-          riskClassification = `Peso elevado para la edad (Z > +1 DE) — Evaluar IMC/edad`;
+          riskClassification = `Peso por encima de la mediana (Z +1 a +2 DE) — Evaluar IMC/edad`;
+        } else {
+          severity = 'moderate';
+          riskClassification = `Peso elevado para la edad (Z > +2 DE) — Evaluar IMC/edad`;
         }
         clinicalInterpretation =
           'El indicador Peso/Edad no distingue entre bajo peso por talla baja y emaciación; interpretar siempre junto a IMC/edad.';
@@ -285,7 +289,7 @@ export const whoGrowthCalculator: CalculatorDefinition = {
           riskClassification = 'Sobrepeso (5–19 años: Z +1 a +2 DE)';
         } else if (manualZ <= 3) {
           severity = 'high';
-          riskClassification = 'Obesidad (5–19 años: Z > +2 DE)';
+          riskClassification = 'Obesidad (5–19 años: Z +2 a +3 DE)';
         } else {
           severity = 'high';
           riskClassification = 'Obesidad grave (5–19 años: Z > +3 DE)';
@@ -295,19 +299,48 @@ export const whoGrowthCalculator: CalculatorDefinition = {
           : 'Clasificación oficial OMS 2007 para niños y adolescentes de 5 a 19 años (IMC/edad).';
       }
 
+      const manualPrimary =
+        zIndicator === 'hfa'
+          ? {
+              label:
+                ageMonths < 24
+                  ? 'Longitud para la edad (Puntaje Z manual)'
+                  : 'Talla para la edad (Puntaje Z manual)',
+              value: heightCm,
+              formattedValue: formatClinicalNumber(heightCm, 1),
+              unit: 'cm',
+            }
+          : zIndicator === 'wfa'
+            ? {
+                label: 'Peso para la edad (Puntaje Z manual)',
+                value: weight,
+                formattedValue: formatClinicalNumber(weight, 1),
+                unit: 'kg',
+              }
+            : {
+                label: 'IMC Pediátrico (Puntaje Z manual)',
+                value: bmi,
+                formattedValue: formatClinicalNumber(bmi, 1),
+                unit: 'kg/m²',
+              };
+
       return {
-        primaryResult: {
-          label: 'IMC Pediátrico (Puntaje Z manual)',
-          value: bmi,
-          formattedValue: formatClinicalNumber(bmi, 1),
-          unit: 'kg/m²',
-        },
+        primaryResult: manualPrimary,
         secondaryResults: [
           {
             label: 'Puntaje Z OMS evaluado',
             formattedValue: formatSignedZ(manualZ),
             unit: '',
           },
+          ...(zIndicator !== 'bmifa'
+            ? [
+                {
+                  label: 'IMC calculado',
+                  formattedValue: formatClinicalNumber(bmi, 1),
+                  unit: 'kg/m²',
+                },
+              ]
+            : []),
           ...(wfaEval
             ? [
                 {
@@ -408,7 +441,7 @@ export const whoGrowthCalculator: CalculatorDefinition = {
 
     const guidance: string[] = [
       'Un solo control muestra una foto del momento; lo más importante es verificar en su cartilla o consulta que el niño siga de forma estable su propio carril de percentil.',
-      'Revisa la gráfica de curvas y la tabla de referencia OMS más arriba (en el panel interactivo) para comparar visualmente con los valores esperados para su edad.',
+      'Revisa la gráfica de curvas y la tabla de referencia OMS más abajo (en el panel interactivo) para comparar visualmente con los valores esperados para su edad.',
     ];
 
     if (bmiEval.zScore < -2 || lhfaEval.zScore < -2 || (wfaEval && wfaEval.zScore < -2)) {

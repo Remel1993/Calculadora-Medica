@@ -254,8 +254,16 @@ export function evaluateWhoIndicator(
       parentExplanation = `La estatura está por debajo del rango habitual (< P3). ${peerPhrase} Conviene revisar la curva previa y la estatura familiar en consulta.`;
     } else if (zScore <= 2) {
       severity = 'normal';
-      classification = `Talla adecuada para la edad (${percentileFormatted})`;
-      parentExplanation = `Estatura dentro del rango normal esperado para su edad (entre P3 y P97). ${peerPhrase}`;
+      if (percentile < 3) {
+        classification = `Talla en límite inferior aceptable (${percentileFormatted} · Z ≥ −2 DE)`;
+        parentExplanation = `Estatura levemente por debajo de P3, aún dentro del límite OMS de −2 DE (Z = ${formatClinicalNumber(zScore, 2)} DE). ${peerPhrase} Conviene vigilar su carril de crecimiento en control.`;
+      } else if (percentile > 97) {
+        classification = `Talla en límite superior aceptable (${percentileFormatted} · Z ≤ +2 DE)`;
+        parentExplanation = `Estatura levemente por encima de P97, aún dentro del límite OMS de +2 DE (Z = +${formatClinicalNumber(zScore, 2)} DE). ${peerPhrase}`;
+      } else {
+        classification = `Talla adecuada para la edad (${percentileFormatted})`;
+        parentExplanation = `Estatura dentro del rango normal esperado para su edad (entre P3 y P97). ${peerPhrase}`;
+      }
     } else {
       severity = 'info';
       classification = `Talla alta para la edad (${percentileFormatted} · Z > +2 DE)`;
@@ -272,8 +280,13 @@ export function evaluateWhoIndicator(
       parentExplanation = `El peso está por debajo de lo esperado (< P3). ${peerPhrase} Debe interpretarse junto con su estatura (IMC/edad).`;
     } else if (zScore <= 1) {
       severity = 'normal';
-      classification = `Peso adecuado para la edad (${percentileFormatted})`;
-      parentExplanation = `Peso dentro del rango normal esperado para su edad. ${peerPhrase}`;
+      if (percentile < 3) {
+        classification = `Peso en límite inferior aceptable (${percentileFormatted} · Z ≥ −2 DE)`;
+        parentExplanation = `Peso levemente por debajo de P3, aún dentro del límite OMS de −2 DE (Z = ${formatClinicalNumber(zScore, 2)} DE). ${peerPhrase} Interpretar junto con su estatura (IMC/edad).`;
+      } else {
+        classification = `Peso adecuado para la edad (${percentileFormatted})`;
+        parentExplanation = `Peso dentro del rango normal esperado para su edad. ${peerPhrase}`;
+      }
     } else if (zScore <= 2) {
       severity = 'low';
       classification = `Peso por encima de la mediana (${percentileFormatted} · Z +1 a +2 DE)`;
@@ -290,8 +303,16 @@ export function evaluateWhoIndicator(
       parentExplanation = `El tamaño de la cabeza está por debajo del percentil 3. ${peerPhrase} Se recomienda revisión médica y seguimiento de su curva.`;
     } else if (zScore <= 2) {
       severity = 'normal';
-      classification = `Perímetro cefálico adecuado (${percentileFormatted})`;
-      parentExplanation = `El perímetro cefálico se encuentra dentro del rango esperado (P3–P97). ${peerPhrase}`;
+      if (percentile < 3) {
+        classification = `Perímetro cefálico en límite inferior aceptable (${percentileFormatted} · Z ≥ −2 DE)`;
+        parentExplanation = `El perímetro cefálico está levemente por debajo de P3, aunque aún dentro del límite OMS de −2 DE (Z = ${formatClinicalNumber(zScore, 2)} DE). ${peerPhrase} Conviene seguimiento de mediciones seriadas.`;
+      } else if (percentile > 97) {
+        classification = `Perímetro cefálico en límite superior aceptable (${percentileFormatted} · Z ≤ +2 DE)`;
+        parentExplanation = `El perímetro cefálico supera levemente P97, aunque aún dentro del límite OMS de +2 DE (Z = +${formatClinicalNumber(zScore, 2)} DE). ${peerPhrase} Conviene seguimiento de mediciones seriadas.`;
+      } else {
+        classification = `Perímetro cefálico adecuado (${percentileFormatted})`;
+        parentExplanation = `El perímetro cefálico se encuentra dentro del rango esperado (P3–P97). ${peerPhrase}`;
+      }
     } else {
       severity = 'moderate';
       classification = `Perímetro cefálico elevado (> P97 · Z > +2 DE)`;
@@ -309,13 +330,21 @@ export function evaluateWhoIndicator(
       parentExplanation = `El peso es bajo en proporción a su estatura. ${peerPhrase} Se recomienda valoración nutricional pediátrica.`;
     } else if (zScore <= 1) {
       severity = 'normal';
-      classification = `Estado nutricional normal (${percentileFormatted})`;
-      parentExplanation = `Proporción saludable entre peso y estatura para su edad. ${peerPhrase}`;
+      if (percentile < 3) {
+        classification = `Estado nutricional en límite inferior aceptable (${percentileFormatted} · Z ≥ −2 DE)`;
+        parentExplanation = `La relación peso-estatura está levemente por debajo de P3, aún dentro del límite OMS de −2 DE (Z = ${formatClinicalNumber(zScore, 2)} DE). ${peerPhrase} Vigilar tendencia en la curva.`;
+      } else {
+        classification = `Estado nutricional normal (${percentileFormatted})`;
+        parentExplanation = `Proporción saludable entre peso y estatura para su edad. ${peerPhrase}`;
+      }
     } else if (under5) {
       if (zScore <= 2) {
         severity = 'low';
         classification = `Riesgo de sobrepeso (< 5 años: ${percentileFormatted} · Z +1 a +2 DE)`;
-        parentExplanation = `Está en el límite superior de la normalidad (P85–P97). ${peerPhrase} Vigilar hábitos de alimentación y actividad física en control sano.`;
+        parentExplanation =
+          percentile > 97
+            ? `El IMC supera levemente P97, aún dentro del límite OMS de +2 DE (Z = +${formatClinicalNumber(zScore, 2)} DE). ${peerPhrase} Vigilar hábitos de alimentación y actividad física en control sano.`
+            : `Está por encima de P85 en rango de riesgo de sobrepeso (Z +1 a +2 DE). ${peerPhrase} Vigilar hábitos de alimentación y actividad física en control sano.`;
       } else if (zScore <= 3) {
         severity = 'moderate';
         classification = `Sobrepeso infantil (< 5 años: ${percentileFormatted} · Z +2 a +3 DE)`;

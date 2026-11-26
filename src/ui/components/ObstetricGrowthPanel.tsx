@@ -17,6 +17,7 @@ import {
   roundClinical,
 } from '../../clinical-core/math/precision.ts';
 import type { CalculatorInputsState, NumberInputValue } from '../../clinical-core/types/clinical.ts';
+import { ScrollableTableShell } from './ScrollableTableShell.tsx';
 
 interface ObstetricGrowthPanelProps {
   inputs: CalculatorInputsState;
@@ -261,7 +262,7 @@ export const ObstetricGrowthPanel: React.FC<ObstetricGrowthPanelProps> = ({ inpu
   return (
     <section
       id="obstetric-growth-panel"
-      className="w-full min-w-0 overflow-hidden rounded-xl border border-sky-200 bg-white p-3.5 sm:rounded-2xl sm:p-6 dark:border-sky-900/60 dark:bg-slate-900"
+      className="-mx-2.5 min-w-0 overflow-hidden rounded-none border-x-0 border-y border-sky-200 bg-white px-3.5 py-4 sm:mx-0 sm:rounded-2xl sm:border sm:p-6 dark:border-sky-900/60 dark:bg-slate-900"
     >
       {/* Header */}
       <div className="flex flex-col gap-2 border-b border-slate-100 pb-3 sm:flex-row sm:items-center sm:justify-between sm:pb-4 dark:border-slate-800">
@@ -324,7 +325,7 @@ export const ObstetricGrowthPanel: React.FC<ObstetricGrowthPanelProps> = ({ inpu
       {activeTab === 'maternal' && (
         <div className="mt-4 space-y-3">
           {maternalEval && (
-            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 sm:p-4 dark:border-slate-800 dark:bg-slate-950/60">
+            <div className="border-l-2 border-sky-500/75 py-1 pl-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="min-w-0">
                   <div className="text-xs font-semibold text-slate-900 sm:text-sm dark:text-slate-100">
@@ -345,7 +346,7 @@ export const ObstetricGrowthPanel: React.FC<ObstetricGrowthPanelProps> = ({ inpu
             </div>
           )}
 
-          <div className="w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-950">
+          <div className="w-full overflow-hidden rounded-lg border border-slate-200 bg-white p-1.5 sm:rounded-xl sm:p-2.5 dark:border-slate-800 dark:bg-slate-950">
             <svg
               viewBox={`0 0 ${svgW} ${svgH}`}
               className="h-auto w-full select-none"
@@ -475,7 +476,7 @@ export const ObstetricGrowthPanel: React.FC<ObstetricGrowthPanelProps> = ({ inpu
       {activeTab === 'fetal' && (
         <div className="mt-4 space-y-3">
           {fetalEval ? (
-            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 sm:p-4 dark:border-slate-800 dark:bg-slate-950/60">
+            <div className="border-l-2 border-sky-500/75 py-1 pl-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="min-w-0">
                   <div className="text-xs font-semibold text-slate-900 sm:text-sm dark:text-slate-100">
@@ -535,7 +536,7 @@ export const ObstetricGrowthPanel: React.FC<ObstetricGrowthPanelProps> = ({ inpu
             </div>
           )}
 
-          <div className="w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-950">
+          <div className="w-full overflow-hidden rounded-lg border border-slate-200 bg-white p-1.5 sm:rounded-xl sm:p-2.5 dark:border-slate-800 dark:bg-slate-950">
             <svg
               viewBox={`0 0 ${svgW} ${svgH}`}
               className="h-auto w-full select-none"
@@ -665,24 +666,24 @@ export const ObstetricGrowthPanel: React.FC<ObstetricGrowthPanelProps> = ({ inpu
       {activeTab === 'combined' && (
         <div className="mt-4 space-y-3">
           {balance && maternalEval && (
-            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 dark:border-slate-800 dark:bg-slate-950/60">
+            <div className="border-b border-slate-200/80 pb-3 dark:border-slate-800">
               <div className="text-xs font-semibold text-slate-900 sm:text-sm dark:text-slate-100">
                 Desglose proporcional: Ganancia Materna vs. Peso Fetal ({formatClinicalNumber(maternalEval.weeks, 1)} sem)
               </div>
               <div className="mt-2.5 grid gap-2 sm:grid-cols-3">
-                <div className="rounded-lg bg-white p-2.5 dark:bg-slate-900">
+                <div className="border-l-2 border-slate-300 pl-2.5 py-0.5 dark:border-slate-700">
                   <div className="text-[11px] text-slate-500 dark:text-slate-400">Ganancia total materna</div>
                   <div className="font-mono text-base font-bold text-slate-900 tabular-nums dark:text-slate-100">
                     {balance.maternalGainKg >= 0 ? '+' : ''}{formatClinicalNumber(balance.maternalGainKg, 1)} kg
                   </div>
                 </div>
-                <div className="rounded-lg bg-white p-2.5 dark:bg-slate-900">
+                <div className="border-l-2 border-sky-500/70 pl-2.5 py-0.5">
                   <div className="text-[11px] text-slate-500 dark:text-slate-400">Peso fetal estimado (PFE)</div>
                   <div className="font-mono text-base font-bold text-sky-700 tabular-nums dark:text-sky-400">
                     {formatClinicalNumber(balance.efwKg, 2)} kg
                   </div>
                 </div>
-                <div className="rounded-lg bg-white p-2.5 dark:bg-slate-900">
+                <div className="border-l-2 border-emerald-500/70 pl-2.5 py-0.5">
                   <div className="text-[11px] text-slate-500 dark:text-slate-400">Ganancia materna neta sin feto</div>
                   <div className="font-mono text-base font-bold text-emerald-700 tabular-nums dark:text-emerald-400">
                     {balance.netMaternalExclFetusKg >= 0 ? '+' : ''}{formatClinicalNumber(balance.netMaternalExclFetusKg, 1)} kg
@@ -706,42 +707,79 @@ export const ObstetricGrowthPanel: React.FC<ObstetricGrowthPanelProps> = ({ inpu
             )}
           </div>
 
-          <div className="max-h-[380px] w-full overflow-x-auto overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800">
-            <table className="w-full min-w-[420px] border-collapse text-left text-[11px] sm:text-xs">
-              <thead className="sticky top-0 z-10 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+          <ScrollableTableShell
+            compactHeightClass="max-h-[380px]"
+            ariaLabel="Tabla combinada IOM 2009 y Hadlock 1991 por edad gestacional"
+          >
+            <table className="w-full min-w-[460px] border-separate border-spacing-0 text-left text-[11px] sm:text-xs">
+              <thead className="text-slate-700 dark:text-slate-200">
                 <tr>
-                  <th className="px-2.5 py-2 font-semibold">EG</th>
-                  <th className="px-2 py-2 text-right font-semibold text-emerald-700 dark:text-emerald-400">
+                  <th
+                    scope="col"
+                    className="sticky top-0 left-0 z-30 min-w-[84px] border-b border-r border-slate-200 bg-slate-100 px-2.5 py-2 font-semibold dark:border-slate-700 dark:bg-slate-800 group-data-[scrolled-x=true]/scroll:shadow-[4px_0_12px_-4px_rgba(15,23,42,0.14)] dark:group-data-[scrolled-x=true]/scroll:shadow-[4px_0_12px_-4px_rgba(0,0,0,0.5)]"
+                  >
+                    EG
+                  </th>
+                  <th
+                    scope="col"
+                    className="sticky top-0 z-20 border-b border-r border-slate-200 bg-slate-100 px-2 py-2 text-right font-semibold text-emerald-700 dark:border-slate-700 dark:bg-slate-800 dark:text-emerald-400"
+                  >
                     Meta Materna (kg)
                   </th>
-                  <th className="px-2 py-2 text-right font-semibold">Feto P10 (g)</th>
-                  <th className="px-2 py-2 text-right font-bold text-sky-700 dark:text-sky-400">Feto P50 (g)</th>
-                  <th className="px-2 py-2 text-right font-semibold">Feto P90 (g)</th>
+                  <th
+                    scope="col"
+                    className="sticky top-0 z-20 border-b border-r border-slate-200 bg-slate-100 px-2 py-2 text-right font-semibold dark:border-slate-700 dark:bg-slate-800"
+                  >
+                    Feto P10 (g)
+                  </th>
+                  <th
+                    scope="col"
+                    className="sticky top-0 z-20 border-b border-r border-slate-200 bg-slate-100 px-2 py-2 text-right font-bold text-sky-700 dark:border-slate-700 dark:bg-slate-800 dark:text-sky-400"
+                  >
+                    Feto P50 (g)
+                  </th>
+                  <th
+                    scope="col"
+                    className="sticky top-0 z-20 border-b border-slate-200 bg-slate-100 px-2 py-2 text-right font-semibold dark:border-slate-700 dark:bg-slate-800"
+                  >
+                    Feto P90 (g)
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {combinedRows.map((row) => {
+              <tbody>
+                {combinedRows.map((row, rowIdx) => {
                   const isClosest = closestTableWeek === row.weeks;
+                  const isLast = rowIdx === combinedRows.length - 1;
+                  const borderRow = isLast ? '' : 'border-b border-slate-100 dark:border-slate-800';
                   return (
                     <tr
                       key={row.weeks}
-                      className={
+                      className={`group/row ${
                         isClosest
-                          ? 'bg-sky-50 font-semibold text-sky-950 dark:bg-sky-950/50 dark:text-sky-100'
+                          ? 'bg-sky-50 font-semibold text-sky-950 dark:bg-sky-950/60 dark:text-sky-100'
                           : 'bg-white text-slate-700 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/60'
-                      }
+                      }`}
                     >
-                      <td className="px-2.5 py-2 whitespace-nowrap">{row.weeks} sem</td>
-                      <td className="px-2 py-2 text-right font-mono tabular-nums text-emerald-700 dark:text-emerald-400">
+                      <th
+                        scope="row"
+                        className={`sticky left-0 z-10 min-w-[84px] border-r border-slate-200 px-2.5 py-2 text-left whitespace-nowrap dark:border-slate-800 group-data-[scrolled-x=true]/scroll:shadow-[4px_0_12px_-4px_rgba(15,23,42,0.12)] dark:group-data-[scrolled-x=true]/scroll:shadow-[4px_0_12px_-4px_rgba(0,0,0,0.45)] ${borderRow} ${
+                          isClosest
+                            ? 'bg-sky-50 font-semibold text-sky-950 dark:bg-sky-950 dark:text-sky-100'
+                            : 'bg-white font-medium text-slate-800 group-hover/row:bg-slate-50 dark:bg-slate-900 dark:text-slate-200 dark:group-hover/row:bg-slate-800'
+                        }`}
+                      >
+                        {row.weeks} sem
+                      </th>
+                      <td className={`border-r border-slate-100 px-2 py-2 text-right font-mono tabular-nums text-emerald-700 dark:border-slate-800 dark:text-emerald-400 ${borderRow}`}>
                         {formatClinicalNumber(row.matMin, 1)}–{formatClinicalNumber(row.matMax, 1)}
                       </td>
-                      <td className="px-2 py-2 text-right font-mono tabular-nums">
+                      <td className={`border-r border-slate-100 px-2 py-2 text-right font-mono tabular-nums dark:border-slate-800 ${borderRow}`}>
                         {row.fetP10 ?? '—'}
                       </td>
-                      <td className="px-2 py-2 text-right font-mono font-bold tabular-nums text-sky-700 dark:text-sky-400">
+                      <td className={`border-r border-slate-100 px-2 py-2 text-right font-mono font-bold tabular-nums text-sky-700 dark:border-slate-800 dark:text-sky-400 ${borderRow}`}>
                         {row.fetP50 ?? '—'}
                       </td>
-                      <td className="px-2 py-2 text-right font-mono tabular-nums">
+                      <td className={`px-2 py-2 text-right font-mono tabular-nums ${borderRow}`}>
                         {row.fetP90 ?? '—'}
                       </td>
                     </tr>
@@ -749,7 +787,7 @@ export const ObstetricGrowthPanel: React.FC<ObstetricGrowthPanelProps> = ({ inpu
                 })}
               </tbody>
             </table>
-          </div>
+          </ScrollableTableShell>
         </div>
       )}
     </section>

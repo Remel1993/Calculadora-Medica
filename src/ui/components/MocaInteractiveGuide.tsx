@@ -685,7 +685,7 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
   );
 
   return (
-    <section className="w-full min-w-0 overflow-hidden rounded-xl border border-sky-200 bg-sky-50/40 p-3.5 sm:rounded-2xl sm:p-5 dark:border-sky-900/60 dark:bg-sky-950/20">
+    <section className="-ml-3 -mr-3.5 min-w-0 overflow-hidden border-y border-sky-200/80 bg-sky-50/25 pl-3 pr-3.5 py-3 sm:mx-0 sm:rounded-xl sm:border sm:px-4 sm:py-4 dark:border-sky-900/60 dark:bg-sky-950/15">
       {/* Header bar */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0">
@@ -767,7 +767,7 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
       )}
 
       {/* Step Content */}
-      <div className="mt-3 rounded-xl border border-slate-200 bg-white p-3 sm:p-4 dark:border-slate-800 dark:bg-slate-900">
+      <div className="mt-3 border-t border-sky-200/70 pt-3 dark:border-sky-900/50">
         {!patientView && (
           <h3 className="text-xs font-bold uppercase tracking-wide text-sky-800 sm:text-sm dark:text-sky-300">
             {STEPS[activeStep].title}
@@ -805,7 +805,7 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
                 </button>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-white p-2">
+              <div className="ml-7 mr-2 rounded-lg border border-slate-200 bg-white p-1.5 sm:mx-0 sm:p-2 dark:border-slate-700">
                 <svg
                   ref={trailSvgRef}
                   viewBox="0 0 320 200"
@@ -813,7 +813,7 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
                   onPointerMove={handleTrailPointerMove}
                   onPointerUp={handleTrailPointerUp}
                   onPointerCancel={handleTrailPointerUp}
-                  className="mx-auto w-full max-w-[380px] touch-none select-none cursor-crosshair"
+                  className="mx-auto w-full max-w-[440px] touch-none select-none cursor-crosshair"
                   role="group"
                   aria-label="Prueba interactiva de trazo alternante 1 a E"
                 >
@@ -891,7 +891,7 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
             </div>
 
             {/* 1B: Necker Cube Model + Dedicated Persistent Cube Drawing Pad */}
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950">
+            <div className="border-t border-slate-200/80 pt-3 dark:border-slate-800">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                 <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
                   1B. Copiar el cubo tridimensional
@@ -926,18 +926,20 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
                   <NeckerCubeSvg />
                 </div>
 
-                <TouchDrawingPad
-                  strokes={cubeStrokes}
-                  onChangeStrokes={setCubeStrokes}
-                  ariaLabel="Lienzo táctil para copiar el cubo"
-                  placeholder="Dibuja aquí el cubo con el dedo o lápiz táctil"
-                  heightClass="h-44 sm:h-48"
-                />
+                <div className="ml-7 mr-2 sm:mx-0">
+                  <TouchDrawingPad
+                    strokes={cubeStrokes}
+                    onChangeStrokes={setCubeStrokes}
+                    ariaLabel="Lienzo táctil para copiar el cubo"
+                    placeholder="Dibuja aquí el cubo con el dedo o lápiz táctil"
+                    heightClass="h-44 sm:h-48"
+                  />
+                </div>
               </div>
             </div>
 
             {/* 1C: Dedicated Persistent Clock Drawing Pad */}
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950">
+            <div className="border-t border-slate-200/80 pt-3 dark:border-slate-800">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <span className="block text-xs font-semibold text-slate-800 dark:text-slate-200">
@@ -969,13 +971,15 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
                 </div>
               </div>
 
-              <TouchDrawingPad
-                strokes={clockStrokes}
-                onChangeStrokes={setClockStrokes}
-                ariaLabel="Lienzo táctil para dibujar el reloj marcando las 11:10"
-                placeholder="Dibuja aquí el círculo del reloj, los números 1–12 y las manecillas (11:10)"
-                heightClass="h-56 sm:h-64"
-              />
+              <div className="ml-7 mr-2 sm:mx-0">
+                <TouchDrawingPad
+                  strokes={clockStrokes}
+                  onChangeStrokes={setClockStrokes}
+                  ariaLabel="Lienzo táctil para dibujar el reloj marcando las 11:10"
+                  placeholder="Dibuja aquí el círculo del reloj, los números 1–12 y las manecillas (11:10)"
+                  heightClass="h-56 sm:h-64"
+                />
+              </div>
             </div>
 
             {!patientView && (
@@ -1034,7 +1038,7 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
         {activeStep === 1 && (
           <div className="mt-2.5 space-y-3">
             {patientView ? (
-              <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-3 text-center">
+              <div className="space-y-3 py-1 text-center">
                 <p className="text-sm font-semibold text-slate-900">
                   ¿Cómo se llama este animal? ({animalSlide + 1} / 3)
                 </p>
@@ -1088,7 +1092,7 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
         {/* STEP 3: MEMORY TRIAL + ATTENTION */}
         {activeStep === 2 && (
           <div className="mt-2.5 space-y-3">
-            <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3 dark:border-amber-900/60 dark:bg-amber-950/30">
+            <div className="border-l-2 border-amber-500 bg-amber-50/55 py-2 pl-3 pr-2 dark:border-amber-500/70 dark:bg-amber-950/25">
               <p className="text-xs font-semibold text-amber-950 dark:text-amber-200">
                 Memoria inmediata (sin puntaje aquí — se evalúa en el Paso 6):
               </p>
@@ -1192,7 +1196,7 @@ export const MocaInteractiveGuide: React.FC<MocaInteractiveGuideProps> = ({
               />
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950">
+            <div className="border-t border-slate-200/80 pt-3 dark:border-slate-800">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-800 dark:text-slate-200">
                   <Timer className="h-4 w-4 text-sky-600" />
