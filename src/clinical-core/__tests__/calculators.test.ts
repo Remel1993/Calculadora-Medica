@@ -3016,8 +3016,8 @@ test('Consulta Externa Expansion (18 tools): Geriatrics, Cardio/Lipids, Hepato/G
   assert.equal(mchatMod.severity, 'moderate');
 });
 
-test('Catalog: 193 deduplicated tools, cross-specialty tagging, and accent-insensitive search', () => {
-  assert.equal(CALCULATOR_CATALOG.length, 193);
+test('Catalog: 195 deduplicated tools, cross-specialty tagging, and accent-insensitive search', () => {
+  assert.equal(CALCULATOR_CATALOG.length, 195);
 
   const oncoCalcs = getCalculatorsBySpecialty('oncologia');
   assert.ok(oncoCalcs.some((c) => c.id === 'acr-tirads-thyroid'));
@@ -4257,7 +4257,7 @@ test('MINSA Nicaragua Immunization, Broselow PALS, AAP 2022 Phototherapy/Exchang
       `Falta tabla clínica nueva: ${id}`,
     );
   }
-  assert.equal(CLINICAL_REFERENCE_TABLES.length, 50);
+  assert.equal(CLINICAL_REFERENCE_TABLES.length, 52);
 });
 
 test('Regression audit fixes: SOS Table 1, SCORE2 smoking, SVS WIfI IVb, HbA1c rounding, Broselow decimals, ICHD-3 mixed aura, Hadlock 4000 g', async () => {
@@ -4898,8 +4898,14 @@ test('Ebola Virus, Lassa Fever, Herpes Zoster, and Gonorrhea calculators + refer
     hoursSinceRash: 'lte72',
     egfrBand: 'ge50',
   });
-  assert.equal(hzNormal.primaryResult.formattedValue, 'Valaciclovir VO');
+  assert.equal(hzNormal.primaryResult.formattedValue, 'Valaciclovir / Aciclovir VO');
   assert.ok(hzNormal.secondaryResults?.some((r) => r.formattedValue === '1,000 mg VO c/8 h × 7 días'));
+  assert.ok(
+    hzNormal.secondaryResults?.some((r) =>
+      r.formattedValue.includes('800 mg VO 5 veces al día'),
+    ),
+  );
+  assert.ok(hzNormal.guidance?.some((g) => g.includes('800 mg VO 5 veces al día')));
 
   const hzRenal = herpesZosterCalculator.calculate({
     ...createInitialInputs(herpesZosterCalculator),
@@ -4970,7 +4976,8 @@ test('Ebola Virus, Lassa Fever, Herpes Zoster, and Gonorrhea calculators + refer
   assert.ok(searchCalculators('herpes zoster').some((c) => c.id === 'herpes-zoster'));
   assert.ok(searchCalculators('gonorrea').some((c) => c.id === 'gonorrhea-sti'));
   assert.ok(CLINICAL_REFERENCE_TABLES.some((t) => t.id === 'vhf-ebola-lassa-table'));
-  assert.ok(CLINICAL_REFERENCE_TABLES.some((t) => t.id === 'herpes-zoster-gonorrhea-table'));
+  assert.ok(CLINICAL_REFERENCE_TABLES.some((t) => t.id === 'sti-syndromic-treatment-table'));
+  assert.ok(CLINICAL_REFERENCE_TABLES.some((t) => t.id === 'herpes-zoster-varicella-exanthems-table'));
 });
 
 test('VHF Critical Suite, Endemic Fevers, Non-Endemic/Traveler Fevers, and Escala de Fine (PSI/PORT)', async () => {
@@ -5110,7 +5117,251 @@ test('VHF Critical Suite, Endemic Fevers, Non-Endemic/Traveler Fevers, and Escal
   assert.ok(searchCalculators('fiebre no endemica').some((c) => c.id === 'non-endemic-imported-fevers'));
   assert.ok(searchCalculators('tifoidea').some((c) => c.id === 'non-endemic-imported-fevers'));
   assert.ok(CLINICAL_REFERENCE_TABLES.some((t) => t.id === 'vhf-other-complications-table'));
-  assert.ok(CLINICAL_REFERENCE_TABLES.some((t) => t.id === 'endemic-non-endemic-fevers-table'));
+  assert.ok(CLINICAL_REFERENCE_TABLES.some((t) => t.id === 'endemic-fevers-table'));
+  assert.ok(CLINICAL_REFERENCE_TABLES.some((t) => t.id === 'non-endemic-fevers-table'));
+});
+
+test('STI Syndromes (ETS-only), Pediatric Varicella & Childhood Exanthems, and pure table separation', async () => {
+  const { stiSyndromesCalculator } = await import('../calculators/stiSyndromes.ts');
+  const { pediatricVaricellaExanthemsCalculator } = await import(
+    '../calculators/pediatricVaricellaExanthems.ts'
+  );
+
+  // 1. STI Syndromes (exclusively STIs)
+  const syphEarlyAdult = stiSyndromesCalculator.calculate({
+    ...createInitialInputs(stiSyndromesCalculator),
+    stiEntity: 'syphilis_early',
+    weightKg: { value: '70', unitId: 'kg' },
+    pregnant: false,
+    penicillinAllergy: false,
+  });
+  assert.equal(syphEarlyAdult.primaryResult.value, 2400000);
+  assert.ok(syphEarlyAdult.primaryResult.formattedValue.includes('2400000'));
+
+  const syphEarlyChild = stiSyndromesCalculator.calculate({
+    ...createInitialInputs(stiSyndromesCalculator),
+    stiEntity: 'syphilis_early',
+    weightKg: { value: '30', unitId: 'kg' },
+    pregnant: false,
+    penicillinAllergy: false,
+  });
+  assert.equal(syphEarlyChild.primaryResult.value, 1500000);
+  assert.ok(syphEarlyChild.primaryResult.formattedValue.includes('1500000'));
+
+  const syphPregAllergy = stiSyndromesCalculator.calculate({
+    ...createInitialInputs(stiSyndromesCalculator),
+    stiEntity: 'syphilis_late',
+    pregnant: true,
+    penicillinAllergy: true,
+  });
+  assert.equal(syphPregAllergy.severity, 'high');
+  assert.ok(syphPregAllergy.primaryResult.formattedValue.includes('Desensibilización'));
+
+  const neuroSyph = stiSyndromesCalculator.calculate({
+    ...createInitialInputs(stiSyndromesCalculator),
+    stiEntity: 'neurosyphilis',
+    pregnant: true,
+    penicillinAllergy: true,
+  });
+  assert.equal(neuroSyph.severity, 'critical');
+  assert.ok(neuroSyph.guidance?.some((g) => g.includes('DESENSIBILIZACIÓN')));
+
+  const hsvFirstPreg = stiSyndromesCalculator.calculate({
+    ...createInitialInputs(stiSyndromesCalculator),
+    stiEntity: 'genital_herpes_first',
+    pregnant: true,
+  });
+  assert.equal(hsvFirstPreg.primaryResult.value, 400);
+  assert.ok(hsvFirstPreg.secondaryResults?.some((r) => r.formattedValue.includes('36 SG')));
+
+  const chancroidOut = stiSyndromesCalculator.calculate({
+    ...createInitialInputs(stiSyndromesCalculator),
+    stiEntity: 'chancroid',
+  });
+  assert.ok(chancroidOut.primaryResult.formattedValue.includes('Azitromicina 1 g'));
+
+  const lgvPreg = stiSyndromesCalculator.calculate({
+    ...createInitialInputs(stiSyndromesCalculator),
+    stiEntity: 'lgv_donovanosis',
+    pregnant: true,
+  });
+  assert.ok(lgvPreg.primaryResult.formattedValue.includes('Eritromicina'));
+
+  const trichOut = stiSyndromesCalculator.calculate({
+    ...createInitialInputs(stiSyndromesCalculator),
+    stiEntity: 'trichomoniasis',
+  });
+  assert.ok(trichOut.primaryResult.formattedValue.includes('500 mg VO c/12 h × 7 d'));
+
+  const chlamPreg = stiSyndromesCalculator.calculate({
+    ...createInitialInputs(stiSyndromesCalculator),
+    stiEntity: 'chlamydia_ng',
+    pregnant: true,
+  });
+  assert.equal(chlamPreg.primaryResult.value, 1000);
+  assert.ok(chlamPreg.primaryResult.formattedValue.includes('Azitromicina 1 g'));
+
+  // 2. Pediatric Varicella & Childhood Exanthems
+  const varicella18 = pediatricVaricellaExanthemsCalculator.calculate({
+    ...createInitialInputs(pediatricVaricellaExanthemsCalculator),
+    exanthem: 'varicella_pediatric',
+    ageBand: '1_11y',
+    weightKg: { value: '18', unitId: 'kg' },
+    highRiskOrSevere: false,
+  });
+  assert.ok(varicella18.primaryResult.formattedValue.includes('Paracetamol'));
+  assert.ok(varicella18.secondaryResults?.some((r) => r.formattedValue.includes('360 mg VO')));
+  assert.ok(varicella18.secondaryResults?.some((r) => r.formattedValue.includes('180 mg IV')));
+  assert.ok(varicella18.guidance?.some((g) => g.includes('PROHIBIDO AAS')));
+
+  const measlesLt6m = pediatricVaricellaExanthemsCalculator.calculate({
+    ...createInitialInputs(pediatricVaricellaExanthemsCalculator),
+    exanthem: 'measles',
+    ageBand: 'lt6m',
+    weightKg: { value: '6', unitId: 'kg' },
+  });
+  assert.equal(measlesLt6m.primaryResult.value, 50000);
+
+  const measles6to11m = pediatricVaricellaExanthemsCalculator.calculate({
+    ...createInitialInputs(pediatricVaricellaExanthemsCalculator),
+    exanthem: 'measles',
+    ageBand: '6_11m',
+    weightKg: { value: '9', unitId: 'kg' },
+  });
+  assert.equal(measles6to11m.primaryResult.value, 100000);
+
+  const measles1y = pediatricVaricellaExanthemsCalculator.calculate({
+    ...createInitialInputs(pediatricVaricellaExanthemsCalculator),
+    exanthem: 'measles',
+    ageBand: '1_11y',
+    weightKg: { value: '15', unitId: 'kg' },
+  });
+  assert.equal(measles1y.primaryResult.value, 200000);
+
+  const scarlet20 = pediatricVaricellaExanthemsCalculator.calculate({
+    ...createInitialInputs(pediatricVaricellaExanthemsCalculator),
+    exanthem: 'scarlet_fever',
+    weightKg: { value: '20', unitId: 'kg' },
+    penicillinAllergy: false,
+  });
+  assert.equal(scarlet20.primaryResult.value, 1000);
+  assert.ok(scarlet20.secondaryResults?.some((r) => r.formattedValue.includes('600000 UI')));
+
+  const scarlet35 = pediatricVaricellaExanthemsCalculator.calculate({
+    ...createInitialInputs(pediatricVaricellaExanthemsCalculator),
+    exanthem: 'scarlet_fever',
+    weightKg: { value: '35', unitId: 'kg' },
+    penicillinAllergy: false,
+  });
+  assert.ok(scarlet35.secondaryResults?.some((r) => r.formattedValue.includes('1200000 UI')));
+
+  const kawasaki18 = pediatricVaricellaExanthemsCalculator.calculate({
+    ...createInitialInputs(pediatricVaricellaExanthemsCalculator),
+    exanthem: 'kawasaki_alert',
+    weightKg: { value: '18', unitId: 'kg' },
+  });
+  assert.equal(kawasaki18.severity, 'critical');
+  assert.equal(kawasaki18.primaryResult.value, 36);
+  assert.ok(kawasaki18.primaryResult.formattedValue.includes('36.0 g'));
+
+  const rubellaOut = pediatricVaricellaExanthemsCalculator.calculate({
+    ...createInitialInputs(pediatricVaricellaExanthemsCalculator),
+    exanthem: 'rubella',
+  });
+  assert.ok(rubellaOut.riskClassification.includes('Rubéola'));
+
+  const roseolaOut = pediatricVaricellaExanthemsCalculator.calculate({
+    ...createInitialInputs(pediatricVaricellaExanthemsCalculator),
+    exanthem: 'roseola_hhv6',
+  });
+  assert.ok(roseolaOut.primaryResult.formattedValue.includes('NO dar antibióticos'));
+
+  const b19Risk = pediatricVaricellaExanthemsCalculator.calculate({
+    ...createInitialInputs(pediatricVaricellaExanthemsCalculator),
+    exanthem: 'erythema_infectiosum_b19',
+    highRiskOrSevere: true,
+  });
+  assert.equal(b19Risk.severity, 'high');
+
+  const hfmOut = pediatricVaricellaExanthemsCalculator.calculate({
+    ...createInitialInputs(pediatricVaricellaExanthemsCalculator),
+    exanthem: 'hand_foot_mouth',
+  });
+  assert.ok(hfmOut.riskClassification.includes('Mano-Pie-Boca'));
+
+  // 3. Search & strict table category separation checks
+  assert.ok(searchCalculators('chancroide').some((c) => c.id === 'sti-ulcer-discharge'));
+  assert.ok(searchCalculators('herpes simple').some((c) => c.id === 'sti-ulcer-discharge'));
+  assert.ok(searchCalculators('varicela').some((c) => c.id === 'pediatric-varicella-exanthems'));
+  assert.ok(searchCalculators('exantematicas').some((c) => c.id === 'pediatric-varicella-exanthems'));
+  assert.ok(searchCalculators('escarlatina').some((c) => c.id === 'pediatric-varicella-exanthems'));
+
+  const getRowFirstCol = (row: (typeof CLINICAL_REFERENCE_TABLES)[number]['rows'][number]) =>
+    typeof row[0] === 'string' ? row[0] : row[0].text;
+
+  // VHF tables must contain ONLY Viral Hemorrhagic Fevers
+  const vhfOtherTable = CLINICAL_REFERENCE_TABLES.find((t) => t.id === 'vhf-other-complications-table');
+  assert.ok(vhfOtherTable);
+  const vhfTitles = vhfOtherTable.rows.map(getRowFirstCol).join(' | ');
+  assert.ok(vhfTitles.includes('Dengue Grave'));
+  assert.ok(vhfTitles.includes('Fiebre Amarilla'));
+  assert.ok(vhfTitles.includes('Hantavirus'));
+  assert.ok(vhfTitles.includes('Arenavirus'));
+  assert.ok(vhfTitles.includes('Marburgo'));
+  assert.ok(vhfTitles.includes('Crimea-Congo'));
+  assert.ok(!vhfTitles.includes('Zika'));
+  assert.ok(!vhfTitles.includes('Chikungunya'));
+  assert.ok(!vhfTitles.includes('Chagas'));
+  assert.ok(!vhfTitles.includes('Tifoidea'));
+
+  // Endemic fevers table must contain endemic non-hemorrhagic fevers, no Marburg/Lassa/Ebola
+  const endemicTable = CLINICAL_REFERENCE_TABLES.find((t) => t.id === 'endemic-fevers-table');
+  assert.ok(endemicTable);
+  const endemicTitles = endemicTable.rows.map(getRowFirstCol).join(' | ');
+  assert.ok(endemicTitles.includes('Malaria'));
+  assert.ok(endemicTitles.includes('Leptospirosis'));
+  assert.ok(endemicTitles.includes('Chikungunya'));
+  assert.ok(endemicTitles.includes('Chagas'));
+  assert.ok(!endemicTitles.includes('Ébola'));
+  assert.ok(!endemicTitles.includes('Marburgo'));
+
+  // Non-endemic fevers table must cover traveler/imported non-endemic fevers
+  const nonEndemicTable = CLINICAL_REFERENCE_TABLES.find((t) => t.id === 'non-endemic-fevers-table');
+  assert.ok(nonEndemicTable);
+  const nonEndemicTitles = nonEndemicTable.rows.map(getRowFirstCol).join(' | ');
+  assert.ok(nonEndemicTitles.includes('Tifoidea XDR'));
+  assert.ok(nonEndemicTitles.includes('Fiebre Q'));
+  assert.ok(nonEndemicTitles.includes('Babesiosis'));
+
+  // STI table must contain strictly STIs (no Herpes Zoster row)
+  const stiTable = CLINICAL_REFERENCE_TABLES.find((t) => t.id === 'sti-syndromic-treatment-table');
+  assert.ok(stiTable);
+  const stiTitles = stiTable.rows.map(getRowFirstCol).join(' | ');
+  assert.ok(stiTitles.includes('Gonorrea'));
+  assert.ok(stiTitles.includes('Sífilis'));
+  assert.ok(stiTitles.includes('Herpes Simple Genital'));
+  assert.ok(stiTitles.includes('Chancro Blando'));
+  assert.ok(stiTitles.includes('Linfogranuloma Venéreo'));
+  assert.ok(stiTitles.includes('Tricomoniasis'));
+  assert.ok(!stiTitles.includes('Herpes Zóster'));
+
+  // Herpes Zoster + Pediatric Varicella + Childhood Exanthems table
+  const exanthemTable = CLINICAL_REFERENCE_TABLES.find(
+    (t) => t.id === 'herpes-zoster-varicella-exanthems-table',
+  );
+  assert.ok(exanthemTable);
+  const exanthemTitles = exanthemTable.rows.map(getRowFirstCol).join(' | ');
+  assert.ok(exanthemTitles.includes('Herpes Zóster'));
+  assert.ok(exanthemTitles.includes('Varicela Infantil'));
+  assert.ok(exanthemTitles.includes('Sarampión'));
+  assert.ok(exanthemTitles.includes('Escarlatina'));
+  assert.ok(exanthemTitles.includes('Rubéola'));
+  assert.ok(exanthemTitles.includes('Roséola'));
+  assert.ok(exanthemTitles.includes('Mano-Pie-Boca'));
+  const hzRowText = String(exanthemTable.rows[0][2]);
+  assert.ok(hzRowText.includes('Aciclovir 800 mg VO 5 veces al día'));
+  assert.ok(hzRowText.includes('Valaciclovir 1,000 mg VO c/8 h'));
+  assert.ok(hzRowText.includes('Famciclovir 500 mg VO c/8 h'));
 });
 
 

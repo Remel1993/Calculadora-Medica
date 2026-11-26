@@ -107,6 +107,12 @@ export const CLINICAL_ACRONYMS: ClinicalAcronymEntry[] = [
   { sigla: 'TP', significado: 'Tiempo de Protrombina' },
   { sigla: 'TTPa', significado: 'Tiempo de Tromboplastina Parcial Activada' },
   { sigla: 'IBP', significado: 'Inhibidor de la Bomba de Protones' },
+  { sigla: 'FHV', significado: 'Fiebres Hemorrágicas Virales' },
+  { sigla: 'UNG', significado: 'Uretritis No Gonocócica' },
+  { sigla: 'VHS', significado: 'Virus del Herpes Simple (VHS-1 / VHS-2)' },
+  { sigla: 'IGIV', significado: 'Inmunoglobulina Intravenosa Humana' },
+  { sigla: 'VariZIG', significado: 'Inmunoglobulina Específica contra Varicela-Zóster' },
+  { sigla: 'SRP', significado: 'Vacuna Triple Viral (Sarampión, Rubéola y Parotiditis / MMR)' },
 
   // Signos vitales, Reanimación y Vías de administración
   { sigla: 'PAS', significado: 'Presión Arterial Sistólica' },

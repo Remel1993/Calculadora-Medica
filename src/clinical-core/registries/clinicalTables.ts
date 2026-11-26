@@ -2755,24 +2755,24 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
   },
   {
     id: 'vhf-ebola-lassa-table',
-    title: 'Fiebres Hemorrágicas Virales (Virus del Ébola y Virus de Lassa): Diagnóstico, Bioseguridad y Tratamiento (OMS / CDC)',
-    shortTitle: 'Ébola y Fiebre de Lassa (OMS / CDC)',
+    title: 'Fiebres Hemorrágicas Virales No Endémicas (BSL-4): Virus del Ébola y Fiebre de Lassa (OMS / CDC)',
+    shortTitle: 'FHV No Endémicas: Ébola y Lassa (OMS / CDC)',
     specialty: 'infectologia',
     secondarySpecialties: ['urgencias', 'medicina-interna', 'gineco-obstetricia', 'pediatria'],
     setting: 'ambos',
     guidelineVersion: 'OMS Ebola Therapeutics 2022 · OMS Lassa · CDC Viral Hemorrhagic Fevers',
     summary:
-      'Resumen comparativo de incubación, claves clínicas, diagnóstico confirmatorio por RT-PCR, anticuerpos monoclonales específicos para Zaire ebolavirus y régimen IV de Ribavirina por peso en Fiebre de Lassa.',
+      'Cuadro exclusivo de Fiebres Hemorrágicas Virales no endémicas en América de máxima bioseguridad (Filovirus Ébola y Arenavirus del Viejo Mundo Lassa): incubación, RT-PCR, mAb específicos y Ribavirina IV por peso.',
     columns: [
-      'Patología / Escenario clínico',
+      'Fiebre hemorrágica viral (Clasificación OMS)',
       'Transmisión, incubación y claves clínicas',
       'Diagnóstico y tratamiento específico (OMS / CDC)',
     ],
     rows: [
       [
-        { text: 'Enfermedad por Virus del Ébola (EVE — Filovirus)', tone: 'critical', emphasize: true },
-        'Incubación 2–21 días (media 8–10 d); NO contagioso en fase asintomática. Transmisión por contacto directo con sangre, fluidos, fómites o ritos funerarios. Cuadro: fiebre abrupta, astenia, mialgias y diarrea acuosa/vómitos masivos (pérdida de electrolitos K⁺/Mg²⁺) ± sangrado y choque.',
-        'Confirmación: RT-PCR en sangre total (si es negativa en primeras < 72 h, repetir a las 72 h). Tratamiento específico (Zaire ebolavirus): Ansuvimab-zykl (mAb114 / Ebanga®) 50 mg/kg IV dosis única Ó REGN-EB3 (Inmazeb®) 50/50/50 mg/kg IV dosis única + reanimación con Lactato de Ringer/SRO. Vacuna preventiva: rVSV-ZEBOV (Ervebo®).',
+        { text: 'Enfermedad por Virus del Ébola (EVE — Filovirus · No endémica en América)', tone: 'critical', emphasize: true },
+        'Incubación 2–21 días (media 8–10 d); NO contagioso en fase asintomática. Transmisión por sangre, fluidos, fómites o ritos funerarios. Cuadro: fiebre abrupta, astenia, mialgias y diarrea acuosa/vómitos masivos (pérdida de electrolitos K⁺/Mg²⁺) ± sangrado y choque.',
+        'Confirmación: RT-PCR en sangre total (si es negativa < 72 h, repetir a las 72 h). Tratamiento específico (Zaire ebolavirus): Ansuvimab-zykl (mAb114 / Ebanga®) 50 mg/kg IV DU Ó REGN-EB3 (Inmazeb®) 50/50/50 mg/kg IV DU + Lactato de Ringer/SRO. Vacuna: rVSV-ZEBOV (Ervebo®).',
       ],
       [
         { text: 'EVE en Embarazo y Lactancia', tone: 'high', emphasize: true },
@@ -2780,22 +2780,22 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
         'Administrar Ansuvimab o REGN-EB3 (mAb específicos anti-Zaire) también en gestantes; atención obstétrica bajo EPP completo y suspensión de lactancia materna hasta negativización virológica documentada.',
       ],
       [
-        { text: 'Fiebre de Lassa (Arenavirus — Mastomys natalensis)', tone: 'high', emphasize: true },
-        'Incubación 6–21 días; reservorio roedor Mastomys natalensis (orina/heces) y transmisión persona-persona por fluidos. ~80 % leve/asintomática; ~20 % grave. Claves distintivas: faringitis exudativa, dolor retroesternal, edema facial/cervical, proteinuria e hipoacusia neurosensorial (25–30 % de sobrevivientes).',
+        { text: 'Fiebre de Lassa (Arenavirus — Mastomys natalensis · África Occidental)', tone: 'high', emphasize: true },
+        'Incubación 6–21 días; reservorio roedor Mastomys natalensis y transmisión persona-persona por fluidos. ~80 % leve/asintomática; ~20 % grave. Claves: faringitis exudativa, dolor retroesternal, edema facial/cervical, proteinuria e hipoacusia neurosensorial (25–30 % de sobrevivientes).',
         'Confirmación: RT-PCR / ELISA antígeno-IgM. Ribavirina IV (McCormick / OMS, máxima eficacia ≤ 6 días): Carga 30 mg/kg IV DU (máx 2,000 mg) → 16 mg/kg IV c/6 h × 4 d (máx 1,000 mg/dosis) → 8 mg/kg IV c/8 h × 6 d (máx 500 mg/dosis). Vigilar anemia hemolítica.',
       ],
       [
         { text: 'Fiebre de Lassa en Embarazo y Bioseguridad', tone: 'critical', emphasize: true },
-        'Mortalidad materna muy elevada en el 3.er trimestre y alta pérdida fetal; la fiebre hemorrágica debe notificarse de inmediato.',
+        'Mortalidad materna muy elevada en el 3.er trimestre y alta pérdida fetal; notificación epidemiológica inmediata.',
         'Aislamiento de contacto y gotas (aéreo en procedimientos generadores de aerosoles), evitar AINEs/AAS/inyecciones IM y valorar evacuación uterina oportuna tras estabilización en Lassa grave del 3.er trimestre.',
       ],
     ],
     keyManagementPearls: [
-      'En zonas endémicas, descartar siempre malaria y bacteriemia (cobertura empírica inicial en casos graves) sin retrasar el aislamiento ni el EPP.',
-      'En sobrevivientes de EVE, aconsejar abstinencia o uso estricto de preservativo durante al menos 12 meses o hasta obtener 2 pruebas de RT-PCR negativas en semen.',
+      'Cuadro restringido exclusivamente a Fiebres Hemorrágicas Virales (clasificación OMS/CDC). Descartar malaria y bacteriemia concomitantes en viajeros sin retrasar aislamiento ni EPP.',
+      'En sobrevivientes de EVE, indicar abstinencia o preservativo ≥ 12 meses o hasta 2 RT-PCR negativas en semen.',
     ],
     cautionNote:
-      'Los anticuerpos monoclonales ansuvimab y REGN-EB3 están validados únicamente para Zaire ebolavirus y no deben asumirse efectivos en virus de Sudán o Marburgo.',
+      'Los anticuerpos monoclonales ansuvimab y REGN-EB3 están validados únicamente para Zaire ebolavirus y no deben asumirse efectivos en Marburgo, Sudán u otras FHV.',
     references: [
       {
         citation:
@@ -2815,168 +2815,173 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
     ],
   },
   {
-    id: 'herpes-zoster-gonorrhea-table',
-    title: 'Herpes Zóster (VVZ) y Gonorrea (Neisseria gonorrhoeae): Esquemas, Ajuste Renal y Alertas (CDC / OMS)',
-    shortTitle: 'Herpes Zóster y Gonorrea (CDC / OMS)',
-    specialty: 'infectologia',
-    secondarySpecialties: ['dermatologia', 'urologia', 'gineco-obstetricia', 'neurologia', 'medicina-interna'],
-    setting: 'ambos',
-    guidelineVersion: 'CDC STI 2021 · WHO STI 2024 · European S2k Herpes Zoster · CDC RZV',
-    summary:
-      'Guía rápida de tratamiento antiviral en Herpes Zóster con ajuste estricto a TFG y signos de alarma oftálmica/ótica, junto con regímenes vigentes para Gonorrea no complicada, faríngea, EIP, IGD y oftalmía neonatal.',
-    columns: [
-      'Entidad / Escenario clínico',
-      'Esquema terapéutico de elección',
-      'Ajustes, contraindicaciones y seguimiento',
-    ],
-    rows: [
-      [
-        { text: 'Herpes Zóster localizado inmunocompetente (≤ 72 h o vesículas activas)', tone: 'moderate', emphasize: true },
-        'Valaciclovir 1,000 mg VO c/8 h × 7 d (preferido) · Alternativas: Famciclovir 500 mg VO c/8 h × 7 d o Aciclovir 800 mg VO 5 veces/d × 7–10 d (preferido en embarazo)',
-        'Ajuste Valaciclovir por TFG: 30–49 mL/min → 1,000 mg c/12 h; 10–29 mL/min → 1,000 mg c/24 h; < 10 mL/min → 500 mg c/24 h posdiálisis. NO usar aciclovir tópico.',
-      ],
-      [
-        { text: 'Zóster Oftálmico (V1 / Hutchinson), Ramsay Hunt o Inmunocomprometido', tone: 'critical', emphasize: true },
-        'Oftálmico/Ramsay Hunt: iniciar antiviral aunque > 72 h (+ Prednisona 1 mg/kg/d × 5–7 d en Ramsay Hunt). Inmunocomprometido/diseminado/SNC: Aciclovir 10 mg/kg IV c/8 h × 7–14 d',
-        'Signo de Hutchinson (vesículas en punta/ala nasal) exige valoración oftalmológica urgente (< 24 h) con lámpara de hendidura. Aislamiento aéreo + contacto en diseminado. Prevenir recurrencia/NPH con vacuna RZV (Shingrix®) 2 dosis en ≥ 50 años o inmunocomprometidos ≥ 18 a.',
-      ],
-      [
-        { text: 'Gonorrea no complicada (urogenital, rectal o faríngea — CDC 2021)', tone: 'moderate', emphasize: true },
-        'Ceftriaxona 500 mg IM dosis única (< 150 kg) · Ceftriaxona 1,000 mg (1 g) IM dosis única (≥ 150 kg). Si Chlamydia NO descartada: + Doxiciclina 100 mg VO c/12 h × 7 d (o Azitromicina 1 g VO DU si embarazo)',
-        'Guía OMS 2024 (abordaje sindrómico sin NAAT): Ceftriaxona IM + Azitromicina 1 g VO DU. En alergia grave a cefalosporinas: Gentamicina 240 mg IM DU + Azitromicina 2 g VO DU. En gonorrea faríngea es OBLIGATORIA prueba de curación (TOC) a los 7–14 días.',
-      ],
-      [
-        { text: 'Gonorrea complicada: EIP, IGD y Oftalmía Neonatal', tone: 'critical', emphasize: true },
-        'EIP/Epididimitis: Ceftriaxona 500 mg (o 1 g si ≥ 150 kg) IM DU + Doxiciclina 14 d (± Metronidazol 500 mg c/12 h × 14 d en EIP) · IGD: Ceftriaxona 1 g IV/IM c/24 h (2 g IV c/12 h si SNC/endocarditis) · Oftalmía neonatal: Ceftriaxona 25–50 mg/kg IV/IM DU (máx 125 mg CDC / 250 mg OMS)',
-        'Tratar a parejas sexuales de los últimos 60 días, indicar abstinencia 7 días, tamizar VIH/sífilis y evitar Ceftriaxona en neonatos con hiperbilirrubinemia o calcio IV concomitante (preferir Cefotaxima).',
-      ],
-    ],
-    keyManagementPearls: [
-      'En Neuralgia Posherpética (> 90 días), primera línea con Gabapentina/Pregabalina (ajustadas a TFG), Amitriptilina/Nortriptilina o parche de Lidocaína 5 % sobre piel intacta.',
-      'Nunca utilizar azitromicina ni ciprofloxacino en monoterapia empírica para gonorrea por tasas elevadas de resistencia antimicrobiana.',
-    ],
-    references: [
-      {
-        citation:
-          'Workowski KA, Bachmann LH, Chan PA, et al. Sexually Transmitted Infections Treatment Guidelines, 2021. MMWR Recomm Rep. 2021;70(4):1-187.',
-        year: 2021,
-      },
-      {
-        citation:
-          'World Health Organization (WHO). Updated recommendations for the treatment of Neisseria gonorrhoeae, Chlamydia trachomatis, and Treponema pallidum. Geneva: WHO; 2024.',
-        year: 2024,
-      },
-      {
-        citation:
-          'Werner RN, Nikkels AF, Marinović B, et al. European consensus-based (S2k) Guideline on the Management of Herpes Zoster. JEADV. 2017;31(1):9-29.',
-        year: 2017,
-      },
-    ],
-  },
-  {
     id: 'vhf-other-complications-table',
-    title: 'Fiebres Hemorrágicas Virales Graves: Marburgo, Fiebre Amarilla, FHCC, Hantavirus y Arenavirus Sudamericanos',
-    shortTitle: 'Fiebres Hemorrágicas Graves (OMS / OPS)',
+    title: 'Fiebres Hemorrágicas Virales (Clasificación Estricta Endémicas y No Endémicas): Dengue Grave, Fiebre Amarilla, Marburgo, FHCC, Valle del Rift, Hantavirus y Arenavirus',
+    shortTitle: 'Fiebres Hemorrágicas Virales (Clasificación OMS)',
     specialty: 'infectologia',
     secondarySpecialties: ['urgencias', 'medicina-interna', 'pediatria', 'gineco-obstetricia'],
     setting: 'ambos',
-    guidelineVersion: 'OMS Viral Haemorrhagic Fevers · OPS Fiebre Amarilla / Hantavirus · CDC',
+    guidelineVersion: 'OMS Viral Haemorrhagic Fevers · OPS Dengue / Fiebre Amarilla / Hantavirus · CDC',
     summary:
-      'Síntesis clínica y alertas de bioseguridad o manejo crítico (incluyendo restricción hídrica en SCPH por Hantavirus y ventana de plasma inmune en Junín) para fiebres hemorrágicas de alta morbimortalidad.',
+      'Clasificación clínica exclusiva de enfermedades pertenecientes al grupo de Fiebres Hemorrágicas Virales (Filovirus, Flavivirus hemorrágicos, Bunyavirus/Hantavirus/Nairovirus y Arenavirus), diferenciando formas endémicas en América vs. no endémicas.',
     columns: [
-      'Fiebre hemorrágica (Agente / Vector)',
+      'Fiebre hemorrágica viral (Clasificación y endemicidad)',
       'Incubación y complicaciones graves principales',
-      'Manejo específico, soporte y precauciones',
+      'Manejo específico, soporte y alertas críticas',
     ],
     rows: [
       [
-        { text: 'Virus de Marburgo (Filovirus · murciélagos Rousettus / fluidos)', tone: 'critical', emphasize: true },
-        'Incubación 2–21 días. Fiebre abrupta, diarrea acuosa profusa, sangrado mucoso, disfunción hepática/renal y choque (letalidad 24–88 %).',
-        'Aislamiento BSL-4/EPP completo, RT-PCR (repetir a las 72 h si negativa precoz) y reanimación hidroelectrolítica agresiva (Lactato de Ringer 20 mL/kg en choque + K⁺/Mg²⁺). NO usar mAb anti-Ébola Zaire.',
+        { text: 'Dengue Grave (Flavivirus · ENDÉMICA en América / Trópico)', tone: 'high', emphasize: true },
+        'Incubación 4–10 días (Aedes aegypti). Extravasación plasmática grave con choque/derrame masivo, hemorragia grave o falla orgánica (AST/ALT ≥ 1,000 U/L, miocarditis, SNC) al caer la fiebre.',
+        'Lactato de Ringer 10 mL/kg en 1 h (MINSA Normativa 147) o bolos 10–20 mL/kg (OPS) sobre peso ideal. Prohibidos AINEs, AAS, corticoides e IM. Ver tabla específica de Dengue.',
       ],
       [
-        { text: 'Fiebre Amarilla (Flavivirus · Aedes / Haemagogus)', tone: 'critical', emphasize: true },
-        'Incubación 3–6 días. Tras breve remisión, 15–25 % entra en fase tóxica: ictericia, AST > ALT muy elevada, hematemesis ("vómito negro"), albuminuria/LRA, signo de Faget y encefalopatía.',
-        'Soporte en UCI (control de hipoglucemia, terapia renal si LRA, hemoderivados solo si sangrado activo). Vacuna 17D preventiva (contraindicada en < 6 meses, timoma e inmunosupresión grave). Mosquitero primeros 5 días.',
+        { text: 'Fiebre Amarilla (Flavivirus · ENDÉMICA en cuencas tropicales América/África)', tone: 'critical', emphasize: true },
+        'Incubación 3–6 días (Aedes / Haemagogus). Tras breve remisión, 15–25 % pasa a fase tóxica: ictericia, AST > ALT muy elevada, hematemesis ("vómito negro"), albuminuria/LRA, signo de Faget y encefalopatía.',
+        'Soporte en UCI (control de hipoglucemia, reemplazo renal si LRA, hemoderivados solo si sangrado activo). Vacuna 17D preventiva (contraindicada en < 6 meses, timoma e inmunosupresión grave). Mosquitero primeros 5 d.',
       ],
       [
-        { text: 'Fiebre Hemorrágica de Crimea-Congo (FHCC · Nairovirus · garrapata Hyalomma)', tone: 'high', emphasize: true },
-        'Incubación 1–13 días. Equimosis extensas, trombocitopenia grave (< 20,000/µL), TTPa ≥ 60 s, fibrinógeno ≤ 110 mg/dL, AST ≥ 200 U/L y hemorragia digestiva/visceral.',
-        'Aislamiento estricto (alto riesgo nosocomial), soporte plaquetario/PFC según sangrado y valorar Ribavirina IV temprana (carga 30 mg/kg máx 2 g → 16 mg/kg c/6 h → 8 mg/kg c/8 h) según protocolo institucional.',
+        { text: 'Hantavirus: SCPH (ENDÉMICA Américas) y FHSR (Eurasia)', tone: 'critical', emphasize: true },
+        'Incubación 1–8 semanas (roedores). Pródromo febril con trombocitopenia + hemoconcentración + inmunoblastos que evoluciona a edema pulmonar no cardiogénico rápido (SCPH) o LRA oligúrica grave (FHSR).',
+        'EN SCPH EVITAR SOBRECARGA HÍDRICA: balance neutro/restrictivo, vasopresores tempranos y ECMO venoarterial ante choque refractario. Precauciones aéreas/gotas en virus Andes.',
       ],
       [
-        { text: 'Hantavirus: SCPH (Andes / Sin Nombre) y FHSR (Hantaan / Dobrava)', tone: 'critical', emphasize: true },
-        'Incubación 1–8 semanas. Pródromo febril con trombocitopenia + hemoconcentración + inmunoblastos que evoluciona a edema pulmonar no cardiogénico rápido (SCPH) o LRA oligúrica grave (FHSR).',
-        'EN SCPH EVITAR SOBRECARGA HÍDRICA: mantener balance neutro/restrictivo, vasopresores tempranos y ECMO venoarterial ante choque refractario. Precauciones aéreas/gotas en virus Andes.',
-      ],
-      [
-        { text: 'Arenavirus Sudamericanos (Junín / FHA, Machupo, Guanarito, Sabiá)', tone: 'high', emphasize: true },
-        'Incubación 6–14 días. Fiebre, leucopenia, trombocitopenia, petequias y compromiso neurológico (temblor lingual, ataxia, hiporreflexia).',
+        { text: 'Arenavirus Sudamericanos (Junín/FHA, Machupo, Guanarito, Sabiá · ENDÉMICA regional Sudamérica)', tone: 'high', emphasize: true },
+        'Incubación 6–14 días. Fiebre, leucopenia (< 2,500/µL), trombocitopenia, petequias y signos neurológicos (temblor lingual, ataxia, hiporreflexia).',
         'En Junín (FHA): Plasma inmune específico ≤ 8 días reduce mortalidad de 15–30 % a < 1–3 % (+ vacuna Candid #1). En Machupo/Guanarito/Sabiá: soporte UCI y valorar Ribavirina IV precoz.',
+      ],
+      [
+        { text: 'Virus de Marburgo (Filovirus · NO ENDÉMICA en América)', tone: 'critical', emphasize: true },
+        'Incubación 2–21 días (murciélagos Rousettus / fluidos). Fiebre abrupta, diarrea acuosa profusa, sangrado mucoso, disfunción hepática/renal y choque (letalidad 24–88 %).',
+        'Aislamiento BSL-4/EPP completo, RT-PCR (repetir a las 72 h si negativa precoz) y reanimación con Lactato de Ringer 20 mL/kg + K⁺/Mg²⁺. NO usar mAb anti-Ébola Zaire.',
+      ],
+      [
+        { text: 'Crimea-Congo (FHCC · Nairovirus) y Fiebre del Valle del Rift (NO ENDÉMICAS en América)', tone: 'high', emphasize: true },
+        'FHCC (1–13 d, garrapata Hyalomma): equimosis extensas, plaquetas < 20,000/µL, TTPa ≥ 60 s, fibrinógeno ≤ 110 mg/dL, alto riesgo nosocomial. Valle del Rift (2–6 d): retinitis/ceguera, hepatitis fulminante o encefalitis.',
+        'Aislamiento estricto + hemoderivados guiados por coagulación/sangrado; valorar Ribavirina IV temprana en FHCC (30 mg/kg carga → 16 mg/kg c/6 h → 8 mg/kg c/8 h) y soporte intensivo.',
       ],
     ],
     keyManagementPearls: [
-      'Nunca administrar AINEs, ácido acetilsalicílico ni inyecciones intramusculares en ninguna sospecha de fiebre hemorrágica viral.',
-      'En SCPH por Hantavirus, la administración agresiva de bolos cristaloides suele agravar fatalmente el edema pulmonar.',
+      'Este cuadro reúne únicamente entidades clasificadas como Fiebres Hemorrágicas Virales (excluyendo fiebres endémicas o importadas no hemorrágicas como Zika, Chikungunya, Chagas, Tifoidea o Fiebre Q).',
+      'Nunca administrar AINEs, AAS ni inyecciones intramusculares ante sospecha de cualquier fiebre hemorrágica viral.',
     ],
     references: [
       {
         citation:
-          'World Health Organization (WHO). Marburg, Yellow Fever, and Crimean-Congo haemorrhagic fever clinical management guidelines. Geneva: WHO.',
+          'World Health Organization (WHO). Viral Haemorrhagic Fevers (Marburg, Yellow Fever, CCHF, Rift Valley Fever): Clinical management guidelines. Geneva: WHO.',
         year: 2023,
       },
       {
         citation:
-          'Organización Panamericana de la Salud (OPS). Manejo clínico de la fiebre amarilla y síndrome cardiopulmonar por hantavirus en las Américas. Washington, D.C.: OPS.',
+          'Organización Panamericana de la Salud (OPS). Manejo clínico de la fiebre amarilla, dengue y síndrome cardiopulmonar por hantavirus en las Américas. Washington, D.C.: OPS.',
         year: 2022,
       },
     ],
   },
   {
-    id: 'endemic-non-endemic-fevers-table',
-    title: 'Fiebres Endémicas Tropicales y No Endémicas / del Viajero: Incubación, Complicaciones y Tratamiento',
-    shortTitle: 'Fiebres Endémicas y No Endémicas',
+    id: 'endemic-fevers-table',
+    title: 'Fiebres Endémicas de Importancia Clínica (América / Trópico — No Hemorrágicas Primarias)',
+    shortTitle: 'Fiebres Endémicas Regionales',
     specialty: 'infectologia',
     secondarySpecialties: ['medicina-interna', 'pediatria', 'urgencias', 'gineco-obstetricia'],
     setting: 'ambos',
-    guidelineVersion: 'OPS/OMS · CDC Yellow Book 2024 · IDSA Babesiosis · AAP Red Book',
+    guidelineVersion: 'OPS/OMS · MINSA · CDC Rickettsial & Vector-Borne Diseases · AAP Red Book',
     summary:
-      'Referencia comparativa entre fiebres endémicas (Chikungunya, Zika, Chagas agudo, Rickettsiosis, Brucelosis) y fiebres no endémicas o importadas (triaje del viajero, Tifoidea/XDR, Fiebre Q y Babesiosis).',
+      'Síndromes febriles endémicos habituales en Centroamérica, Latinoamérica y regiones tropicales (separados de las fiebres hemorrágicas virales y de las fiebres importadas no endémicas).',
     columns: [
-      'Categoría y entidad clínica',
-      'Incubación y claves diagnósticas / complicaciones',
-      'Tratamiento de elección y alertas críticas',
+      'Fiebre endémica (Agente / Vector)',
+      'Incubación, claves clínicas y complicaciones',
+      'Tratamiento de elección y alertas',
     ],
     rows: [
       [
-        { text: 'Endémica: Chikungunya y Virus Zika (Arbovirus Aedes)', tone: 'moderate', emphasize: true },
-        'Chikungunya (3–7 d): poliartralgia simétrica incapacitante, cronicidad (> 3 m), miocarditis/transmisión intraparto. Zika (3–14 d): exantema pruriginoso, conjuntivitis, Síndrome Congénito (microcefalia) y Guillain-Barré.',
-        'Solo Paracetamol en fase febril aguda (NO AINEs hasta descartar dengue). Zika: ecografía fetal seriada si embarazo + preservativo 3 meses (hombres) / 2 meses (mujeres).',
+        { text: 'Malaria (Plasmodium vivax / P. falciparum · Anopheles)', tone: 'high', emphasize: true },
+        'Incubación 7–30 días. Fiebre paroxística, escalofríos, sudoración, esplenomegalia, anemia/trombocitopenia; P. falciparum causa malaria cerebral, LRA, acidosis e hipoglucemia.',
+        'Confirmar con gota gruesa/PDR. P. vivax: Cloroquina + Primaquina (contraindicada en embarazo/< 6 m). Malaria grave: Artesunato IV 2.4 mg/kg (3 mg/kg si < 20 kg) a las 0, 12 y 24 h.',
       ],
       [
-        { text: 'Endémica: Chagas Agudo / Oral y Rickettsiosis (Fiebre Manchada)', tone: 'critical', emphasize: true },
-        'Chagas agudo (5–14 d; oral 3–22 d): Romaña, fiebre prolongada, miocarditis aguda, meningoencefalitis. Rickettsiosis (2–14 d): fiebre + cefalea + exantema palmoplantar, vasculitis/CID.',
-        'Chagas agudo: Benznidazol 5–7 mg/kg/d adultos (5–10 mg/kg/d niños) c/12 h × 60 d (evitar en embarazo). Rickettsiosis: Doxiciclina 100 mg c/12 h (2.2 mg/kg c/12 h si < 45 kg) INMEDIATA sin esperar serología (< 5 d).',
+        { text: 'Leptospirosis (Leptospira spp. · Agua/suelo contaminado)', tone: 'high', emphasize: true },
+        'Incubación 2–30 días (media 5–14 d). Fiebre, mialgias intensas en pantorrillas, sufusión conjuntival; Síndrome de Weil (ictericia, LRA hipopotasémica, hemorragia alveolar pulmonar).',
+        'Iniciar sin esperar ELISA/MAT: Leve: Doxiciclina 100 mg c/12 h × 7 d (embarazo/< 10 a: Amoxicilina). Grave/Weil: Penicilina G cristalina IV (o Ceftriaxona 1–2 g IV/d) × 7 d; vigilar Jarisch-Herxheimer.',
       ],
       [
-        { text: 'Endémica: Brucelosis (Brucella spp. — Fiebre ondulante)', tone: 'moderate', emphasize: true },
-        'Incubación 1–8 semanas. Lácteos no pasteurizados/ganado; fiebre ondulante, sudoración nocturna, sacroileítis, orquitis, endocarditis.',
-        'Doxiciclina 100 mg c/12 h × 6 sem + Estreptomicina 15 mg/kg IM/d (14–21 d) o Gentamicina 5 mg/kg/d (7–14 d) o Rifampicina × 6 sem. Embarazo / < 8 a: TMP-SMX + Rifampicina × 6 sem.',
+        { text: 'Chikungunya y Virus Zika (Alfavirus / Flavivirus · Aedes)', tone: 'moderate', emphasize: true },
+        'Chikungunya (3–7 d): poliartralgia distal incapacitante, artritis subaguda/crónica (> 3 m), miocarditis/transmisión intraparto. Zika (3–14 d): exantema pruriginoso, conjuntivitis no purulenta, microcefalia congénita y Síndrome de Guillain-Barré.',
+        'Solo Paracetamol en fase febril aguda (PROHIBIDOS AINEs hasta descartar dengue). Zika: ecografía fetal seriada si embarazo + preservativo 3 meses (hombres) / 2 meses (mujeres).',
       ],
       [
-        { text: 'No Endémica / Viajero: Fiebre Tifoidea (S. Typhi) y Triaje por Incubación', tone: 'high', emphasize: true },
-        '< 14 d: malaria P. falciparum, arbovirus, tifoidea, rickettsia; 14–21 d: malaria, tifoidea, leptospira, FVH; > 21 d: malaria P. vivax/ovale, absceso amebiano, brucelosis, TB. Tifoidea (6–30 d): Faget, perforación ileal (3.ª sem).',
-        'DESCARTAR MALARIA SIEMPRE en viajero de zona endémica (gota gruesa ×3). Tifoidea: Ceftriaxona 2 g/d IV (50–75 mg/kg/d niños) o Azitromicina 1 g/d (20 mg/kg/d); en XDR Pakistán: Meropenem + Azitromicina.',
+        { text: 'Enfermedad de Chagas Aguda / Transmisión Oral (Trypanosoma cruzi)', tone: 'critical', emphasize: true },
+        'Incubación 5–14 d vectorial / 3–22 d oral. Signo de Romaña, chagoma, fiebre prolongada en brotes orales, miocarditis aguda, derrame pericárdico y meningoencefalitis (VIH).',
+        'Benznidazol 5–7 mg/kg/d adultos (5–10 mg/kg/d niños) dividido c/12 h × 60 d (alternativa: Nifurtimox × 60 d). Contraindicado de rutina en embarazo salvo riesgo vital materno.',
       ],
       [
-        { text: 'No Endémica / Cosmopolita: Fiebre Q (Coxiella) y Babesiosis (Babesia)', tone: 'high', emphasize: true },
-        'Fiebre Q (2–3 sem): aerosoles de ganado; neumonía atípica, hepatitis febril y endocarditis crónica con hemocultivos negativos. Babesiosis (1–6 sem): garrapata Ixodes/transfusión; hemólisis ("cruz de Malta"), grave en asplenia.',
-        'Fiebre Q: Doxiciclina 100 mg c/12 h × 14 d (endocarditis: + Hidroxicloroquina ≥ 18–24 m). Babesiosis: Atovacuona + Azitromicina × 7–10 d (si grave/parasitemia ≥ 10 %: Azitromicina IV o Clindamicina + Quinina ± exanguinotransfusión).',
+        { text: 'Rickettsiosis (Rickettsia rickettsii / Tifus endémico) y Brucelosis (Brucella spp.)', tone: 'critical', emphasize: true },
+        'Rickettsiosis (2–14 d): fiebre + cefalea + exantema palmoplantar, vasculitis/CID (mortalidad alta si retraso > 5 d). Brucelosis (1–8 sem): fiebre ondulante, sudoración nocturna, sacroileítis, endocarditis.',
+        'Rickettsiosis: Doxiciclina 100 mg c/12 h (2.2 mg/kg c/12 h si < 45 kg) INMEDIATA sin esperar serología. Brucelosis: Doxiciclina × 6 sem + Estreptomicina/Gentamicina/Rifampicina (TMP-SMX + Rifampicina en embarazo/< 8 a).',
+      ],
+      [
+        { text: 'Fiebre Tifoidea / Entérica Endémica (Salmonella Typhi / Paratyphi)', tone: 'high', emphasize: true },
+        'Incubación 6–30 días (agua/alimentos contaminados). Fiebre en escalera, signo de Faget (bradicardia relativa), roséola, enterorragia y perforación ileal (2.ª–3.ª semana).',
+        'Tomar 2 hemocultivos antes de antibiótico (evitar Widal aislado). Ceftriaxona 2 g IV/d (50–75 mg/kg/d niños) × 10–14 d o Azitromicina VO si leve sensible; dexametasona solo si choque o encefalopatía tifoidea.',
       ],
     ],
     keyManagementPearls: [
-      'En todo viajero con fiebre procedente de zona endémica, un único frotis negativo no descarta malaria; repetir cada 12–24 horas hasta completar 3 determinaciones.',
-      'La doxiciclina en cursos cortos (≤ 21 días) ya no está contraindicada en menores de 8 años para rickettsiosis según AAP Red Book y CDC.',
+      'Para fiebres endémicas hemorrágicas (Dengue Grave, Fiebre Amarilla, Hantavirus SCPH y Arenavirus Sudamericanos), consultar la tabla específica de Fiebres Hemorrágicas Virales.',
+      'La doxiciclina en cursos cortos (≤ 21 días) es segura y de elección también en menores de 8 años ante sospecha de rickettsiosis.',
+    ],
+    references: [
+      {
+        citation:
+          'Organización Panamericana de la Salud (OPS). Directrices para arbovirosis, Chagas y zoonosis endémicas en las Américas. Washington, D.C.: OPS.',
+        year: 2022,
+      },
+      {
+        citation:
+          'Biggs HM, Behravesh CB, Bradley KK, et al. Diagnosis and Management of Tickborne Rickettsial Diseases. MMWR Recomm Rep. 2016;65(2):1-44.',
+        year: 2016,
+      },
+    ],
+  },
+  {
+    id: 'non-endemic-fevers-table',
+    title: 'Fiebres No Endémicas, Importadas y del Viajero: Triaje por Incubación, Fiebre Q, Babesiosis y Tifoidea XDR',
+    shortTitle: 'Fiebres No Endémicas / Viajero',
+    specialty: 'infectologia',
+    secondarySpecialties: ['medicina-interna', 'urgencias', 'pediatria'],
+    setting: 'ambos',
+    guidelineVersion: 'CDC Yellow Book 2024 · IDSA Babesiosis 2020 · WHO Typhoid XDR',
+    summary:
+      'Abordaje exclusivo de síndromes febriles no endémicos, importados o de geografía restringida fuera de la región (excluyendo FHV BSL-4 detalladas en su propia tabla).',
+    columns: [
+      'Escenario / Entidad no endémica',
+      'Incubación, geografía y claves diagnósticas',
+      'Protocolo de descarte y tratamiento',
+    ],
+    rows: [
+      [
+        { text: 'Triaje del Viajero Febril por Ventana de Incubación', tone: 'high', emphasize: true },
+        '< 14 d: malaria P. falciparum, arbovirus, rickettsia, tifoidea. 14–21 d: malaria, tifoidea, leptospira, límite de vigilancia FVH (Ébola/Lassa/Marburgo). > 21 d: malaria P. vivax/ovale (meses), absceso amebiano, brucelosis, TB, fiebre de Katayama.',
+        'REGLA DE ORO: descartar SIEMPRE malaria con gota gruesa/PDR seriada (×3 en 24–48 h) en todo viajero de área endémica, y aislar antes de puncionar si proviene de brote de FHV ≤ 21 días.',
+      ],
+      [
+        { text: 'Fiebre Tifoidea XDR Importada (Asia Meridional / Pakistán)', tone: 'critical', emphasize: true },
+        'Incubación 6–30 días. Resistente a cloranfenicol, ampicilina, TMP-SMX, fluoroquinolonas y cefalosporinas de 3.ª generación (ceftriaxona). Riesgo de perforación ileal y encefalopatía.',
+        'Evitar ciprofloxacino y ceftriaxona empírica aislada en viajeros de Asia Meridional: iniciar Meropenem IV (20–40 mg/kg c/8 h) ± Azitromicina (20 mg/kg/d VO/IV, máx 1 g) guiado por hemocultivo/antibiograma.',
+      ],
+      [
+        { text: 'Fiebre Q (Coxiella burnetii · Zoonosis cosmopolita / brotes ganaderos)', tone: 'high', emphasize: true },
+        'Incubación 2–3 semanas (inhalación de aerosoles de parto/placenta de rumiantes). Neumonía atípica, hepatitis febril granulomatosa y endocarditis con hemocultivos negativos (valvulopatía/embarazo).',
+        'Aguda: Doxiciclina 100 mg VO c/12 h × 14 días (en embarazo valorar TMP-SMX + vigilancia serológica). Crónica/Endocarditis: Doxiciclina 100 mg c/12 h + Hidroxicloroquina 200 mg c/8 h × ≥ 18–24 meses.',
+      ],
+      [
+        { text: 'Babesiosis (Babesia microti · Zonas templadas NE EE. UU./Europa o transfusión)', tone: 'high', emphasize: true },
+        'Incubación 1–6 semanas (garrapata Ixodes). Fiebre, anemia hemolítica intravascular, formas intraeritrocitarias en "cruz de Malta" (sin hemozoína). Grave (SDRA/CID/falla multiorgánica) en asplenia o > 50 años.',
+        'Leve–moderada: Atovacuona 750 mg VO c/12 h (niños 20 mg/kg c/12 h) + Azitromicina × 7–10 d. Grave / parasitemia ≥ 4–10 % / asplenia: Azitromicina IV + Atovacuona (o Clindamicina + Quinina) ± exanguinotransfusión si ≥ 10 %.',
+      ],
+    ],
+    keyManagementPearls: [
+      'Un único frotis de gota gruesa negativo NO excluye malaria importada; repetir cada 12–24 h hasta completar 3 determinaciones.',
+      'En pacientes esplenectomizados con fiebre y antecedente de picadura en áreas templadas o transfusión, examinar frotis de sangre periférica buscando Babesia.',
     ],
     references: [
       {
@@ -2988,6 +2993,150 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
         citation:
           'Krause PJ, Auwaerter PG, Bannuru RR, et al. IDSA 2020 Guideline on Diagnosis and Management of Babesiosis. Clin Infect Dis. 2021;72(2):e49-e64.',
         year: 2021,
+      },
+    ],
+  },
+  {
+    id: 'sti-syndromic-treatment-table',
+    title: 'Infecciones de Transmisión Sexual (ETS / ITS): Gonorrea, Sífilis, Herpes Simple Genital, Chancroide, Chlamydia, LGV y Tricomoniasis',
+    shortTitle: 'ETS / ITS: Esquemas Clínicos (CDC / OMS)',
+    specialty: 'infectologia',
+    secondarySpecialties: ['gineco-obstetricia', 'urologia', 'dermatologia', 'medicina-interna', 'urgencias'],
+    setting: 'ambos',
+    guidelineVersion: 'CDC STI Treatment Guidelines 2021 · WHO STI Guidelines 2024',
+    summary:
+      'Guía exclusiva de Infecciones de Transmisión Sexual organizada por síndrome clínico (flujo/uretritis-cervicitis y úlcera genital), ajustada a peso, embarazo y alergias graves.',
+    columns: [
+      'ETS / Síndrome clínico',
+      'Presentación y claves diagnósticas',
+      'Tratamiento de elección y seguimiento (CDC / OMS)',
+    ],
+    rows: [
+      [
+        { text: 'Gonorrea (Neisseria gonorrhoeae)', tone: 'moderate', emphasize: true },
+        'Uretritis purulenta, cervicitis, proctitis, infección faríngea (a menudo asintomática), EIP/epididimitis, IGD (artritis-dermatitis) u oftalmía neonatal.',
+        'No complicada/faríngea: Ceftriaxona 500 mg IM DU (< 150 kg) ó 1 g IM DU (≥ 150 kg). Alergia grave cefalosporinas: Gentamicina 240 mg IM + Azitromicina 2 g VO. Faríngea exige TOC a los 7–14 días. Oftalmía neonatal: Ceftriaxona 25–50 mg/kg IV/IM DU (máx 125 mg CDC).',
+      ],
+      [
+        { text: 'Chlamydia trachomatis (no LGV) y Uretritis/Cervicitis No Gonocócica', tone: 'low', emphasize: true },
+        'Secreción mucoide/uretritis, cervicitis friable o infección asintomática; si no se descarta por NAAT junto a gonorrea, tratar empíricamente.',
+        'Adulto no gestante: Doxiciclina 100 mg VO c/12 h × 7 días (CDC 2021). Embarazo: Azitromicina 1 g VO DU (+ TOC a las 4 semanas). OMS sindrómica sin NAAT: Azitromicina 1 g VO DU.',
+      ],
+      [
+        { text: 'Sífilis (Treponema pallidum — Primaria, Secundaria, Latente y Neurosífilis)', tone: 'high', emphasize: true },
+        'Chancro duro único indoloro de base limpia; secundarismo con exantema palmoplantar, condilomas planos y adenopatías; compromiso ocular/ótico/SNC en cualquier estadio.',
+        'Temprana (< 1 año): Penicilina G benzatínica 2.4 M UI IM DU (niños 50,000 UI/kg). Tardía (> 1 año): 2.4 M UI IM semanal × 3 semanas. Neurosífilis/ocular: Penicilina G cristalina 18–24 M UI/día IV × 10–14 d. Embarazo con alergia: DESENSIBILIZACIÓN obligatoria.',
+      ],
+      [
+        { text: 'Herpes Simple Genital (VHS-1 / VHS-2)', tone: 'moderate', emphasize: true },
+        'Múltiples vesículas agrupadas dolorosas sobre base eritematosa que ulceran; disuria y adenopatía inguinal bilateral dolorosa en el primer brote.',
+        '1.er episodio: Aciclovir 400 mg VO c/8 h × 7–10 d (o Valaciclovir 1 g c/12 h). Recurrencia: Aciclovir 800 mg c/8 h × 2 d o Valaciclovir 500 mg c/12 h × 3 d. Embarazo desde 36 SG: supresión con Aciclovir 400 mg c/8 h (cesárea si lesiones activas al parto).',
+      ],
+      [
+        { text: 'Chancro Blando / Chancroide (Haemophilus ducreyi)', tone: 'moderate', emphasize: true },
+        'Úlcera genital dolorosa, necrótica, de bordes socavados que sangra fácil + linfadenopatía inguinal dolorosa unilateral supurativa ("bubón").',
+        'Azitromicina 1 g VO DU ó Ceftriaxona 250 mg IM DU (seguras en embarazo); alternativas: Ciprofloxacino 500 mg c/12 h × 3 d o Eritromicina 500 mg c/8 h × 7 d. Aspirar bubón fluctuante con aguja si riesgo de ruptura.',
+      ],
+      [
+        { text: 'Linfogranuloma Venéreo (LGV) y Donovanosis (Granuloma inguinal)', tone: 'moderate', emphasize: true },
+        'LGV (C. trachomatis L1–L3): úlcera indolora fugaz + bubones ("signo del surco") o proctitis hemorrágica. Donovanosis (K. granulomatis): úlcera rojo carne indolora sangrante crónica.',
+        'LGV: Doxiciclina 100 mg VO c/12 h × 21 días (embarazo: Eritromicina 500 mg c/6 h × 21 d). Donovanosis: Azitromicina 1 g VO/sem (o 500 mg/d) × ≥ 3 semanas hasta cicatrización completa.',
+      ],
+      [
+        { text: 'Tricomoniasis (Trichomonas vaginalis)', tone: 'low', emphasize: true },
+        'Flujo vaginal amarillo-verdoso espumoso, eritema vulvar, pH > 4.5, cérvix "en fresa" (o uretritis leve en varones).',
+        'Mujeres: Metronidazol 500 mg VO c/12 h × 7 días (CDC 2021). Hombres: Metronidazol 2 g VO DU. Tratar simultáneamente a la pareja y abstinencia hasta completar tratamiento.',
+      ],
+    ],
+    keyManagementPearls: [
+      'En toda ETS diagnosticada, realizar tamizaje sistemático de VIH, sífilis (VDRL/RPR + treponémica) y hepatitis B/C, además de notificar y tratar a parejas sexuales.',
+      'Nunca utilizar azitromicina o fluoroquinolonas en monoterapia empírica para gonorrea por alta resistencia antimicrobiana.',
+    ],
+    references: [
+      {
+        citation:
+          'Workowski KA, Bachmann LH, Chan PA, et al. Sexually Transmitted Infections Treatment Guidelines, 2021. MMWR Recomm Rep. 2021;70(4):1-187.',
+        year: 2021,
+      },
+      {
+        citation:
+          'World Health Organization (WHO). Updated recommendations for the treatment of Neisseria gonorrhoeae, Chlamydia trachomatis, Treponema pallidum, and symptomatic STIs. Geneva: WHO; 2024.',
+        year: 2024,
+      },
+    ],
+  },
+  {
+    id: 'herpes-zoster-varicella-exanthems-table',
+    title: 'Herpes Zóster (Adulto), Varicela Infantil (VVZ) y Enfermedades Exantemáticas de la Infancia',
+    shortTitle: 'Herpes Zóster, Varicela y Exantemáticas',
+    specialty: 'pediatria',
+    secondarySpecialties: ['infectologia', 'dermatologia', 'medicina-interna', 'neurologia', 'urgencias'],
+    setting: 'ambos',
+    guidelineVersion: 'AAP Red Book 2024 · European S2k Herpes Zoster · OMS Sarampión · AHA Kawasaki',
+    summary:
+      'Tabla integrada para diferenciar la reactivación dermatomérica en adultos (Herpes Zóster), la primoinfección infantil (Varicela) y las principales enfermedades exantemáticas pediátricas con su conducta y alertas clínicas.',
+    columns: [
+      'Entidad clínica (Agente)',
+      'Clínica diferencial, incubación y contagiosidad',
+      'Tratamiento, dosis y precauciones clave',
+    ],
+    rows: [
+      [
+        { text: 'Herpes Zóster (Reactivación VVZ — Adulto / Mayor)', tone: 'moderate', emphasize: true },
+        'Vesículas agrupadas dolorosas unilaterales en 1 dermatoma (no cruzan línea media). Contagia por contacto directo del líquido vesicular hasta costra (produce varicela en seronegativos). Alertas: signo de Hutchinson (punta nasal → V1 ocular) y Ramsay Hunt (VII–VIII). En < 50 a con zóster extenso/recurrente descartar VIH.',
+        '≤ 72 h (o > 72 h si oftálmico/Ramsay Hunt/vesículas nuevas): Aciclovir 800 mg VO 5 veces al día (c/4 h en vigilia × 7–10 d; ClCr 10–25: c/8 h; < 10: c/12 h) · ó Valaciclovir 1,000 mg VO c/8 h × 7 d (ClCr 30–49: c/12 h; 10–29: c/24 h; < 10: 500 mg/d) · ó Famciclovir 500 mg VO c/8 h × 7 d. Inmunocompromiso/diseminado: Aciclovir 10 mg/kg IV c/8 h + aislamiento aéreo/contacto. NO aciclovir tópico; corticoides NO previenen NPH en zóster simple (sí usar Prednisona en Ramsay Hunt). Vacuna RZV (≥ 50 a).',
+      ],
+      [
+        { text: 'Varicela Infantil (Primoinfección VVZ — Niños)', tone: 'high', emphasize: true },
+        'Incubación 10–21 días. Contagia desde 48 h antes del exantema hasta costra total. Exantema pruriginoso cefalocaudal polimorfo en "cielo estrellado" (máculas, pápulas, vesículas en gota de rocío y costras simultáneas) + cuero cabelludo/mucosas.',
+        'Niño sano 1–11 a: sostén + PARACETAMOL (PROHIBIDO AAS por Síndrome de Reye y EVITAR ibuprofeno por fascitis necrotizante estreptocócica). Aciclovir VO 20 mg/kg/dosis c/6 h × 5 d (máx 800 mg) solo si > 12 a, crónicos o 2.º caso familiar ≤ 24 h. Inmunocompromiso/varicela neonatal: Aciclovir IV 10 mg/kg c/8 h (+ VariZIG perinatal).',
+      ],
+      [
+        { text: 'Sarampión (Paramixovirus)', tone: 'critical', emphasize: true },
+        'Incubación 10–14 días. Pródromo fiebre alta + 3 "C" (tos/catarro, coriza, conjuntivitis) + manchas de Koplik; exantema maculopapular rojo parduzco cefalocaudal confluente desde detrás de orejas.',
+        'Soporte + Vitamina A OMS × 2 días (50,000 UI < 6 m · 100,000 UI 6–11 m · 200,000 UI ≥ 12 m) + aislamiento aéreo (4 d antes a 4 d tras exantema). Vigilar neumonía, otitis y encefalitis; vacuna SRP preventiva.',
+      ],
+      [
+        { text: 'Escarlatina (Streptococcus pyogenes — Toxina eritrogénica)', tone: 'moderate', emphasize: true },
+        'Fiebre + amigdalitis exudativa + lengua aframbuesada + exantema micropapular en "papel de lija" blanqueable, líneas de Pastia en pliegues y triángulo peribucal de Filatov + descamación laminar.',
+        'Amoxicilina 50 mg/kg/día VO (máx 1,000 mg/d) o Penicilina V × 10 días (alternativa: Penicilina G benzatínica 600,000 UI < 27 kg ó 1,200,000 UI ≥ 27 kg IM DU; alergia anafiláctica: Azitromicina 12 mg/kg/d × 5 d). Previene fiebre reumática.',
+      ],
+      [
+        { text: 'Rubéola (Togavirus)', tone: 'moderate', emphasize: true },
+        'Incubación 14–21 días. Febrícula, adenopatías retroauriculares y suboccipitales dolorosas + exantema rosado fino cefalocaudal fugaz (3 días) y manchas de Forchheimer.',
+        'Manejo sintomático + aislamiento por gotas 7 días desde el exantema; evitar estrictamente contacto con gestantes susceptibles (riesgo de Síndrome de Rubéola Congénita: sordera, cataratas, cardiopatía).',
+      ],
+      [
+        { text: 'Exantema Súbito / Roséola (VHH-6) y Eritema Infeccioso / 5.ª (Parvovirus B19)', tone: 'low', emphasize: true },
+        'Roséola (6–24 m): fiebre alta (39–40 °C) × 3–5 d en buen estado que cae bruscamente al brotar exantema rosado en tronco. Eritema Infeccioso: "mejillas abofeteadas" + encaje reticular en extremidades.',
+        'Roséola: solo sostén (NO prescribir antibióticos). Parvovirus B19: sostén en niño sano; vigilar crisis aplásica en anemia falciforme/esferocitosis e hidrops fetal si exposición en embarazo.',
+      ],
+      [
+        { text: 'Enfermedad Mano-Pie-Boca (Enterovirus) y Alerta de Kawasaki', tone: 'critical', emphasize: true },
+        'Mano-Pie-Boca: vesículas ovaladas en palmas/plantas y úlceras orales (vigilar deshidratación o miocarditis/encefalitis por EV-A71). Kawasaki: fiebre ≥ 5 d + conjuntivitis no purulenta, labios/lengua fresa, exantema, edema acral y adenopatía cervical ≥ 1.5 cm.',
+        'Mano-Pie-Boca: hidratación + paracetamol. Sospecha de Kawasaki: ecocardiograma urgente + IGIV 2 g/kg IV dosis única + AAS antes del día 10 de fiebre para prevenir aneurismas coronarios.',
+      ],
+    ],
+    keyManagementPearls: [
+      'Ante todo exantema febril con petequias/púrpura que no blanquean a la digitopresión o aspecto séptico, descartar de inmediato meningococcemia y rickettsiosis.',
+      'Diferenciar siempre Herpes Zóster (unilateral dermatomérico por reactivación VVZ) de Varicela (generalizada polimorfa en cielo estrellado) y de Herpes Simple Genital (ETS por VHS-1/2).',
+      'En Herpes Zóster adulto, Aciclovir 800 mg VO 5 veces al día × 7–10 días (con buena hidratación oral) es tan eficaz como Valaciclovir 1,000 mg c/8 h si se inicia ≤ 72 h y suele ser el fármaco disponible en cuadros básicos y embarazo.',
+    ],
+    references: [
+      {
+        citation:
+          'American Academy of Pediatrics (AAP). Red Book: Report of the Committee on Infectious Diseases (Varicella, Measles, Rubella, Group A Streptococcus, Parvovirus B19). 33rd ed. 2024.',
+        year: 2024,
+      },
+      {
+        citation:
+          'Werner RN, Nikkels AF, Marinović B, et al. European consensus-based (S2k) Guideline on the Management of Herpes Zoster. JEADV. 2017;31(1):9-29.',
+        year: 2017,
+      },
+      {
+        citation:
+          'McCrindle BW, Rowley AH, Newburger JW, et al. Diagnosis, Treatment, and Long-Term Management of Kawasaki Disease: AHA Scientific Statement. Circulation. 2017;135(17):e927-e999.',
+        year: 2017,
       },
     ],
   },

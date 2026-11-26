@@ -110,11 +110,11 @@ function getValacyclovirDose(egfrBand: string): string {
 function getOralAcyclovirDose(egfrBand: string): string {
   switch (egfrBand) {
     case '10_29':
-      return '800 mg VO c/8 h × 7–10 días';
+      return '800 mg VO c/8 h × 7–10 días (si ClCr 10–25 mL/min; 800 mg 5 veces/d si > 25)';
     case 'lt10':
-      return '800 mg VO c/12 h × 7–10 días';
+      return '800 mg VO c/12 h × 7–10 días (posdiálisis en HD)';
     default:
-      return '800 mg VO 5 veces/día (c/4 h omitiendo toma nocturna) × 7–10 días';
+      return '800 mg VO 5 veces al día (c/4 h en vigilia, p. ej. 07–11–15–19–23 h) × 7–10 días';
   }
 }
 
@@ -311,7 +311,7 @@ export const herpesZosterCalculator: CalculatorDefinition = {
           ? 'La presencia de vesículas en la punta o ala nasal (nervio nasociliar, rama V1) predice compromiso intraocular en > 50–70 % de los casos (queratitis, uveítis, hipertensión ocular).'
           : 'La afectación de V1 o ganglio geniculado (VII–VIII) conlleva riesgo de secuela visual, parálisis facial persistente o vértigo/hipoacusia.',
         guidance: [
-          `Iniciar antiviral de inmediato (incluso si > 72 h): ${pregnant ? oralAcyclovir : valacyclovir}. En afectación oftálmica grave o inmunosupresión, usar aciclovir IV 10 mg/kg c/8 h.`,
+          `Iniciar antiviral de inmediato (incluso si > 72 h): ${pregnant ? oralAcyclovir : `${valacyclovir} (o Aciclovir ${oralAcyclovir})`}. En afectación oftálmica grave o inmunosupresión, usar aciclovir IV 10 mg/kg c/8 h.`,
           hutchinson
             ? 'VALORACIÓN OFTALMOLÓGICA URGENTE con lámpara de hendidura (dentro de las primeras 24 h) para descartar queratitis dendrítica/estromal o uveítis anterior; NO iniciar colirios corticoides sin oftalmología.'
             : 'En Síndrome de Ramsay Hunt sin contraindicación, asociar corticoide oral temprano (p. ej. Prednisona 1 mg/kg/día, máx 60 mg/d × 5–7 días con descenso) junto con el antiviral y protección corneal si lagoftalmos.',
@@ -336,7 +336,7 @@ export const herpesZosterCalculator: CalculatorDefinition = {
           'El dolor persistente más allá de 90 días tras el inicio del exantema define NPH. El tratamiento precoz del dolor agudo intenso y la vacunación RZV reducen la carga de enfermedad.',
         guidance: [
           'Primera línea en NPH: Gabapentina (titular desde 300 mg/d hasta 1,200–3,600 mg/d en 3 tomas, ajustar a TFG), Pregabalina (75–300 mg c/12 h, ajustar a TFG), Amitriptilina/Nortriptilina (10–25 mg nocturnos, precaución en ancianos/cardiopatía) o parche de Lidocaína 5 % (solo sobre piel intacta sin vesículas).',
-          'En fase aguda (≤ 72 h o vesículas nuevas activas), combinar el antiviral ajustado a función renal con analgesia escalonada (paracetamol/AINE si sin contraindicación ± neuromodulador si dolor neuropático intenso).',
+          'En fase aguda (≤ 72 h o vesículas nuevas activas), combinar el antiviral ajustado a función renal (Valaciclovir 1,000 mg c/8 h o Aciclovir 800 mg VO 5 veces/día) con analgesia escalonada (paracetamol/AINE si sin contraindicación ± neuromodulador si dolor neuropático intenso).',
           'Prevención secundaria/primaria: recomendar vacuna recombinante adyuvada RZV (Shingrix®, 2 dosis separadas 2–6 meses) en adultos ≥ 50 años o inmunocomprometidos ≥ 18 años tras resolver el episodio agudo.',
         ],
         formulaUsed: 'Algoritmo multimodal de dolor neuropático + dosis antiviral ajustada a TFG',
@@ -353,7 +353,7 @@ export const herpesZosterCalculator: CalculatorDefinition = {
         formattedValue: antiviralRecommended
           ? pregnant
             ? 'Aciclovir VO'
-            : 'Valaciclovir VO'
+            : 'Valaciclovir / Aciclovir VO'
           : 'Solo analgesia y vigilancia',
         unit: antiviralRecommended ? 'Ajustado a TFG' : '> 72 h sin vesículas nuevas',
       },
@@ -367,10 +367,12 @@ export const herpesZosterCalculator: CalculatorDefinition = {
         : 'Pasadas 72 h sin aparición de nuevas vesículas ni factores de riesgo (≥ 50 años, dolor intenso, oftálmico o inmunocompromiso), los antivirales sistémicos ofrecen beneficio clínico mínimo.',
       guidance: [
         antiviralRecommended
-          ? `Esquema oral de elección (${pregnant ? 'embarazo: Aciclovir preferido' : 'adulto inmunocompetente'}): ${pregnant ? oralAcyclovir : valacyclovir}.`
+          ? pregnant
+            ? `Esquema oral preferido en embarazo: Aciclovir ${oralAcyclovir} con abundante hidratación oral.`
+            : `Opciones orales de 1.ª línea: Valaciclovir ${valacyclovir} (preferido por posología) ó Aciclovir ${oralAcyclovir} (amplia disponibilidad en cuadro básico; mantener hidratación oral) ó Famciclovir ${famciclovir}.`
           : 'Mantener lesiones limpias y secas (cubiertas para evitar transmisión por contacto a personas no inmunes/embarazadas) y tratar el dolor con paracetamol, AINEs o neuromoduladores según intensidad.',
-        'Evitar ungüentos antivirales tópicos o antibióticos tópicos de rutina salvo sobreinfección bacteriana documentada (celulitis secundaria).',
-        'Advertir signos de alarma para reconsulta inmediata: lesiones en punta nasal u ojo, dolor ocular/visión borrosa, parálisis facial, cefalea con rigidez nucal o diseminación > 20 lesiones fuera del dermatoma.',
+        'Los corticoides sistémicos NO previenen la neuralgia posherpética en zóster localizado simple. Evitar aciclovir tópico, corticoides tópicos o antibióticos tópicos de rutina salvo celulitis bacteriana secundaria.',
+        'Contagiosidad y vigilancia: cubrir lesiones y evitar contacto con embarazadas susceptibles, neonatos o inmunocomprometidos hasta costra total. Si paciente < 50 años con zóster multidermatómico/recurrente, valorar tamizaje de VIH o inmunosupresión. Reconsultar de inmediato ante lesiones en punta nasal/ojo, parálisis facial o cefalea con rigidez nucal.',
       ],
       formulaUsed: 'Ventana 72 h + ajuste por TFG (CDC / European S2k Guideline)',
       inputsSummary: `Inicio: ${hours === 'lte72' ? '≤ 72 h' : '> 72 h'} · TFG: ${egfrBand} · Lesiones nuevas: ${newLesions ? 'Sí' : 'No'}`,

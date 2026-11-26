@@ -191,6 +191,8 @@ import { gonorrheaCalculator } from '../calculators/gonorrhea.ts';
 import { vhfCriticalSuiteCalculator } from '../calculators/vhfCriticalSuite.ts';
 import { endemicArbovirusesCalculator } from '../calculators/endemicArbovirusesZoonoses.ts';
 import { nonEndemicImportedFeversCalculator } from '../calculators/nonEndemicImportedFevers.ts';
+import { stiSyndromesCalculator } from '../calculators/stiSyndromes.ts';
+import { pediatricVaricellaExanthemsCalculator } from '../calculators/pediatricVaricellaExanthems.ts';
 import type {
   CalculatorDefinition,
   GuidelineScope,
@@ -403,6 +405,8 @@ export const CALCULATOR_CATALOG: CalculatorDefinition[] = [
   vhfCriticalSuiteCalculator,
   endemicArbovirusesCalculator,
   nonEndemicImportedFeversCalculator,
+  stiSyndromesCalculator,
+  pediatricVaricellaExanthemsCalculator,
 ].sort(compareCalculatorsAlphabetically);
 
 export const CALCULATOR_BY_ID: Record<string, CalculatorDefinition> = CALCULATOR_CATALOG.reduce(
