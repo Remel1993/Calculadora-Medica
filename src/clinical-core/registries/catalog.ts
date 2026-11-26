@@ -184,6 +184,13 @@ import { neonatalPhototherapyExchangeAap2022Calculator } from '../calculators/ne
 import { dailyDrugConvertersCalculator } from '../calculators/dailyDrugConverters.ts';
 import { tuberculosisClinicalSuiteCalculator } from '../calculators/tuberculosisClinicalSuite.ts';
 import { malariaLeptospirosisMinsaCalculator } from '../calculators/malariaLeptospirosisMinsa.ts';
+import { ebolaVirusCalculator } from '../calculators/ebolaVirus.ts';
+import { lassaVirusCalculator } from '../calculators/lassaVirus.ts';
+import { herpesZosterCalculator } from '../calculators/herpesZoster.ts';
+import { gonorrheaCalculator } from '../calculators/gonorrhea.ts';
+import { vhfCriticalSuiteCalculator } from '../calculators/vhfCriticalSuite.ts';
+import { endemicArbovirusesCalculator } from '../calculators/endemicArbovirusesZoonoses.ts';
+import { nonEndemicImportedFeversCalculator } from '../calculators/nonEndemicImportedFevers.ts';
 import type {
   CalculatorDefinition,
   GuidelineScope,
@@ -389,6 +396,13 @@ export const CALCULATOR_CATALOG: CalculatorDefinition[] = [
   dailyDrugConvertersCalculator,
   tuberculosisClinicalSuiteCalculator,
   malariaLeptospirosisMinsaCalculator,
+  ebolaVirusCalculator,
+  lassaVirusCalculator,
+  herpesZosterCalculator,
+  gonorrheaCalculator,
+  vhfCriticalSuiteCalculator,
+  endemicArbovirusesCalculator,
+  nonEndemicImportedFeversCalculator,
 ].sort(compareCalculatorsAlphabetically);
 
 export const CALCULATOR_BY_ID: Record<string, CalculatorDefinition> = CALCULATOR_CATALOG.reduce(

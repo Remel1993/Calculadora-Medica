@@ -3016,8 +3016,8 @@ test('Consulta Externa Expansion (18 tools): Geriatrics, Cardio/Lipids, Hepato/G
   assert.equal(mchatMod.severity, 'moderate');
 });
 
-test('Catalog: 185 deduplicated tools, cross-specialty tagging, and accent-insensitive search', () => {
-  assert.equal(CALCULATOR_CATALOG.length, 186);
+test('Catalog: 193 deduplicated tools, cross-specialty tagging, and accent-insensitive search', () => {
+  assert.equal(CALCULATOR_CATALOG.length, 193);
 
   const oncoCalcs = getCalculatorsBySpecialty('oncologia');
   assert.ok(oncoCalcs.some((c) => c.id === 'acr-tirads-thyroid'));
@@ -4257,7 +4257,7 @@ test('MINSA Nicaragua Immunization, Broselow PALS, AAP 2022 Phototherapy/Exchang
       `Falta tabla clínica nueva: ${id}`,
     );
   }
-  assert.equal(CLINICAL_REFERENCE_TABLES.length, 46);
+  assert.equal(CLINICAL_REFERENCE_TABLES.length, 50);
 });
 
 test('Regression audit fixes: SOS Table 1, SCORE2 smoking, SVS WIfI IVb, HbA1c rounding, Broselow decimals, ICHD-3 mixed aura, Hadlock 4000 g', async () => {
@@ -4833,6 +4833,284 @@ test('dual guideline architecture: International default vs Nicaragua (MINSA) fi
       `MINSA in references of ${dualTableId}`,
     );
   }
+});
+
+test('Ebola Virus, Lassa Fever, Herpes Zoster, and Gonorrhea calculators + reference tables', async () => {
+  const { ebolaVirusCalculator } = await import('../calculators/ebolaVirus.ts');
+  const { lassaVirusCalculator } = await import('../calculators/lassaVirus.ts');
+  const { herpesZosterCalculator } = await import('../calculators/herpesZoster.ts');
+  const { gonorrheaCalculator } = await import('../calculators/gonorrhea.ts');
+
+  // 1. Ebola Virus: confirmed 60 kg -> Ansuvimab 3000 mg, REGN-EB3 3000/3000/3000 mg, 20 mL/kg = 1200 mL
+  const ebolaConfirmed = ebolaVirusCalculator.calculate({
+    ...createInitialInputs(ebolaVirusCalculator),
+    scenario: 'enfermedad_confirmada',
+    weightKg: { value: '60', unitId: 'kg' },
+    epiExposure: true,
+    fever: true,
+    giLoss: true,
+  });
+  assert.equal(ebolaConfirmed.severity, 'high');
+  assert.ok(ebolaConfirmed.secondaryResults?.some((r) => r.formattedValue.includes('3000 mg IV DU')));
+  assert.ok(ebolaConfirmed.secondaryResults?.some((r) => r.formattedValue.includes('1200 mL')));
+
+  const ebolaSuspect = ebolaVirusCalculator.calculate({
+    ...createInitialInputs(ebolaVirusCalculator),
+    scenario: 'triage_contacto',
+    epiExposure: true,
+    fever: true,
+  });
+  assert.equal(ebolaSuspect.primaryResult.formattedValue, 'Caso Sospechoso');
+
+  const ebolaPreg = ebolaVirusCalculator.calculate({
+    ...createInitialInputs(ebolaVirusCalculator),
+    scenario: 'embarazo_lactancia',
+    bleedingOrShock: true,
+  });
+  assert.equal(ebolaPreg.severity, 'critical');
+
+  // 2. Lassa Fever: McCormick IV Ribavirin dosing & caps
+  const lassa60 = lassaVirusCalculator.calculate({
+    ...createInitialInputs(lassaVirusCalculator),
+    scenario: 'tratamiento_ribavirina',
+    weightKg: { value: '60', unitId: 'kg' },
+    daysFromOnset: { value: '4', unitId: 'days' },
+  });
+  assert.equal(lassa60.primaryResult.value, 1800);
+  assert.ok(lassa60.secondaryResults?.some((r) => r.formattedValue.includes('1800 mg IV')));
+  assert.ok(lassa60.secondaryResults?.some((r) => r.formattedValue.includes('960 mg IV c/6 h')));
+  assert.ok(lassa60.secondaryResults?.some((r) => r.formattedValue.includes('480 mg IV c/8 h')));
+
+  const lassa80Capped = lassaVirusCalculator.calculate({
+    ...createInitialInputs(lassaVirusCalculator),
+    scenario: 'tratamiento_ribavirina',
+    weightKg: { value: '80', unitId: 'kg' },
+    daysFromOnset: { value: '8', unitId: 'days' },
+  });
+  assert.equal(lassa80Capped.primaryResult.value, 2000);
+  assert.ok(lassa80Capped.secondaryResults?.some((r) => r.formattedValue.includes('1000 mg IV c/6 h')));
+  assert.ok(lassa80Capped.secondaryResults?.some((r) => r.formattedValue.includes('500 mg IV c/8 h')));
+
+  // 3. Herpes Zoster: eGFR adjustments, Hutchinson sign, IV Acyclovir
+  const hzNormal = herpesZosterCalculator.calculate({
+    ...createInitialInputs(herpesZosterCalculator),
+    scenario: 'inmunocompetente',
+    hoursSinceRash: 'lte72',
+    egfrBand: 'ge50',
+  });
+  assert.equal(hzNormal.primaryResult.formattedValue, 'Valaciclovir VO');
+  assert.ok(hzNormal.secondaryResults?.some((r) => r.formattedValue === '1,000 mg VO c/8 h × 7 días'));
+
+  const hzRenal = herpesZosterCalculator.calculate({
+    ...createInitialInputs(herpesZosterCalculator),
+    scenario: 'inmunocompetente',
+    hoursSinceRash: 'lte72',
+    egfrBand: '10_29',
+  });
+  assert.ok(hzRenal.secondaryResults?.some((r) => r.formattedValue === '1,000 mg VO c/24 h × 7 días'));
+
+  const hzHutchinson = herpesZosterCalculator.calculate({
+    ...createInitialInputs(herpesZosterCalculator),
+    scenario: 'inmunocompetente',
+    hoursSinceRash: 'gt72',
+    hutchinsonSign: true,
+  });
+  assert.equal(hzHutchinson.severity, 'high');
+  assert.equal(hzHutchinson.primaryResult.formattedValue, 'Oftalmología urgente');
+
+  const hzDisseminated = herpesZosterCalculator.calculate({
+    ...createInitialInputs(herpesZosterCalculator),
+    scenario: 'inmunocomprometido_diseminado',
+    egfrBand: 'ge50',
+  });
+  assert.equal(hzDisseminated.severity, 'critical');
+  assert.equal(hzDisseminated.primaryResult.formattedValue, 'Aciclovir IV inmediato');
+
+  // 4. Gonorrhea: weight cutoffs (<150 vs >=150 kg), pregnancy, pharyngeal TOC, allergy, DGI, neonatal
+  const gono70 = gonorrheaCalculator.calculate({
+    ...createInitialInputs(gonorrheaCalculator),
+    syndrome: 'uncomplicated_urogenital_rectal',
+    weightKg: { value: '70', unitId: 'kg' },
+    chlamydiaExcluded: false,
+    pregnant: false,
+  });
+  assert.equal(gono70.primaryResult.value, 500);
+  assert.ok(gono70.secondaryResults?.some((r) => r.formattedValue.includes('Doxiciclina 100 mg')));
+
+  const gono160Preg = gonorrheaCalculator.calculate({
+    ...createInitialInputs(gonorrheaCalculator),
+    syndrome: 'pharyngeal',
+    weightKg: { value: '160', unitId: 'kg' },
+    chlamydiaExcluded: false,
+    pregnant: true,
+  });
+  assert.equal(gono160Preg.primaryResult.value, 1000);
+  assert.ok(gono160Preg.secondaryResults?.some((r) => r.formattedValue.includes('Azitromicina 1 g')));
+  assert.ok(gono160Preg.secondaryResults?.some((r) => r.formattedValue.includes('OBLIGATORIA')));
+
+  const gonoAllergy = gonorrheaCalculator.calculate({
+    ...createInitialInputs(gonorrheaCalculator),
+    syndrome: 'uncomplicated_urogenital_rectal',
+    severeCephalosporinAllergy: true,
+  });
+  assert.ok(gonoAllergy.primaryResult.formattedValue.includes('Gentamicina 240 mg'));
+
+  const gonoNeonatal = gonorrheaCalculator.calculate({
+    ...createInitialInputs(gonorrheaCalculator),
+    syndrome: 'neonatal_ophthalmia',
+    weightKg: { value: '3.5', unitId: 'kg' },
+  });
+  assert.equal(gonoNeonatal.severity, 'critical');
+  assert.equal(gonoNeonatal.primaryResult.value, 125);
+  assert.equal(gonoNeonatal.primaryResult.formattedValue, '88–125 mg IV/IM DU');
+
+  // 5. Search & reference tables verification
+  assert.ok(searchCalculators('ebola').some((c) => c.id === 'ebola-virus'));
+  assert.ok(searchCalculators('lassa').some((c) => c.id === 'lassa-virus'));
+  assert.ok(searchCalculators('herpes zoster').some((c) => c.id === 'herpes-zoster'));
+  assert.ok(searchCalculators('gonorrea').some((c) => c.id === 'gonorrhea-sti'));
+  assert.ok(CLINICAL_REFERENCE_TABLES.some((t) => t.id === 'vhf-ebola-lassa-table'));
+  assert.ok(CLINICAL_REFERENCE_TABLES.some((t) => t.id === 'herpes-zoster-gonorrhea-table'));
+});
+
+test('VHF Critical Suite, Endemic Fevers, Non-Endemic/Traveler Fevers, and Escala de Fine (PSI/PORT)', async () => {
+  const { vhfCriticalSuiteCalculator } = await import('../calculators/vhfCriticalSuite.ts');
+  const { endemicArbovirusesCalculator } = await import(
+    '../calculators/endemicArbovirusesZoonoses.ts'
+  );
+  const { nonEndemicImportedFeversCalculator } = await import(
+    '../calculators/nonEndemicImportedFevers.ts'
+  );
+
+  // 1. Escala de Fine prominently searchable and labeled
+  assert.ok(psiPortCalculator.name.includes('Escala de Fine'));
+  assert.ok(searchCalculators('escala de fine').some((c) => c.id === 'psi-port'));
+  assert.ok(searchCalculators('fine').some((c) => c.id === 'psi-port'));
+
+  // 2. VHF Critical Suite: Hantavirus fluid restriction, Yellow Fever toxic phase, CCHF Ribavirin, Junin <=8d, Marburg 20 mL/kg
+  const hantaScph = vhfCriticalSuiteCalculator.calculate({
+    ...createInitialInputs(vhfCriticalSuiteCalculator),
+    pathogen: 'hantavirus',
+    severeComplications: true,
+  });
+  assert.equal(hantaScph.severity, 'critical');
+  assert.ok(
+    hantaScph.secondaryResults?.some((r) => r.formattedValue.includes('Restricción hídrica')),
+  );
+
+  const yfToxic = vhfCriticalSuiteCalculator.calculate({
+    ...createInitialInputs(vhfCriticalSuiteCalculator),
+    pathogen: 'yellow_fever',
+    severeComplications: true,
+  });
+  assert.equal(yfToxic.severity, 'critical');
+  assert.ok(yfToxic.primaryResult.formattedValue.includes('Intoxicación'));
+
+  const cchf = vhfCriticalSuiteCalculator.calculate({
+    ...createInitialInputs(vhfCriticalSuiteCalculator),
+    pathogen: 'cchf',
+    weightKg: { value: '65', unitId: 'kg' },
+    daysFromOnset: { value: '3', unitId: 'days' },
+  });
+  assert.ok(cchf.secondaryResults?.some((r) => r.formattedValue.includes('Carga 1950 mg')));
+
+  const juninEarly = vhfCriticalSuiteCalculator.calculate({
+    ...createInitialInputs(vhfCriticalSuiteCalculator),
+    pathogen: 'south_american_arenavirus',
+    daysFromOnset: { value: '6', unitId: 'days' },
+  });
+  assert.ok(juninEarly.primaryResult.formattedValue.includes('≤ 8 días'));
+
+  const marburg = vhfCriticalSuiteCalculator.calculate({
+    ...createInitialInputs(vhfCriticalSuiteCalculator),
+    pathogen: 'marburg',
+    weightKg: { value: '65', unitId: 'kg' },
+    severeComplications: true,
+  });
+  assert.ok(marburg.secondaryResults?.some((r) => r.formattedValue.includes('1300 mL')));
+
+  // 3. Endemic Fevers: Chagas Benznidazol, Rickettsiosis pediatric Doxycycline, Brucellosis pregnancy, Zika, Chikungunya
+  const chagasAdult = endemicArbovirusesCalculator.calculate({
+    ...createInitialInputs(endemicArbovirusesCalculator),
+    disease: 'chagas_acute',
+    weightKg: { value: '60', unitId: 'kg' },
+    pediatricUnder8Or45: false,
+  });
+  assert.equal(chagasAdult.primaryResult.formattedValue, '300–350 mg/d');
+
+  const chagasChild = endemicArbovirusesCalculator.calculate({
+    ...createInitialInputs(endemicArbovirusesCalculator),
+    disease: 'chagas_acute',
+    weightKg: { value: '20', unitId: 'kg' },
+    pediatricUnder8Or45: true,
+  });
+  assert.equal(chagasChild.primaryResult.formattedValue, '100–200 mg/d');
+
+  const rickettsiaChild = endemicArbovirusesCalculator.calculate({
+    ...createInitialInputs(endemicArbovirusesCalculator),
+    disease: 'rickettsiosis',
+    weightKg: { value: '30', unitId: 'kg' },
+    pediatricUnder8Or45: true,
+  });
+  assert.equal(rickettsiaChild.primaryResult.value, 66);
+
+  const brucellaPreg = endemicArbovirusesCalculator.calculate({
+    ...createInitialInputs(endemicArbovirusesCalculator),
+    disease: 'brucellosis',
+    weightKg: { value: '62', unitId: 'kg' },
+    pregnant: true,
+  });
+  assert.ok(brucellaPreg.primaryResult.formattedValue.includes('TMP-SMX + Rifampicina'));
+
+  const zikaPreg = endemicArbovirusesCalculator.calculate({
+    ...createInitialInputs(endemicArbovirusesCalculator),
+    disease: 'zika',
+    pregnant: true,
+  });
+  assert.equal(zikaPreg.severity, 'high');
+
+  // 4. Non-Endemic & Traveler Fevers: triage windows, Typhoid peds, Q fever, Babesiosis
+  const travelerLong = nonEndemicImportedFeversCalculator.calculate({
+    ...createInitialInputs(nonEndemicImportedFeversCalculator),
+    condition: 'traveler_triage',
+    incubationWindow: 'gt21',
+  });
+  assert.ok(travelerLong.primaryResult.formattedValue.includes('> 21 días'));
+
+  const typhoidChild = nonEndemicImportedFeversCalculator.calculate({
+    ...createInitialInputs(nonEndemicImportedFeversCalculator),
+    condition: 'typhoid_enteric',
+    weightKg: { value: '20', unitId: 'kg' },
+    pediatric: true,
+  });
+  assert.equal(typhoidChild.primaryResult.value, 1500);
+  assert.ok(typhoidChild.secondaryResults?.some((r) => r.formattedValue.includes('400 mg VO')));
+
+  const qFeverEndo = nonEndemicImportedFeversCalculator.calculate({
+    ...createInitialInputs(nonEndemicImportedFeversCalculator),
+    condition: 'q_fever',
+    severeOrXdr: true,
+  });
+  assert.equal(qFeverEndo.severity, 'critical');
+  assert.ok(qFeverEndo.primaryResult.formattedValue.includes('Hidroxicloroquina'));
+
+  const babesiaMild = nonEndemicImportedFeversCalculator.calculate({
+    ...createInitialInputs(nonEndemicImportedFeversCalculator),
+    condition: 'babesiosis',
+    weightKg: { value: '70', unitId: 'kg' },
+    severeOrXdr: false,
+  });
+  assert.equal(babesiaMild.primaryResult.value, 750);
+
+  // 5. Search & reference tables verification
+  assert.ok(searchCalculators('fiebre amarilla').some((c) => c.id === 'vhf-critical-suite'));
+  assert.ok(searchCalculators('marburgo').some((c) => c.id === 'vhf-critical-suite'));
+  assert.ok(searchCalculators('fiebres endemicas').some((c) => c.id === 'endemic-arboviruses-fevers'));
+  assert.ok(searchCalculators('chikungunya').some((c) => c.id === 'endemic-arboviruses-fevers'));
+  assert.ok(searchCalculators('fiebre no endemica').some((c) => c.id === 'non-endemic-imported-fevers'));
+  assert.ok(searchCalculators('tifoidea').some((c) => c.id === 'non-endemic-imported-fevers'));
+  assert.ok(CLINICAL_REFERENCE_TABLES.some((t) => t.id === 'vhf-other-complications-table'));
+  assert.ok(CLINICAL_REFERENCE_TABLES.some((t) => t.id === 'endemic-non-endemic-fevers-table'));
 });
 
 

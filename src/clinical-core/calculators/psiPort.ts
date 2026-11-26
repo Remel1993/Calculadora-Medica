@@ -59,16 +59,26 @@ const boolFields: BooleanFieldDef[] = [
 
 export const psiPortCalculator: CalculatorDefinition = {
   id: 'psi-port',
-  name: 'Índice de Gravedad de Neumonía (PSI / PORT)',
-  shortName: 'PSI / PORT',
+  name: 'Escala de Fine (PSI / PORT) — Índice de Gravedad de Neumonía',
+  shortName: 'Escala de Fine (PSI)',
   primarySpecialty: 'neumologia',
   secondarySpecialties: ['infectologia', 'urgencias', 'medicina-interna'],
   subcategory: 'gravedad',
-  keywords: ['psi', 'port', 'neumonia', 'fine', 'mortalidad', 'hospitalizacion'],
+  keywords: [
+    'fine',
+    'escala de fine',
+    'indice de fine',
+    'psi',
+    'port',
+    'neumonia',
+    'nac',
+    'mortalidad',
+    'hospitalizacion',
+  ],
   description:
-    'Estratificación de riesgo a 30 días en neumonía adquirida en la comunidad (20 variables clínicas, analíticas y radiográficas en Clases I–V).',
+    'Escala de Fine (Pneumonia Severity Index / PORT): estratificación de mortalidad a 30 días en neumonía adquirida en la comunidad (20 variables clínicas, analíticas y radiográficas en Clases I–V).',
   clinicalIndication:
-    'Identificación segura de pacientes de bajo riesgo (Clases I–II) candidatos a manejo ambulatorio en NAC (preferido sobre CURB-65 por guías ATS/IDSA 2019).',
+    'Identificación segura de pacientes de bajo riesgo (Clases I–II de Fine) candidatos a manejo ambulatorio en NAC (preferido sobre CURB-65 por guías ATS/IDSA 2019).',
   validatedPopulation: 'Adultos inmunocompetentes con neumonía adquirida en la comunidad.',
   requiredLabsNote: 'Requiere gasometría/oximetría, BUN, Na⁺, glucosa, hematocrito y radiografía de tórax para las Clases II–V.',
   contraindications: [
