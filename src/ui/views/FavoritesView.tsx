@@ -3,11 +3,17 @@ import {
   CALCULATOR_BY_ID,
   compareCalculatorsAlphabetically,
 } from '../../clinical-core/registries/catalog.ts';
+import {
+  isCalculatorVisibleForScope,
+  resolveCalculatorForGuideline,
+} from '../../clinical-core/registries/guidelineRegistry.ts';
+import type { GuidelineScope } from '../../clinical-core/types/clinical.ts';
 import { CalculatorCard } from '../components/CalculatorCard.tsx';
 import { ClinicalStarIcon } from '../icons/clinicalUiIcons.tsx';
 
 interface FavoritesViewProps {
   favorites: string[];
+  guidelineScope: GuidelineScope;
   onSelectCalculator: (id: string) => void;
   onToggleFavorite: (id: string) => void;
   onGoHome: () => void;
@@ -15,13 +21,16 @@ interface FavoritesViewProps {
 
 export const FavoritesView: React.FC<FavoritesViewProps> = ({
   favorites,
+  guidelineScope,
   onSelectCalculator,
   onToggleFavorite,
   onGoHome,
 }) => {
   const items = favorites
+    .filter((id) => isCalculatorVisibleForScope(id, guidelineScope))
     .map((id) => CALCULATOR_BY_ID[id])
     .filter((item): item is NonNullable<typeof item> => Boolean(item))
+    .map((item) => resolveCalculatorForGuideline(item, guidelineScope))
     .sort(compareCalculatorsAlphabetically);
 
   return (

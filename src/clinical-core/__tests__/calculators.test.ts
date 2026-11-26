@@ -141,10 +141,19 @@ import {
 } from '../math/whoLms.ts';
 import {
   CALCULATOR_CATALOG,
+  getCatalogForScope,
   getCalculatorsBySpecialty,
   searchCalculators,
+  searchCalculatorsForScope,
   searchCalculatorsInSpecialty,
 } from '../registries/catalog.ts';
+import {
+  isDualCalculator,
+  isDualTable,
+  isTableVisibleForScope,
+  resolveCalculatorForGuideline,
+  resolveTableForGuideline,
+} from '../registries/guidelineRegistry.ts';
 import { SPECIALTIES } from '../registries/specialties.ts';
 import { dripRateIvCalculator } from '../calculators/dripRateIv.ts';
 import { nursingDilutionCalculator } from '../calculators/nursingDilution.ts';
@@ -159,6 +168,7 @@ import { hivCdcCd4ProphylaxisCalculator } from '../calculators/hivCdcCd4Prophyla
 import { hivPepPrepCalculator } from '../calculators/hivPepPrep.ts';
 import { hivOpportunisticArtTimingCalculator } from '../calculators/hivOpportunisticArtTiming.ts';
 import { immunizationMinsaNicaraguaCalculator } from '../calculators/immunizationMinsaNicaragua.ts';
+import { malariaLeptospirosisMinsaCalculator } from '../calculators/malariaLeptospirosisMinsa.ts';
 import { pediatricBroselowResuscitationCalculator } from '../calculators/pediatricBroselowResuscitation.ts';
 import { neonatalPhototherapyExchangeAap2022Calculator } from '../calculators/neonatalPhototherapyExchangeAap2022.ts';
 import { dailyDrugConvertersCalculator } from '../calculators/dailyDrugConverters.ts';
@@ -4618,6 +4628,213 @@ test('MINSA Nicaragua schemes: VIH (TLD/PPE/vertical), Dengue Normativa 147, MgS
   assert.ok(minsaSiglas.includes('Col-Vol'));
   assert.ok(minsaSiglas.includes('MgSO₄'));
 });
+
+test('dual guideline architecture: International default vs Nicaragua (MINSA) filtering and dual resolution', async () => {
+  const { tuberculosisClinicalSuiteCalculator } = await import(
+    '../calculators/tuberculosisClinicalSuite.ts'
+  );
+
+  // 1. All pathologies (including Malaria, Leptospirosis & Immunizations) exist in BOTH modes
+  const intlCatalog = getCatalogForScope('international');
+  const nicCatalog = getCatalogForScope('nicaragua');
+  assert.equal(nicCatalog.length, CALCULATOR_CATALOG.length);
+  assert.equal(intlCatalog.length, CALCULATOR_CATALOG.length);
+  assert.ok(intlCatalog.some((c) => c.id === 'immunization-minsa-nicaragua'));
+  assert.ok(intlCatalog.some((c) => c.id === 'malaria-leptospirosis-minsa'));
+
+  const intlSearchLepto = searchCalculatorsForScope('leptospirosis', 'international');
+  const nicSearchLepto = searchCalculatorsForScope('leptospirosis', 'nicaragua');
+  assert.ok(intlSearchLepto.some((c) => c.id === 'malaria-leptospirosis-minsa'));
+  assert.ok(nicSearchLepto.some((c) => c.id === 'malaria-leptospirosis-minsa'));
+
+  const intlTables = CLINICAL_REFERENCE_TABLES.filter((t) =>
+    isTableVisibleForScope(t.id, 'international'),
+  );
+  const nicTables = CLINICAL_REFERENCE_TABLES.filter((t) =>
+    isTableVisibleForScope(t.id, 'nicaragua'),
+  );
+  assert.equal(nicTables.length, CLINICAL_REFERENCE_TABLES.length);
+  assert.equal(intlTables.length, CLINICAL_REFERENCE_TABLES.length);
+  assert.ok(intlTables.some((t) => t.id === 'minsa-nicaragua-immunization-table'));
+  assert.ok(intlTables.some((t) => t.id === 'malaria-leptospirosis-minsa-table'));
+
+  // 2. Dual markers (all 9 calculators and 7 tables)
+  assert.equal(isDualCalculator('dengue-oms'), true);
+  assert.equal(isDualCalculator('obstetric-mgso4'), true);
+  assert.equal(isDualCalculator('malaria-leptospirosis-minsa'), true);
+  assert.equal(isDualCalculator('immunization-minsa-nicaragua'), true);
+  assert.equal(isDualCalculator('imc'), false);
+  assert.equal(isDualTable('dengue-paho-who-table'), true);
+  assert.equal(isDualTable('tuberculosis-oms-cdc-reference-table'), true);
+  assert.equal(isDualTable('malaria-leptospirosis-minsa-table'), true);
+  assert.equal(isDualTable('minsa-nicaragua-immunization-table'), true);
+
+  // 3. Dengue OMS/OPS vs MINSA Nicaragua
+  const dengueIntl = resolveCalculatorForGuideline(dengueOmsCalculator, 'international');
+  assert.ok(!dengueIntl.name.includes('MINSA'));
+  assert.ok(!dengueIntl.version.includes('Normativa 147'));
+  assert.ok(!dengueIntl.references.some((r) => r.citation.includes('MINSA')));
+
+  const dengueB2Intl = dengueIntl.calculate({
+    ...createInitialInputs(dengueIntl),
+    weightKg: { value: '60', unitId: 'kg' },
+    ws_pain: true,
+  });
+  assert.equal(dengueB2Intl.primaryResult.value, 2);
+  assert.ok(dengueB2Intl.secondaryResults?.some((r) => r.formattedValue === '600 mL'));
+
+  const dengueCIntl = dengueIntl.calculate({
+    ...createInitialInputs(dengueIntl),
+    weightKg: { value: '60', unitId: 'kg' },
+    sev_plasma: true,
+  });
+  assert.equal(dengueCIntl.primaryResult.value, 3);
+  assert.ok(dengueCIntl.secondaryResults?.some((r) => r.formattedValue === '1200 mL'));
+
+  // 4. MgSO4 Zuspan (International defaults: 100 mL load + 20 g / 500 mL -> 25 mL/h for 1 g/h)
+  const mgso4Intl = resolveCalculatorForGuideline(obstetricMgso4Calculator, 'international');
+  assert.ok(!mgso4Intl.name.includes('MINSA'));
+  assert.ok(!mgso4Intl.version.includes('Normativa 109'));
+  const mgso4IntlDefaults = createInitialInputs(mgso4Intl);
+  assert.equal(mgso4IntlDefaults.loadingPrep, '100ml');
+  assert.equal(mgso4IntlDefaults.bagPrep, '20g_500ml');
+  const mgso4IntlOut = mgso4Intl.calculate(mgso4IntlDefaults);
+  assert.equal(mgso4IntlOut.primaryResult.value, 25);
+  assert.equal(mgso4IntlOut.secondaryResults?.[0].formattedValue, '300 mL/h');
+
+  const mgso4Nic = resolveCalculatorForGuideline(obstetricMgso4Calculator, 'nicaragua');
+  const mgso4NicDefaults = createInitialInputs(mgso4Nic);
+  assert.equal(mgso4NicDefaults.loadingPrep, '200ml');
+  assert.equal(mgso4NicDefaults.bagPrep, '8g_420ml');
+  assert.equal(mgso4Nic.calculate(mgso4NicDefaults).primaryResult.value, 62.5);
+
+  // 5. Remaining dual calculators strip MINSA wording in international mode
+  const preeclampsiaIntl = resolveCalculatorForGuideline(
+    preeclampsiaHellpCalculator,
+    'international',
+  );
+  assert.ok(!preeclampsiaIntl.references.some((r) => r.citation.includes('MINSA')));
+
+  const hivCd4Intl = resolveCalculatorForGuideline(
+    hivCdcCd4ProphylaxisCalculator,
+    'international',
+  );
+  const hivCd4Out = hivCd4Intl.calculate({
+    ...createInitialInputs(hivCd4Intl),
+    cd4Count: { value: '180', unitId: 'cells_ul' },
+    isPregnant: true,
+  });
+  assert.ok(!hivCd4Out.guidance?.some((g) => g.includes('MINSA')));
+
+  const hivPepIntl = resolveCalculatorForGuideline(hivPepPrepCalculator, 'international');
+  const hivPepOut = hivPepIntl.calculate({
+    ...createInitialInputs(hivPepIntl),
+    mode: 'pep',
+    hoursSinceExposure: { value: '12', unitId: 'h' },
+    exposureRisk: 'high_percutaneous_sexual',
+  });
+  assert.ok(!hivPepOut.guidance?.some((g) => g.includes('MINSA')));
+  assert.ok(hivPepOut.guidance?.some((g) => g.includes('CDC 2025')));
+
+  const hivArtIntl = resolveCalculatorForGuideline(
+    hivOpportunisticArtTimingCalculator,
+    'international',
+  );
+  const hivArtOut = hivArtIntl.calculate(createInitialInputs(hivArtIntl));
+  assert.ok(!hivArtOut.clinicalInterpretation.includes('MINSA'));
+
+  const tbIntl = resolveCalculatorForGuideline(
+    tuberculosisClinicalSuiteCalculator,
+    'international',
+  );
+  assert.ok(!tbIntl.name.includes('MINSA'));
+  assert.ok(!tbIntl.references.some((r) => r.citation.includes('MINSA')));
+  const tbIntlOut = tbIntl.calculate({
+    ...createInitialInputs(tbIntl),
+    weightKg: { value: '60', unitId: 'kg' },
+  });
+  assert.ok(!tbIntlOut.clinicalInterpretation.includes('MINSA'));
+  assert.ok(!tbIntlOut.guidance?.some((g) => g.includes('Normativa 054')));
+
+  // 6. Malaria & Leptospirosis dual mode (WHO/CDC vs MINSA)
+  const malLeptoIntl = resolveCalculatorForGuideline(
+    malariaLeptospirosisMinsaCalculator,
+    'international',
+  );
+  assert.ok(!malLeptoIntl.name.includes('MINSA'));
+  assert.ok(!malLeptoIntl.references.some((r) => r.citation.includes('MINSA')));
+
+  const vivaxIntl = malLeptoIntl.calculate({
+    ...createInitialInputs(malLeptoIntl),
+    protocolMode: 'malaria_vivax',
+    weightKg: { value: '60', unitId: 'kg' },
+    patientGroup: 'adult_adolescent',
+  });
+  assert.ok(vivaxIntl.primaryResult.formattedValue.includes('15.0 mg/d PQ × 14 d'));
+
+  const leptoLeveIntl = malLeptoIntl.calculate({
+    ...createInitialInputs(malLeptoIntl),
+    protocolMode: 'leptospirosis_leve',
+    weightKg: { value: '70', unitId: 'kg' },
+    patientGroup: 'adult_adolescent',
+  });
+  assert.ok(leptoLeveIntl.primaryResult.formattedValue.includes('Doxiciclina 100 mg'));
+  assert.ok(!leptoLeveIntl.primaryResult.label.includes('MINSA'));
+
+  const leptoPregIntl = malLeptoIntl.calculate({
+    ...createInitialInputs(malLeptoIntl),
+    protocolMode: 'leptospirosis_leve',
+    weightKg: { value: '65', unitId: 'kg' },
+    patientGroup: 'pregnant_lactating',
+  });
+  assert.ok(leptoPregIntl.primaryResult.formattedValue.includes('Amoxicilina 500 mg VO c/8 h'));
+
+  const leptoGraveIntl = malLeptoIntl.calculate({
+    ...createInitialInputs(malLeptoIntl),
+    protocolMode: 'leptospirosis_grave',
+    weightKg: { value: '70', unitId: 'kg' },
+    patientGroup: 'adult_adolescent',
+  });
+  assert.ok(!leptoGraveIntl.primaryResult.label.includes('MINSA'));
+  assert.ok(leptoGraveIntl.clinicalInterpretation.includes('Ceftriaxona 1–2 g IV'));
+
+  // 7. Immunizations dual mode (WHO Routine Immunization vs MINSA PAI)
+  const immIntl = resolveCalculatorForGuideline(
+    immunizationMinsaNicaraguaCalculator,
+    'international',
+  );
+  assert.ok(!immIntl.name.includes('MINSA'));
+  assert.ok(!immIntl.references.some((r) => r.citation.includes('MINSA')));
+  const immPregIntl = immIntl.calculate({
+    ...createInitialInputs(immIntl),
+    mode: 'esquema_edad',
+    ageGroup: 'embarazada',
+  });
+  assert.ok(immPregIntl.primaryResult.formattedValue.includes('Tdap'));
+  assert.ok(!immPregIntl.riskClassification.includes('MINSA'));
+
+  // 8. Dual tables resolve cleanly in international mode
+  for (const dualTableId of [
+    'dengue-paho-who-table',
+    'tuberculosis-oms-cdc-reference-table',
+    'malaria-leptospirosis-minsa-table',
+    'minsa-nicaragua-immunization-table',
+  ]) {
+    const baseTable = CLINICAL_REFERENCE_TABLES.find((t) => t.id === dualTableId);
+    assert.ok(baseTable, `Missing table ${dualTableId}`);
+    const resolvedTable = resolveTableForGuideline(baseTable, 'international');
+    assert.ok(!resolvedTable.title.includes('MINSA'), `MINSA in title of ${dualTableId}`);
+    assert.ok(
+      !resolvedTable.guidelineVersion.includes('MINSA'),
+      `MINSA in guidelineVersion of ${dualTableId}`,
+    );
+    assert.ok(
+      !resolvedTable.references.some((r) => r.citation.includes('MINSA')),
+      `MINSA in references of ${dualTableId}`,
+    );
+  }
+});
+
 
 
 

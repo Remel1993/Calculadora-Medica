@@ -184,7 +184,15 @@ import { neonatalPhototherapyExchangeAap2022Calculator } from '../calculators/ne
 import { dailyDrugConvertersCalculator } from '../calculators/dailyDrugConverters.ts';
 import { tuberculosisClinicalSuiteCalculator } from '../calculators/tuberculosisClinicalSuite.ts';
 import { malariaLeptospirosisMinsaCalculator } from '../calculators/malariaLeptospirosisMinsa.ts';
-import type { CalculatorDefinition, SpecialtyId } from '../types/clinical.ts';
+import type {
+  CalculatorDefinition,
+  GuidelineScope,
+  SpecialtyId,
+} from '../types/clinical.ts';
+import {
+  isCalculatorVisibleForScope,
+  resolveCalculatorForGuideline,
+} from './guidelineRegistry.ts';
 import { SPECIALTY_MAP } from './specialties.ts';
 
 export function compareCalculatorsAlphabetically(
@@ -441,6 +449,84 @@ export function searchCalculatorsInSpecialty(
   query: string,
 ): CalculatorDefinition[] {
   const specialtyItems = getCalculatorsBySpecialty(specialtyId);
+  const normalizedQuery = normalizeSearchText(query);
+  if (!normalizedQuery) {
+    return specialtyItems;
+  }
+
+  const terms = normalizedQuery.split(/\s+/).filter(Boolean);
+
+  return specialtyItems.filter((calc) => {
+    const haystack = normalizeSearchText(
+      [
+        calc.name,
+        calc.shortName,
+        calc.description,
+        calc.clinicalIndication,
+        calc.keywords.join(' '),
+      ].join(' '),
+    );
+
+    return terms.every((term) => haystack.includes(term));
+  });
+}
+
+export function getCatalogForScope(scope: GuidelineScope): CalculatorDefinition[] {
+  return CALCULATOR_CATALOG.filter((calc) => isCalculatorVisibleForScope(calc.id, scope))
+    .map((calc) => resolveCalculatorForGuideline(calc, scope))
+    .sort(compareCalculatorsAlphabetically);
+}
+
+export function getCalculatorsBySpecialtyForScope(
+  specialtyId: SpecialtyId,
+  scope: GuidelineScope,
+): CalculatorDefinition[] {
+  return getCatalogForScope(scope).filter(
+    (calc) =>
+      calc.primarySpecialty === specialtyId ||
+      calc.secondarySpecialties.includes(specialtyId),
+  );
+}
+
+export function searchCalculatorsForScope(
+  query: string,
+  scope: GuidelineScope,
+): CalculatorDefinition[] {
+  const catalog = getCatalogForScope(scope);
+  const normalizedQuery = normalizeSearchText(query);
+  if (!normalizedQuery) {
+    return catalog;
+  }
+
+  const terms = normalizedQuery.split(/\s+/).filter(Boolean);
+
+  return catalog.filter((calc) => {
+    const specialtyNames = [
+      SPECIALTY_MAP[calc.primarySpecialty].name,
+      ...calc.secondarySpecialties.map((id) => SPECIALTY_MAP[id].name),
+    ].join(' ');
+
+    const haystack = normalizeSearchText(
+      [
+        calc.name,
+        calc.shortName,
+        calc.description,
+        calc.clinicalIndication,
+        calc.keywords.join(' '),
+        specialtyNames,
+      ].join(' '),
+    );
+
+    return terms.every((term) => haystack.includes(term));
+  });
+}
+
+export function searchCalculatorsInSpecialtyForScope(
+  specialtyId: SpecialtyId,
+  query: string,
+  scope: GuidelineScope,
+): CalculatorDefinition[] {
+  const specialtyItems = getCalculatorsBySpecialtyForScope(specialtyId, scope);
   const normalizedQuery = normalizeSearchText(query);
   if (!normalizedQuery) {
     return specialtyItems;

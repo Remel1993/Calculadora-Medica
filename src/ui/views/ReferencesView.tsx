@@ -1,5 +1,5 @@
 import { ArrowLeft, ChevronDown, X } from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { CALCULATOR_CATALOG } from '../../clinical-core/registries/catalog.ts';
 import {
   CLINICAL_REFERENCE_TABLES,
@@ -9,19 +9,30 @@ import {
   type TableTone,
 } from '../../clinical-core/registries/clinicalTables.ts';
 import { getCalculatorFormulaReference } from '../../clinical-core/registries/formulaReference.ts';
+import {
+  isDualCalculator,
+  isDualTable,
+  isCalculatorVisibleForScope,
+  isTableVisibleForScope,
+  resolveCalculatorForGuideline,
+  resolveTableForGuideline,
+} from '../../clinical-core/registries/guidelineRegistry.ts';
 import { SPECIALTIES, SPECIALTY_MAP } from '../../clinical-core/registries/specialties.ts';
-import type { SpecialtyId } from '../../clinical-core/types/clinical.ts';
+import type { GuidelineScope, SpecialtyId } from '../../clinical-core/types/clinical.ts';
 import {
   ClinicalEvidenceBookIcon,
   ClinicalInfoPulseIcon,
   ClinicalSafetyShieldIcon,
   ClinicalSearchIcon,
 } from '../icons/clinicalUiIcons.tsx';
+import { GuidelineToggle } from '../components/GuidelineToggle.tsx';
 import { ScrollableTableShell } from '../components/ScrollableTableShell.tsx';
 import { AcronymLegend } from '../components/AcronymLegend.tsx';
 import { SPECIALTY_VISUALS } from '../registries/specialtyVisuals.tsx';
 
 interface ReferencesViewProps {
+  guidelineScope: GuidelineScope;
+  onChangeGuidelineScope: (scope: GuidelineScope) => void;
   onBack: () => void;
 }
 
@@ -94,12 +105,23 @@ function getStickyFirstColToneClass(tone?: TableTone, isRowHighlighted?: boolean
   }
 }
 
-export const ReferencesView: React.FC<ReferencesViewProps> = ({ onBack }) => {
+export const ReferencesView: React.FC<ReferencesViewProps> = ({
+  guidelineScope,
+  onChangeGuidelineScope,
+  onBack,
+}) => {
   const [activeTab, setActiveTab] = useState<ReferenceTab>('tables');
   const [query, setQuery] = useState('');
   const [specialtyFilter, setSpecialtyFilter] = useState<SpecialtyId | 'all'>('all');
   const [settingFilter, setSettingFilter] = useState<SettingFilter>('all');
   const [highlightedRows, setHighlightedRows] = useState<Record<string, number | null>>({});
+  const [tableScopeOverrides, setTableScopeOverrides] = useState<Record<string, GuidelineScope>>({});
+  const [formulaScopeOverrides, setFormulaScopeOverrides] = useState<Record<string, GuidelineScope>>({});
+
+  useEffect(() => {
+    setTableScopeOverrides({});
+    setFormulaScopeOverrides({});
+  }, [guidelineScope]);
 
   const toggleHighlightedRow = (tableId: string, rowIdx: number) => {
     setHighlightedRows((prev) => ({
@@ -108,22 +130,42 @@ export const ReferencesView: React.FC<ReferencesViewProps> = ({ onBack }) => {
     }));
   };
 
+  const resolvedTables = useMemo(
+    () =>
+      CLINICAL_REFERENCE_TABLES.filter((table) =>
+        isTableVisibleForScope(table.id, guidelineScope),
+      ).map((table) =>
+        resolveTableForGuideline(table, tableScopeOverrides[table.id] ?? guidelineScope),
+      ),
+    [guidelineScope, tableScopeOverrides],
+  );
+
+  const resolvedCalculators = useMemo(
+    () =>
+      CALCULATOR_CATALOG.filter((calc) =>
+        isCalculatorVisibleForScope(calc.id, guidelineScope),
+      ).map((calc) =>
+        resolveCalculatorForGuideline(calc, formulaScopeOverrides[calc.id] ?? guidelineScope),
+      ),
+    [guidelineScope, formulaScopeOverrides],
+  );
+
   const totalCitations = useMemo(
-    () => CALCULATOR_CATALOG.reduce((sum, calc) => sum + calc.references.length, 0),
-    [],
+    () => resolvedCalculators.reduce((sum, calc) => sum + calc.references.length, 0),
+    [resolvedCalculators],
   );
 
   const formulaMap = useMemo(() => {
     const entries = new Map<string, ReturnType<typeof getCalculatorFormulaReference>>();
-    for (const calc of CALCULATOR_CATALOG) {
+    for (const calc of resolvedCalculators) {
       entries.set(calc.id, getCalculatorFormulaReference(calc));
     }
     return entries;
-  }, []);
+  }, [resolvedCalculators]);
 
   const filteredTables = useMemo(() => {
     const q = normalizeText(query);
-    return CLINICAL_REFERENCE_TABLES.filter((table) => {
+    return resolvedTables.filter((table) => {
       if (
         specialtyFilter !== 'all' &&
         table.specialty !== specialtyFilter &&
@@ -161,11 +203,11 @@ export const ReferencesView: React.FC<ReferencesViewProps> = ({ onBack }) => {
 
       return haystack.includes(q);
     });
-  }, [query, specialtyFilter, settingFilter]);
+  }, [resolvedTables, query, specialtyFilter, settingFilter]);
 
   const filteredCalculators = useMemo(() => {
     const q = normalizeText(query);
-    return CALCULATOR_CATALOG.filter((calc) => {
+    return resolvedCalculators.filter((calc) => {
       if (
         specialtyFilter !== 'all' &&
         calc.primarySpecialty !== specialtyFilter &&
@@ -194,7 +236,7 @@ export const ReferencesView: React.FC<ReferencesViewProps> = ({ onBack }) => {
 
       return haystack.includes(q);
     });
-  }, [query, specialtyFilter, formulaMap]);
+  }, [resolvedCalculators, query, specialtyFilter, formulaMap]);
 
   return (
     <div className="w-full min-w-0 space-y-4 sm:space-y-6">
@@ -209,7 +251,7 @@ export const ReferencesView: React.FC<ReferencesViewProps> = ({ onBack }) => {
         </button>
 
         <div className="font-mono text-xs font-medium tabular-nums text-slate-500 dark:text-slate-400">
-          {CLINICAL_REFERENCE_TABLES.length} tablas · {CALCULATOR_CATALOG.length} fórmulas · {totalCitations} citas
+          {resolvedTables.length} tablas · {resolvedCalculators.length} fórmulas · {totalCitations} citas
         </div>
       </div>
 
@@ -228,11 +270,19 @@ export const ReferencesView: React.FC<ReferencesViewProps> = ({ onBack }) => {
           </div>
         </div>
 
+        <GuidelineToggle
+          variant="inline"
+          className="mt-3"
+          label="Estándar de guías"
+          value={guidelineScope}
+          onChange={onChangeGuidelineScope}
+        />
+
         {/* Mode Switcher */}
         <div
           role="tablist"
           aria-label="Secciones de guías y referencias"
-          className="mt-4 grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1 dark:bg-slate-950"
+          className="mt-3 grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1 dark:bg-slate-950"
         >
           <button
             type="button"
@@ -245,7 +295,7 @@ export const ReferencesView: React.FC<ReferencesViewProps> = ({ onBack }) => {
                 : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
-            Tablas y manejos ({CLINICAL_REFERENCE_TABLES.length})
+            Tablas y manejos ({resolvedTables.length})
           </button>
           <button
             type="button"
@@ -258,7 +308,7 @@ export const ReferencesView: React.FC<ReferencesViewProps> = ({ onBack }) => {
                 : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
-            Fórmulas y bibliografía ({CALCULATOR_CATALOG.length})
+            Fórmulas y bibliografía ({resolvedCalculators.length})
           </button>
         </div>
 
@@ -338,7 +388,7 @@ export const ReferencesView: React.FC<ReferencesViewProps> = ({ onBack }) => {
       {activeTab === 'tables' ? (
         <>
           <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Mostrando {filteredTables.length} de {CLINICAL_REFERENCE_TABLES.length} tablas clínicas
+            Mostrando {filteredTables.length} de {resolvedTables.length} tablas clínicas
           </div>
 
           {filteredTables.length > 0 ? (
@@ -346,9 +396,11 @@ export const ReferencesView: React.FC<ReferencesViewProps> = ({ onBack }) => {
               {filteredTables.map((table) => {
                 const spec = SPECIALTY_MAP[table.specialty];
                 const visual = SPECIALTY_VISUALS[table.specialty];
+                const tableScope = tableScopeOverrides[table.id] ?? guidelineScope;
                 return (
                   <article
                     key={table.id}
+                    data-dual-table-id={isDualTable(table.id) ? table.id : undefined}
                     className="-mx-2.5 rounded-none border-x-0 border-y border-slate-200 bg-white px-3.5 py-4 sm:mx-0 sm:rounded-2xl sm:border sm:p-5 dark:border-slate-800 dark:bg-slate-900"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-2.5">
@@ -386,6 +438,18 @@ export const ReferencesView: React.FC<ReferencesViewProps> = ({ onBack }) => {
                     <p className="mt-2.5 text-xs leading-relaxed text-slate-600 sm:text-sm dark:text-slate-300">
                       {table.summary}
                     </p>
+
+                    {isDualTable(table.id) && (
+                      <GuidelineToggle
+                        variant="inline"
+                        className="mt-3"
+                        label="Versión de esta tabla"
+                        value={tableScope}
+                        onChange={(nextScope) =>
+                          setTableScopeOverrides((prev) => ({ ...prev, [table.id]: nextScope }))
+                        }
+                      />
+                    )}
 
                     {/* Responsive 2D Sticky Reference Table */}
                     <ScrollableTableShell
@@ -544,7 +608,7 @@ export const ReferencesView: React.FC<ReferencesViewProps> = ({ onBack }) => {
       ) : (
         <>
           <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Mostrando {filteredCalculators.length} de {CALCULATOR_CATALOG.length} herramientas para verificación técnica
+            Mostrando {filteredCalculators.length} de {resolvedCalculators.length} herramientas para verificación técnica
           </div>
 
           {filteredCalculators.length > 0 ? (
@@ -553,9 +617,11 @@ export const ReferencesView: React.FC<ReferencesViewProps> = ({ onBack }) => {
                 const spec = SPECIALTY_MAP[calc.primarySpecialty];
                 const visual = SPECIALTY_VISUALS[calc.primarySpecialty];
                 const formulaInfo = formulaMap.get(calc.id);
+                const formulaScope = formulaScopeOverrides[calc.id] ?? guidelineScope;
                 return (
                   <article
                     key={calc.id}
+                    data-dual-formula-id={isDualCalculator(calc.id) ? calc.id : undefined}
                     className="-mx-2.5 rounded-none border-x-0 border-y border-slate-200 bg-white px-3.5 py-4 sm:mx-0 sm:rounded-2xl sm:border sm:p-5 dark:border-slate-800 dark:bg-slate-900"
                   >
                     <div className="flex min-w-0 items-start gap-3">
@@ -588,6 +654,18 @@ export const ReferencesView: React.FC<ReferencesViewProps> = ({ onBack }) => {
                         </p>
                       </div>
                     </div>
+
+                    {isDualCalculator(calc.id) && (
+                      <GuidelineToggle
+                        variant="inline"
+                        className="mt-3"
+                        label="Versión de fórmula"
+                        value={formulaScope}
+                        onChange={(nextScope) =>
+                          setFormulaScopeOverrides((prev) => ({ ...prev, [calc.id]: nextScope }))
+                        }
+                      />
+                    )}
 
                     {/* Formula / Scoring Rule Box */}
                     {formulaInfo && (

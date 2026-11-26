@@ -3,7 +3,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ClinicalAlertOctagonIcon,
   ClinicalCheckShieldIcon,
@@ -19,11 +19,16 @@ import {
   createInitialInputs,
   validateCalculatorInputs,
 } from '../../clinical-core/math/precision.ts';
+import {
+  isDualCalculator,
+  resolveCalculatorForGuideline,
+} from '../../clinical-core/registries/guidelineRegistry.ts';
 import { SPECIALTY_MAP, SUBCATEGORY_LABELS } from '../../clinical-core/registries/specialties.ts';
 import type {
   CalculationOutput,
   CalculatorDefinition,
   CalculatorInputsState,
+  GuidelineScope,
   NumberInputValue,
   SeverityLevel,
   ValidationError,
@@ -32,6 +37,7 @@ import {
   ClinicalVisualGuide,
   SUPPORTED_VISUAL_GUIDE_IDS,
 } from './ClinicalVisualGuides.tsx';
+import { GuidelineToggle } from './GuidelineToggle.tsx';
 import { MocaInteractiveGuide } from './MocaInteractiveGuide.tsx';
 import { ObstetricGrowthPanel } from './ObstetricGrowthPanel.tsx';
 import { PediatricGrowthPanel } from './PediatricGrowthPanel.tsx';
@@ -39,6 +45,7 @@ import { AcronymLegend } from './AcronymLegend.tsx';
 
 interface CalculatorViewProps {
   calculator: CalculatorDefinition;
+  guidelineScope: GuidelineScope;
   isFavorite: boolean;
   onBack: () => void;
   onToggleFavorite: (id: string) => void;
@@ -99,12 +106,22 @@ const SEVERITY_STYLES: Record<
 };
 
 export const CalculatorView: React.FC<CalculatorViewProps> = ({
-  calculator,
+  calculator: baseCalculator,
+  guidelineScope,
   isFavorite,
   onBack,
   onToggleFavorite,
   onSaveHistory,
 }) => {
+  const isDual = isDualCalculator(baseCalculator.id);
+  const [localScope, setLocalScope] = useState<GuidelineScope>(guidelineScope);
+
+  const effectiveScope = isDual ? localScope : guidelineScope;
+  const calculator = useMemo(
+    () => resolveCalculatorForGuideline(baseCalculator, effectiveScope),
+    [baseCalculator, effectiveScope],
+  );
+
   const [inputs, setInputs] = useState<CalculatorInputsState>(() =>
     createInitialInputs(calculator),
   );
@@ -117,7 +134,9 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   const resultRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    setInputs(createInitialInputs(calculator));
+    setLocalScope(guidelineScope);
+    const nextResolved = resolveCalculatorForGuideline(baseCalculator, guidelineScope);
+    setInputs(createInitialInputs(nextResolved));
     setErrors([]);
     setOutput(null);
     setIsOutputStale(false);
@@ -127,7 +146,35 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-  }, [calculator]);
+  }, [baseCalculator, guidelineScope]);
+
+  const handleLocalScopeChange = (nextScope: GuidelineScope) => {
+    if (nextScope === localScope) return;
+    const prevResolved = calculator;
+    const nextResolved = resolveCalculatorForGuideline(baseCalculator, nextScope);
+    setLocalScope(nextScope);
+    setInputs((prev) => {
+      const next = { ...prev };
+      for (const field of nextResolved.fields) {
+        if (field.type === 'select') {
+          const prevField = prevResolved.fields.find((f) => f.id === field.id);
+          const prevDefault = prevField?.type === 'select' ? prevField.defaultValue : undefined;
+          if (
+            field.defaultValue !== undefined &&
+            prevDefault !== field.defaultValue &&
+            prev[field.id] === prevDefault
+          ) {
+            next[field.id] = field.defaultValue;
+          }
+        }
+      }
+      return next;
+    });
+    setErrors([]);
+    setOutput(null);
+    setIsOutputStale(false);
+    setSubmitError(null);
+  };
 
   const errorByField = errors.reduce(
     (acc, err) => {
@@ -304,6 +351,18 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
         <p className="mt-1 max-w-3xl break-words text-xs leading-relaxed text-slate-600 sm:mt-2 sm:text-sm lg:text-base dark:text-slate-300">
           {calculator.description}
         </p>
+
+        {isDual && (
+          <GuidelineToggle
+            variant="inline"
+            value={localScope}
+            onChange={handleLocalScopeChange}
+            label="Versión de guía"
+            internationalLabel="Internacional (OMS/OPS)"
+            nicaraguaLabel="Nicaragua (MINSA)"
+            className="mt-3"
+          />
+        )}
 
         {/* Mobile disclosure toggle for clinical indication & validated population */}
         <button

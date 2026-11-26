@@ -16,14 +16,16 @@ import {
 } from '../icons/clinicalUiIcons.tsx';
 import {
   CALCULATOR_BY_ID,
-  CALCULATOR_CATALOG,
-  searchCalculators,
+  getCatalogForScope,
+  searchCalculatorsForScope,
 } from '../../clinical-core/registries/catalog.ts';
 import { CLINICAL_REFERENCE_TABLES } from '../../clinical-core/registries/clinicalTables.ts';
+import { isTableVisibleForScope } from '../../clinical-core/registries/guidelineRegistry.ts';
 import { SPECIALTIES } from '../../clinical-core/registries/specialties.ts';
-import type { SpecialtyId } from '../../clinical-core/types/clinical.ts';
+import type { GuidelineScope, SpecialtyId } from '../../clinical-core/types/clinical.ts';
 import type { HistoryEntry, ThemeMode } from '../../storage/localStore.ts';
 import { CalculatorCard } from '../components/CalculatorCard.tsx';
+import { GuidelineToggle } from '../components/GuidelineToggle.tsx';
 import { PWAInstallButton } from '../components/PWAControls.tsx';
 import {
   HOME_SPECIALTY_ORDER,
@@ -36,6 +38,8 @@ interface HomeViewProps {
   favorites: string[];
   history: HistoryEntry[];
   theme: ThemeMode;
+  guidelineScope: GuidelineScope;
+  onChangeGuidelineScope: (scope: GuidelineScope) => void;
   onToggleTheme: () => void;
   onSelectCalculator: (id: string) => void;
   onToggleFavorite: (id: string) => void;
@@ -60,6 +64,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
   favorites,
   history,
   theme,
+  guidelineScope,
+  onChangeGuidelineScope,
   onToggleTheme,
   onSelectCalculator,
   onToggleFavorite,
@@ -70,11 +76,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const [query, setQuery] = useState('');
   const [showAllCatalog, setShowAllCatalog] = useState(false);
 
-  const results = useMemo(() => searchCalculators(query), [query]);
+  const visibleCatalog = useMemo(
+    () => getCatalogForScope(guidelineScope),
+    [guidelineScope],
+  );
+
+  const visibleTables = useMemo(
+    () => CLINICAL_REFERENCE_TABLES.filter((t) => isTableVisibleForScope(t.id, guidelineScope)),
+    [guidelineScope],
+  );
+
+  const results = useMemo(
+    () => searchCalculatorsForScope(query, guidelineScope),
+    [query, guidelineScope],
+  );
 
   const totalCitations = useMemo(
-    () => CALCULATOR_CATALOG.reduce((sum, calc) => sum + calc.references.length, 0),
-    [],
+    () => visibleCatalog.reduce((sum, calc) => sum + calc.references.length, 0),
+    [visibleCatalog],
   );
 
   const quickAccessItems = (
@@ -142,22 +161,29 @@ export const HomeView: React.FC<HomeViewProps> = ({
             className="pointer-events-none absolute -top-12 -right-10 h-44 w-44 rounded-full bg-cyan-400/20 blur-2xl"
           />
 
-          {/* Top Controls inside Hero (Mobile quick menu + Theme toggle + Desktop PWA install) */}
+          {/* Top Controls inside Hero (Mobile quick menu + Guideline toggle + Theme toggle + Desktop PWA install) */}
           <div className="relative z-10 flex items-center justify-between gap-2">
-            <button
-              type="button"
-              onClick={() => onSelectSpecialty(null)}
-              aria-label="Abrir todas las especialidades"
-              className="inline-flex min-h-[40px] min-w-[40px] items-center justify-center rounded-xl bg-white/10 text-white hover:bg-white/20 md:hidden"
-            >
-              <ClinicalSpecialtiesIcon className="h-5 w-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => onSelectSpecialty(null)}
+                aria-label="Abrir todas las especialidades"
+                className="inline-flex min-h-[40px] min-w-[40px] items-center justify-center rounded-xl bg-white/10 text-white hover:bg-white/20 md:hidden"
+              >
+                <ClinicalSpecialtiesIcon className="h-5 w-5" />
+              </button>
 
-            <div className="hidden md:flex items-center gap-2 text-xs font-medium text-cyan-200">
-              <span>{CALCULATOR_CATALOG.length} herramientas clínicas validadas · 100% offline</span>
+              <div className="hidden md:flex items-center gap-2 text-xs font-medium text-cyan-200">
+                <span>{visibleCatalog.length} herramientas clínicas validadas · 100% offline</span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <GuidelineToggle
+                variant="hero"
+                value={guidelineScope}
+                onChange={onChangeGuidelineScope}
+              />
               <div className="hidden sm:block">
                 <PWAInstallButton />
               </div>
@@ -339,10 +365,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </div>
                 <div className="min-w-0">
                   <h2 className="text-sm font-bold leading-snug text-white sm:text-lg">
-                    Más de {Math.floor(CALCULATOR_CATALOG.length / 10) * 10} herramientas clínicas ({CALCULATOR_CATALOG.length})
+                    Más de {Math.floor(visibleCatalog.length / 10) * 10} herramientas clínicas ({visibleCatalog.length})
                   </h2>
                   <p className="mt-0.5 text-xs leading-snug text-blue-100 sm:text-sm">
-                    {SPECIALTIES.length} especialidades clínicas con calculadoras, escalas y scores validados.
+                    {SPECIALTIES.length} especialidades clínicas · {guidelineScope === 'nicaragua' ? 'Guías Internacionales + Normativas MINSA Nicaragua' : 'Estándar Internacional (OMS / OPS / guías globales)'}.
                   </p>
                 </div>
               </div>
@@ -443,7 +469,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   Guías, tablas y fórmulas
                 </div>
                 <div className="mt-0.5 truncate text-xs font-semibold text-slate-800 dark:text-slate-200">
-                  {CLINICAL_REFERENCE_TABLES.length} tablas clínicas · {CALCULATOR_CATALOG.length} fórmulas · {totalCitations} citas
+                  {visibleTables.length} tablas clínicas · {visibleCatalog.length} fórmulas · {totalCitations} citas
                 </div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400">
                   Consulta externa, urgencias y verificación bibliográfica
@@ -461,7 +487,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   id="full-catalog-heading"
                   className="text-xs font-semibold uppercase tracking-wide text-slate-500 sm:text-sm dark:text-slate-400"
                 >
-                  Catálogo alfabético completo ({CALCULATOR_CATALOG.length})
+                  Catálogo alfabético completo ({visibleCatalog.length})
                 </h2>
                 <button
                   type="button"
@@ -473,7 +499,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </div>
 
               <div className="grid min-w-0 gap-2.5 sm:gap-3 md:grid-cols-2">
-                {CALCULATOR_CATALOG.map((calc) => (
+                {visibleCatalog.map((calc) => (
                   <CalculatorCard
                     key={calc.id}
                     calculator={calc}

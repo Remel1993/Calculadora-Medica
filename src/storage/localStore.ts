@@ -1,4 +1,4 @@
-import type { SeverityLevel } from '../clinical-core/types/clinical.ts';
+import type { GuidelineScope, SeverityLevel } from '../clinical-core/types/clinical.ts';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -17,6 +17,7 @@ const KEYS = {
   THEME: 'cmi_v1_theme',
   FAVORITES: 'cmi_v1_favorites',
   HISTORY: 'cmi_v1_history',
+  GUIDELINE_SCOPE: 'cmi_v1_guideline_scope',
 } as const;
 
 const MAX_HISTORY_ENTRIES = 100;
@@ -93,4 +94,16 @@ export function removeHistoryEntry(id: string): HistoryEntry[] {
 export function clearHistory(): HistoryEntry[] {
   safeWrite(KEYS.HISTORY, []);
   return [];
+}
+
+export function loadGuidelineScope(): GuidelineScope {
+  const saved = safeRead<string | null>(KEYS.GUIDELINE_SCOPE, null);
+  if (saved === 'international' || saved === 'nicaragua') {
+    return saved;
+  }
+  return 'international';
+}
+
+export function saveGuidelineScope(scope: GuidelineScope): void {
+  safeWrite(KEYS.GUIDELINE_SCOPE, scope);
 }

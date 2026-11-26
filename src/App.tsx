@@ -12,25 +12,30 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { registerSW } from 'virtual:pwa-register';
 import { CALCULATOR_BY_ID } from './clinical-core/registries/catalog.ts';
+import { isCalculatorVisibleForScope } from './clinical-core/registries/guidelineRegistry.ts';
 import type {
   CalculationOutput,
   CalculatorDefinition,
+  GuidelineScope,
   SpecialtyId,
 } from './clinical-core/types/clinical.ts';
 import {
   appendHistoryEntry,
   clearHistory,
   loadFavorites,
+  loadGuidelineScope,
   loadHistory,
   loadTheme,
   removeHistoryEntry,
   saveFavorites,
+  saveGuidelineScope,
   saveTheme,
   type HistoryEntry,
   type ThemeMode,
 } from './storage/localStore.ts';
 import { CalculatorView } from './ui/components/CalculatorView.tsx';
 import { ExitConfirmModal } from './ui/components/ExitConfirmModal.tsx';
+import { GuidelineToggle } from './ui/components/GuidelineToggle.tsx';
 import { OfflineIndicator } from './ui/components/PWAControls.tsx';
 import { TranslucentPageScroller } from './ui/components/TranslucentPageScroller.tsx';
 import { FavoritesView } from './ui/views/FavoritesView.tsx';
@@ -43,6 +48,7 @@ type NavTab = 'inicio' | 'especialidades' | 'favoritos' | 'historial';
 
 export default function App() {
   const [theme, setTheme] = useState<ThemeMode>(() => loadTheme());
+  const [guidelineScope, setGuidelineScope] = useState<GuidelineScope>(() => loadGuidelineScope());
   const [activeTab, setActiveTab] = useState<NavTab>('inicio');
   const [selectedCalculatorId, setSelectedCalculatorId] = useState<string | null>(null);
   const [selectedSpecialty, setSelectedSpecialty] = useState<SpecialtyId | null>(null);
@@ -259,6 +265,14 @@ export default function App() {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
+  const handleChangeGuidelineScope = useCallback((nextScope: GuidelineScope) => {
+    setGuidelineScope(nextScope);
+    saveGuidelineScope(nextScope);
+    setSelectedCalculatorId((prevId) =>
+      prevId && !isCalculatorVisibleForScope(prevId, nextScope) ? null : prevId,
+    );
+  }, []);
+
   const handleToggleFavorite = (id: string) => {
     setFavorites((prev) => {
       const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
@@ -385,8 +399,13 @@ export default function App() {
             })}
           </nav>
 
-          {/* Zone 3: Primary Header Action (Theme Switch) */}
-          <div className="flex items-center shrink-0">
+          {/* Zone 3: Primary Header Actions (Guideline Scope + Theme Switch) */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <GuidelineToggle
+              variant="header"
+              value={guidelineScope}
+              onChange={handleChangeGuidelineScope}
+            />
             <button
               type="button"
               onClick={toggleTheme}
@@ -420,18 +439,25 @@ export default function App() {
         {activeCalculator ? (
           <CalculatorView
             calculator={activeCalculator}
+            guidelineScope={guidelineScope}
             isFavorite={favorites.includes(activeCalculator.id)}
             onBack={() => setSelectedCalculatorId(null)}
             onToggleFavorite={handleToggleFavorite}
             onSaveHistory={handleSaveHistory}
           />
         ) : showReferences ? (
-          <ReferencesView onBack={() => setShowReferences(false)} />
+          <ReferencesView
+            guidelineScope={guidelineScope}
+            onChangeGuidelineScope={handleChangeGuidelineScope}
+            onBack={() => setShowReferences(false)}
+          />
         ) : activeTab === 'inicio' ? (
           <HomeView
             favorites={favorites}
             history={history}
             theme={theme}
+            guidelineScope={guidelineScope}
+            onChangeGuidelineScope={handleChangeGuidelineScope}
             onToggleTheme={toggleTheme}
             onSelectCalculator={handleSelectCalculator}
             onToggleFavorite={handleToggleFavorite}
@@ -445,6 +471,7 @@ export default function App() {
         ) : activeTab === 'especialidades' ? (
           <SpecialtiesView
             selectedSpecialty={selectedSpecialty}
+            guidelineScope={guidelineScope}
             favorites={favorites}
             onSelectSpecialty={(id) => {
               ensureHistoryGuard();
@@ -456,6 +483,7 @@ export default function App() {
         ) : activeTab === 'favoritos' ? (
           <FavoritesView
             favorites={favorites}
+            guidelineScope={guidelineScope}
             onSelectCalculator={handleSelectCalculator}
             onToggleFavorite={handleToggleFavorite}
             onGoHome={() => handleNavigateTab('inicio')}

@@ -34,6 +34,10 @@ export type SeverityLevel =
   | 'critical'
   | 'info';
 
+export type GuidelineScope = 'international' | 'nicaragua';
+
+export type ClinicalGuidelineCoverage = 'universal' | 'nicaragua-only' | 'dual';
+
 export interface SpecialtyMeta {
   id: SpecialtyId;
   name: string;

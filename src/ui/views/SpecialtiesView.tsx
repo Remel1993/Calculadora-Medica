@@ -1,17 +1,18 @@
 import { ArrowLeft, X } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  getCalculatorsBySpecialty,
-  searchCalculatorsInSpecialty,
+  getCalculatorsBySpecialtyForScope,
+  searchCalculatorsInSpecialtyForScope,
 } from '../../clinical-core/registries/catalog.ts';
 import { SPECIALTIES, SPECIALTY_MAP } from '../../clinical-core/registries/specialties.ts';
-import type { SpecialtyId } from '../../clinical-core/types/clinical.ts';
+import type { GuidelineScope, SpecialtyId } from '../../clinical-core/types/clinical.ts';
 import { CalculatorCard } from '../components/CalculatorCard.tsx';
 import { ClinicalFolderIcon, ClinicalSearchIcon } from '../icons/clinicalUiIcons.tsx';
 import { SPECIALTY_VISUALS } from '../registries/specialtyVisuals.tsx';
 
 interface SpecialtiesViewProps {
   selectedSpecialty: SpecialtyId | null;
+  guidelineScope: GuidelineScope;
   favorites: string[];
   onSelectSpecialty: (id: SpecialtyId | null) => void;
   onSelectCalculator: (id: string) => void;
@@ -20,6 +21,7 @@ interface SpecialtiesViewProps {
 
 export const SpecialtiesView: React.FC<SpecialtiesViewProps> = ({
   selectedSpecialty,
+  guidelineScope,
   favorites,
   onSelectSpecialty,
   onSelectCalculator,
@@ -32,16 +34,19 @@ export const SpecialtiesView: React.FC<SpecialtiesViewProps> = ({
   }, [selectedSpecialty]);
 
   const items = useMemo(
-    () => (selectedSpecialty ? getCalculatorsBySpecialty(selectedSpecialty) : []),
-    [selectedSpecialty],
+    () =>
+      selectedSpecialty
+        ? getCalculatorsBySpecialtyForScope(selectedSpecialty, guidelineScope)
+        : [],
+    [selectedSpecialty, guidelineScope],
   );
 
   const filteredItems = useMemo(
     () =>
       selectedSpecialty
-        ? searchCalculatorsInSpecialty(selectedSpecialty, specialtyQuery)
+        ? searchCalculatorsInSpecialtyForScope(selectedSpecialty, specialtyQuery, guidelineScope)
         : [],
-    [selectedSpecialty, specialtyQuery],
+    [selectedSpecialty, specialtyQuery, guidelineScope],
   );
 
   if (selectedSpecialty) {
@@ -191,7 +196,7 @@ export const SpecialtiesView: React.FC<SpecialtiesViewProps> = ({
 
       <div className="grid min-w-0 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
         {SPECIALTIES.map((spec) => {
-          const count = getCalculatorsBySpecialty(spec.id).length;
+          const count = getCalculatorsBySpecialtyForScope(spec.id, guidelineScope).length;
           const visual = SPECIALTY_VISUALS[spec.id];
           return (
             <button
