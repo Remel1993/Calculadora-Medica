@@ -894,14 +894,14 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
   },
   {
     id: 'preeclampsia-acog-table',
-    title: 'Trastornos Hipertensivos del Embarazo y Preeclampsia (ACOG / ISSHP)',
-    shortTitle: 'Preeclampsia y Crisis Obstétrica',
+    title: 'Trastornos Hipertensivos del Embarazo, Preeclampsia y Normativa 109 MINSA (ACOG / ISSHP)',
+    shortTitle: 'Preeclampsia y Crisis Obstétrica (MINSA 109)',
     specialty: 'gineco-obstetricia',
     secondarySpecialties: ['urgencias'],
     setting: 'ambos',
-    guidelineVersion: 'ACOG Practice Bulletin 222 / ISSHP 2022',
+    guidelineVersion: 'Normativa 109 MINSA Nicaragua · ACOG PB 222 · ISSHP 2022',
     summary:
-      'Criterios diagnósticos exactos desde las 20 semanas de gestación, definición de gravedad/HELLP y fármacos de primera línea en emergencia obstétrica.',
+      'Criterios diagnósticos exactos desde las 20 semanas de gestación, esquema Zuspan Normativa 109 MINSA (4 g/200 mL carga + 8 g/420 mL SSN mantenimiento), y antihipertensivos de primera línea en emergencia obstétrica.',
     columns: ['Entidad clínica', 'Criterios diagnósticos exactos', 'Conducta urgente / Neuroprotección / Finalización'],
     rows: [
       [
@@ -917,19 +917,24 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
       [
         { text: 'Preeclampsia con signos de gravedad', tone: 'critical', emphasize: true },
         'PAS ≥ 160 o PAD ≥ 110 mmHg (confirmada en ≥ 15 min) O HTA ≥ 140/90 tras ≥ 20 SG con ≥ 1 de: plaquetas < 100,000/µL, AST/ALT ≥ 2× LSN (o epigastralgia intensa), Cr > 1.1 mg/dL (o 2× basal), edema pulmonar, cefalea refractaria o escotomas',
-        '1) MgSO₄ Zuspan: 4 g IV en 15–20 min + 1 g/h IV. 2) Si PA ≥ 160/110: Labetalol 20→40→80 mg IV c/10 min, o Nifedipino acción inmediata 10 mg VO c/20 min, o Hidralazina 5–10 mg IV c/20 min (meta PAS 130–150 / PAD 80–100 mmHg). 3) Finalizar ≥ 34 0/7 SG tras estabilización (si < 34 SG estable, maduración pulmonar en 3.er nivel).',
+        '1) MgSO₄ Zuspan Normativa 109 MINSA: carga 4 g al 10 % en 200 mL SSN/RL/D5% (5–15 min) + mantenimiento c/8 h con 8 g (80 mL) en 420 mL SSN = 500 mL a 60 microgotas/min (20 gotas/min = 1 g/h). 2) Si PA ≥ 160/110: Hidralazina 5 mg IV bolo lento c/15 min (máx 4 dosis), Labetalol IV o Nifedipino acción rápida 10 mg VÍA ORAL (NUNCA sublingual). 3) Finalizar ≥ 34 0/7 SG tras estabilización.',
       ],
       [
         { text: 'Eclampsia / Síndrome HELLP', tone: 'critical', emphasize: true },
         'Eclampsia: convulsiones tónico-clónicas nuevas sin otra causa. HELLP (Tennessee): LDH ≥ 600 U/L (o hemólisis) + AST/ALT ≥ 2× LSN + Plaquetas < 100,000/µL',
-        'Vía aérea / decúbito lateral izquierdo + MgSO₄ IV inmediato (si convulsiona bajo infusión: bolo adicional 2 g IV) + control PA + finalización obstétrica prioritaria tras estabilización materna.',
+        'Vía aérea / decúbito lateral izquierdo + MgSO₄ IV inmediato (si recurre convulsión > 15 min poscarga: refuerzo de 2 g al 10 % en 100 mL en ~5 min) + control PA + finalización obstétrica prioritaria tras estabilización materna.',
       ],
     ],
     keyManagementPearls: [
-      'Durante la infusión de MgSO₄ vigilar cada hora: reflejos osteotendinosos presentes (su abolición es el signo más precoz de toxicidad), frecuencia respiratoria ≥ 12 rpm (algunos protocolos exigen ≥ 14–16 rpm) y diuresis ≥ 30 mL/h (o ≥ 100 mL en 4 h). Antídoto: Gluconato de calcio 10 % 10 mL (1 g) IV lento en 3–5 min.',
+      'Normativa 109 MINSA: durante infusión de MgSO₄ vigilar cada hora reflejos rotulianos presentes, FR ≥ 13 rpm (≥ 12–16 rpm ACOG) y diuresis ≥ 30 mL/h (en 4 h previas). Antídoto: Gluconato de calcio al 10 % 10 mL (1 g) IV lento en 3–5 min. Mantener MgSO₄ hasta 24 h posparto o última convulsión.',
       'Prevención en gestantes de alto riesgo: AAS 100–150 mg/noche iniciado entre 12 y 16 SG hasta las 36 semanas.',
     ],
     references: [
+      {
+        citation:
+          'Ministerio de Salud de Nicaragua (MINSA). Normativa 109: Protocolos para la Atención de las Complicaciones Obstétricas. Managua: MINSA.',
+        year: 2018,
+      },
       {
         citation:
           'ACOG Practice Bulletin No. 222: Gestational Hypertension and Preeclampsia. Obstet Gynecol. 2020;135(6):e237-e260.',
@@ -993,46 +998,51 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
   },
   {
     id: 'dengue-paho-who-table',
-    title: 'Dengue: Clasificación de Gravedad y Esquema de Líquidos (OPS / OMS)',
-    shortTitle: 'Dengue: Grupos A, B y C (OPS/OMS)',
+    title: 'Dengue: Clasificación de Gravedad y Esquema de Líquidos (MINSA Normativa 147 · OPS / OMS)',
+    shortTitle: 'Dengue: Grupos A, B y C (MINSA 147 / OPS)',
     specialty: 'infectologia',
     secondarySpecialties: ['urgencias', 'medicina-interna', 'pediatria'],
     setting: 'ambos',
-    guidelineVersion: 'OPS / OMS (Edición vigente)',
+    guidelineVersion: 'Normativa 147 MINSA Nicaragua · OPS / OMS Directrices Dengue',
     summary:
-      'Criterios clínicos de triage para decidir manejo ambulatorio (Grupo A), observación (Grupo B1), hospitalización (Grupo B2) o reanimación (Grupo C).',
-    columns: ['Grupo OPS / OMS', 'Criterios clínicos exactos', 'Manejo de líquidos y vigilancia'],
+      'Criterios clínicos de triage y reposición hídrica exacta con Lactato de Ringer para manejo ambulatorio (Grupo A), UAF (Grupo B1), signos de alarma (Grupo B2: 7 mL/kg/h MINSA) y choque/dengue grave (Grupo C: 10 mL/kg/h MINSA).',
+    columns: ['Grupo MINSA 147 / OPS', 'Criterios clínicos exactos', 'Manejo de líquidos y vigilancia'],
     rows: [
       [
         { text: 'Grupo A — Dengue sin signos de alarma ni comorbilidad', tone: 'normal', emphasize: true },
         'Fiebre + síntomas clásicos, tolera vía oral, diuresis adecuada (≥ 1 micción c/6 h), sin signos de alarma ni condición de riesgo',
-        'Ambulatorio: hidratación oral abundante (SRO), paracetamol; CONTRAINDICADOS AINEs, AAS, metamizol IM y corticoides. Control clínico y BH cada 24–48 h hasta 48 h posdefervescencia.',
+        'Ambulatorio: hidratación oral abundante (SRO), paracetamol/acetaminofén; CONTRAINDICADOS AINEs, AAS, metamizol IM y corticoides. Control clínico y BH cada 24–48 h hasta 48 h posdefervescencia.',
       ],
       [
-        { text: 'Grupo B1 — Sin alarma pero con condición asociada o riesgo social', tone: 'low', emphasize: true },
+        { text: 'Grupo B1 — Sin alarma pero con condición asociada o riesgo social (UAF)', tone: 'low', emphasize: true },
         'Embarazo, < 1 año, ≥ 65 años, obesidad mórbida, DM, HTA, nefropatía, cardiopatía, hepatopatía, coagulopatía o riesgo social',
-        'Observación o ingreso para asegurar hidratación oral o IV de mantenimiento (2–3 mL/kg/h) y vigilancia estrecha de aparición de signos de alarma.',
+        'Ingreso u observación en UAF (Unidad de Atención a Febriles): priorizar vía oral supervisada (SRO) o mantenimiento IV con Lactato de Ringer/SSN si no tolera VO; vigilancia cada 4 h.',
       ],
       [
         { text: 'Grupo B2 — Dengue con signos de alarma', tone: 'high', emphasize: true },
         '≥ 1 signo: dolor abdominal intenso/continuo, vómitos persistentes (≥ 3 en 1 h o ≥ 4 en 6 h), ascitis/derrame pleural/pericárdico, sangrado mucosas, letargia/irritabilidad, hipotensión postural, hepatomegalia > 2 cm, ↑ Hto con caída rápida plaquetas',
-        'Hospitalización inmediata: Cristaloide isotónico (SS 0.9 % o Ringer Lactato) 10 mL/kg IV en 1 h; reevaluar Hto y signos vitales; si mejora reducir escalonadamente: 5–7 mL/kg/h (2–4 h) → 3–5 mL/kg/h (2–4 h) → 2–3 mL/kg/h.',
+        'Normativa 147 MINSA: Hospitalización inmediata y Lactato de Ringer (preferido sobre SSN 0.9 %) a 7 mL/kg en la 1.ª hora sobre peso ideal en sobrepeso/obesidad (OPS regional usa hasta 10 mL/kg en 1 h). Si mejora (diuresis ≥ 1 mL/kg/h), bajar gradualmente 5 → 3 → 2 mL/kg/h; si empeora repetir o pasar a Grupo C.',
       ],
       [
-        { text: 'Grupo C — Dengue grave', tone: 'critical', emphasize: true },
+        { text: 'Grupo C — Dengue grave / Choque', tone: 'critical', emphasize: true },
         '≥ 1 criterio: choque por extravasación plasmática, distrés respiratorio por sobrecarga/derrame, sangrado grave o daño orgánico grave (AST/ALT ≥ 1000 U/L, alteración SNC, miocarditis)',
-        'UCI / Reanimación: Bolo cristaloide isotónico 20 mL/kg IV en 15–30 min; si mejora pasar a 10 mL/kg en 1 h y descenso escalonado. Si persiste choque tras 2–3 bolos de cristaloide, valorar coloide (10–20 mL/kg) o transfusión de GR (5–10 mL/kg) si cae Hto sin mejoría.',
+        'UCI / Reanimación: Normativa 147 MINSA inicia cargas vigiladas de Lactato de Ringer (o SSN 0.9 %) a 10 mL/kg en 1 hora (OPS 10–20 mL/kg en 15–30 min en choque descompensado) y descenso 7 → 5 → 3 mL/kg/h si mejora. Si persiste choque y CAE el Hto: sospechar hemorragia oculta y valorar transfusión de GR (o coloide si Hto elevado).',
       ],
     ],
     keyManagementPearls: [
-      'La fase crítica (extravasación plasmática, hemoconcentración y choque) suele iniciar al caer la fiebre (días 3–7 de enfermedad), NO durante el pico febril inicial.',
-      'NO transfundir plaquetas de forma profiláctica por trombocitopenia aislada sin sangrado activo grave ni procedimiento quirúrgico urgente.',
+      'Normativa 147 MINSA Nicaragua: calcular cargas IV con PESO IDEAL para la talla en sobrepeso/obesidad (peso real en bajo peso) y preferir Lactato de Ringer para evitar acidosis metabólica hiperclorémica por SSN 0.9 % prolongada.',
+      'La fase crítica suele iniciar al caer la fiebre (días 3–7), NO en el pico febril. No transfundir plaquetas profilácticamente sin sangrado activo grave.',
     ],
     references: [
       {
         citation:
-          'Organización Panamericana de la Salud (OPS/OMS). Guías para la atención de enfermos con dengue en la Región de las Américas (2.ª ed.).',
-        year: 2016,
+          'Ministerio de Salud de Nicaragua (MINSA). Normativa 147: Guía para el Manejo Clínico del Dengue en Pediatría y Adultos. Managua: MINSA.',
+        year: 2020,
+      },
+      {
+        citation:
+          'Organización Panamericana de la Salud (OPS/OMS). Directrices para el diagnóstico clínico y el tratamiento del dengue, el chikunguña y el zika. Washington, D.C.: OPS; 2022.',
+        year: 2022,
       },
     ],
   },
@@ -2175,7 +2185,7 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
       ],
     ],
     keyManagementPearls: [
-      'Una prueba rápida reactiva NUNCA confirma por sí sola el diagnóstico definitivo: debe completarse el algoritmo con segunda prueba / diferenciación VIH-1/2 o carga viral antes de emitir diagnóstico definitivo.',
+      'En Nicaragua (MINSA/CNDR), una prueba rápida reactiva requiere algoritmo de confirmación nacional y toma de muestra basal de carga viral y CD4 remitida al CNDR sin retrasar la vinculación a TAR.',
       'La vacuna contra fiebre amarilla y otras vacunas de virus vivos atenuados (SRP/triple viral, varicela) están CONTRAINDICADAS cuando los CD4 son < 200 cél/µL (< 15 %).',
     ],
     references: [
@@ -2186,21 +2196,21 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
       },
       {
         citation:
-          'World Health Organization. Consolidated guidelines on HIV prevention, testing, treatment, service delivery and monitoring. Geneva: WHO; 2021.',
-        year: 2021,
+          'World Health Organization & Ministerio de Salud de Nicaragua (MINSA). Consolidated guidelines on HIV (WHO 2021) y Normativa de Atención Integral del VIH/SIDA (CNDR).',
+        year: 2023,
       },
     ],
   },
   {
     id: 'hiv-art-regimens-interactions-table',
-    title: 'Terapia Antirretroviral (TAR) de Primera Línea, Poblaciones Especiales e Interacciones Críticas',
-    shortTitle: 'VIH: Esquemas TAR e Interacciones',
+    title: 'Terapia Antirretroviral (TAR) de Primera Línea (MINSA TLD · DHHS), Embarazo e Interacciones',
+    shortTitle: 'VIH: Esquemas TAR (TLD MINSA) e Interacciones',
     specialty: 'infectologia',
     secondarySpecialties: ['medicina-interna', 'gineco-obstetricia', 'urgencias'],
     setting: 'ambos',
-    guidelineVersion: 'NIH/DHHS ART Guidelines 2024 · WHO 2021–2024 · EACS',
+    guidelineVersion: 'MINSA Nicaragua (TLD & Transmisión Vertical) · NIH/DHHS 2024 · WHO',
     summary:
-      'Esquemas preferidos de inicio rápido (INSTI de 2.ª generación), ajustes obligatorios en embarazo, coinfección por VHB/TB, daño renal e interacciones farmacológicas peligrosas.',
+      'Esquemas preferidos de inicio rápido (TLD MINSA: TDF/3TC/DTG y BIC/FTC/TAF), prevención materno-infantil MINSA, coinfección VHB/TB e interacciones críticas.',
     columns: [
       'Escenario clínico / Esquema',
       'Composición y Dosis estándar adulto',
@@ -2208,8 +2218,8 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
     ],
     rows: [
       [
-        { text: '1.ª Línea Universal (OMS TLD y DHHS)', tone: 'normal', emphasize: true },
-        'TDF 300 mg + 3TC 300 mg (o FTC 200 mg) + Dolutegravir (DTG) 50 mg VO c/24 h · O BIC 50 mg / FTC 200 mg / TAF 25 mg (Biktarvy) 1 comp VO c/24 h',
+        { text: '1.ª Línea Universal (MINSA Nicaragua TLD · OMS · DHHS)', tone: 'normal', emphasize: true },
+        'TLD (Dosis Fija Combinada MINSA/OMS): TDF 300 mg + 3TC 300 mg + Dolutegravir (DTG) 50 mg VO 1 comp c/24 h · Alternativas DHHS: TDF/FTC + DTG o BIC 50 / FTC 200 / TAF 25 mg c/24 h',
         'Alta barrera genética a resistencia y excelente tolerancia. TLD (TDF/3TC/DTG) requiere ClCr ≥ 50–60 mL/min; BIC/FTC/TAF requiere ClCr ≥ 30 mL/min. Ambos tratan coinfección por VHB.',
       ],
       [
@@ -2219,13 +2229,13 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
       ],
       [
         { text: 'Coinfección VIH + Tuberculosis con Rifampicina', tone: 'high', emphasize: true },
-        'TDF/3TC (o TDF/FTC) + Dolutegravir 50 mg CADA 12 HORAS (dosis doble) · O TDF/FTC + Efavirenz 600 mg/noche',
-        'Rifampicina reduce niveles de inhibidores de integrasa: duplicar DTG a 50 mg c/12 h (hasta 2 sem tras fin de rifampicina). CONTRAINDICADO usar BIC/FTC/TAF estándar o inhibidores de proteasa potenciados con rifampicina.',
+        'TLD (TDF/3TC/DTG) c/24 h + 1 tableta adicional de Dolutegravir 50 mg a las 12 horas (= DTG 50 mg c/12 h) · Alternativa: TDF/FTC + EFV 600 mg/noche',
+        'Rifampicina induce UGT1A1/CYP3A4: duplicar DTG a 50 mg c/12 h (hasta 2 sem tras fin de rifampicina). CONTRAINDICADO usar BIC/FTC/TAF estándar o inhibidores de proteasa potenciados con rifampicina.',
       ],
       [
-        { text: 'Embarazo / Deseo gestacional / Coinfección VHB', tone: 'low', emphasize: true },
-        'Preferido DHHS/OMS: TDF/FTC (o TAF/FTC) + Dolutegravir 50 mg VO c/24 h (alternativa Raltegravir 400 mg c/12 h o Darunavir/ritonavir)',
-        'Los datos actuales (Tsepamo actualizado) respaldan DTG como seguro y preferido en todos los trimestres del embarazo. Si hay coinfección por VHB (HBsAg +), el esquema DEBE contener TDF o TAF + 3TC/FTC (nunca suspender abruptamente por riesgo de falla hepática fulminante).',
+        { text: 'Embarazo y Transmisión Materno-Infantil (MINSA Nicaragua / OMS)', tone: 'low', emphasize: true },
+        'Tamizaje VIH desde 1.er control prenatal + inicio inmediato de TLD (TDF/3TC/DTG) independiente de CD4 (alternativas: RAL 400 mg c/12 h o DRV/r)',
+        'Normativa MINSA Nicaragua: valorar cesárea electiva a las 38 SG si carga viral > 1,000 copias/mL o desconocida, SUSPENDER lactancia materna con provisión segura de fórmula infantil (sucedáneo) y dar profilaxis ARV neonatal (AZT ± 3TC ± NVP) desde las primeras horas de vida.',
       ],
       [
         { text: 'Interacciones Críticas en Urgencias / Consulta', tone: 'critical', emphasize: true },
@@ -2238,6 +2248,11 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
       'El inicio rápido de TAR el mismo día está indicado en pacientes motivados sin síntomas meníngeos; ante cefalea, rigidez de nuca o fiebre alta en CD4 bajos, descartar primero meningitis criptocócica o tuberculosa.',
     ],
     references: [
+      {
+        citation:
+          'Ministerio de Salud de Nicaragua (MINSA). Normativa de Atención Integral del VIH/SIDA y Prevención de la Transmisión Materno-Infantil de VIH y Sífilis (Esquema TLD). Managua: MINSA.',
+        year: 2023,
+      },
       {
         citation:
           'Panel on Antiretroviral Guidelines for Adults and Adolescents. Guidelines for the Use of Antiretroviral Agents in Adults and Adolescents with HIV (DHHS). 2024.',
@@ -2311,14 +2326,14 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
   },
   {
     id: 'hiv-pep-prep-prevention-table',
-    title: 'Prevención de VIH: PEP (Post-Exposición ≤ 72 h), PrEP y Control de Exposición Ocupacional/Sexual',
-    shortTitle: 'VIH: PEP ≤ 72 h y PrEP',
+    title: 'Prevención de VIH: PEP / PPE (Post-Exposición ≤ 72 h MINSA), PrEP y Control Ocupacional/Sexual',
+    shortTitle: 'VIH: PEP/PPE ≤ 72 h y PrEP (MINSA)',
     specialty: 'infectologia',
     secondarySpecialties: ['urgencias', 'medicina-interna', 'gineco-obstetricia'],
     setting: 'ambos',
-    guidelineVersion: 'CDC PEP 2025 · CDC PrEP 2021 · OMS Prevention 2024',
+    guidelineVersion: 'MINSA Nicaragua PPE · CDC PEP 2025 · CDC PrEP 2021 · OMS',
     summary:
-      'Criterios de urgencia en exposiciones biológicas o sexuales, pautas farmacológicas completas de PEP (28 días) y modalidades aprobadas de PrEP.',
+      'Criterios de urgencia en exposiciones biológicas o violencia sexual, esquema completo de PPE/PEP (28 días con TDF/3TC o TDF/FTC + DTG), seguimiento MINSA (6 sem, 3 m y 6 m) y PrEP.',
     columns: [
       'Estrategia preventiva',
       'Criterios e indicaciones exactas',
@@ -2326,31 +2341,36 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
     ],
     rows: [
       [
-        { text: 'PEP — Profilaxis Post-Exposición (URGENCIA ≤ 72 h)', tone: 'critical', emphasize: true },
+        { text: 'PEP / PPE — Profilaxis Post-Exposición (URGENCIA ≤ 72 h)', tone: 'critical', emphasize: true },
         'Exposición percutánea/mucosa con sangre/semen/secreciones vaginales/LCR de fuente VIH+ detectable o desconocida de alto riesgo, dentro de las ≤ 72 horas (óptimo ≤ 2 h)',
-        'Iniciar inmediatamente 3 fármacos × 28 DÍAS: TDF/FTC 300/200 mg VO c/24 h + Dolutegravir 50 mg VO c/24 h (alternativas: BIC/FTC/TAF c/24 h o TDF/FTC + Raltegravir 400 mg c/12 h). Si ClCr < 60: evitar TDF (usar TAF/FTC + DTG).',
+        'Iniciar inmediatamente 3 fármacos × 28 DÍAS: TDF/3TC 300/300 mg (o TDF/FTC 300/200 mg) VO c/24 h + Dolutegravir 50 mg VO c/24 h (alternativas: BIC/FTC/TAF c/24 h o TDF/FTC + RAL 400 mg c/12 h). Si ClCr < 60: evitar TDF (usar TAF/FTC + DTG).',
       ],
       [
         { text: 'Exposición SIN riesgo / Criterio I=I', tone: 'normal', emphasize: true },
         'Piel íntegra, saliva sin sangre, orina/heces sin sangre, lágrimas; O exposición sexual exclusiva con fuente VIH+ en TAR y carga viral < 200 copias/mL confirmada',
-        'NO requiere PEP por riesgo nulo de transmisión sexual (Indetectable = Intransmisible). Si existe duda sobre adherencia de la fuente, agresión sexual o exposición laboral punzocortante, valorar PEP por precaución.',
+        'NO requiere PEP por riesgo nulo de transmisión sexual (Indetectable = Intransmisible). Si existe duda sobre adherencia de la fuente, violencia sexual o exposición laboral punzocortante, valorar PPE por precaución.',
       ],
       [
-        { text: 'Seguimiento Post-Exposición y Otras Infecciones', tone: 'moderate', emphasize: true },
+        { text: 'Seguimiento Post-Exposición (MINSA / CDC) y Otras Infecciones', tone: 'moderate', emphasize: true },
         'Todo paciente evaluado por accidente biológico o exposición sexual de riesgo',
-        'Basal: VIH 4.ª gen, HBsAg/anti-HBs, VHC, sífilis, creatinina/PFH, test embarazo. Repetir VIH a las 4–6 semanas y 12 semanas (6 meses si fuente VHC+ y coinfección). En accidente laboral sin inmunidad VHB: vacuna + gammaglobulina anti-VHB (HBIG).',
+        'Basal: prueba rápida / 4.ª gen VIH, HBsAg/anti-HBs, VHC, sífilis, creatinina/PFH, test embarazo. Control serológico VIH MINSA: 6 semanas, 3 meses y 6 meses post-exposición. En accidente laboral sin inmunidad VHB: vacuna + HBIG.',
       ],
       [
         { text: 'PrEP Oral Diaria / A Demanda (2-1-1) / Inyectable', tone: 'low', emphasize: true },
         'Personas VIH negativas (4.ª generación negativa reciente sin síntomas agudos) con riesgo sexual o uso de drogas inyectables',
-        'Oral diaria: TDF/FTC 300/200 mg VO/día (ClCr ≥ 60) o TAF/FTC 25/200 mg/día (ClCr ≥ 30, solo HSH/trans). Esquema 2-1-1 (solo HSH sexo anal sin VHB): 2 comp 2–24 h antes → 1 a las 24 h → 1 a las 48 h. Inyectable donde disponible: Cabotegravir 600 mg IM c/2 meses. Control VIH c/3 meses.',
+        'Oral diaria: TDF/FTC 300/200 mg VO/día (ClCr ≥ 60) o TAF/FTC 25/200 mg/día (ClCr ≥ 30, solo HSH/trans). Esquema 2-1-1 (solo HSH sexo anal sin VHB): 2 comp 2–24 h antes → 1 a las 24 h → 1 a las 48 h. Control VIH c/3 meses.',
       ],
     ],
     keyManagementPearls: [
-      'En Urgencias, la primera dosis de PEP NO debe retrasarse esperando resultados de serología de la fuente ni bioquímica basal: administrar de inmediato dentro de las primeras horas.',
+      'En Urgencias y en kits de atención por violencia sexual (MINSA), la primera dosis de PPE NO debe retrasarse esperando resultados de laboratorio: administrar dentro de las primeras horas (ideal < 2 h).',
       'Nunca prescribir PrEP (2 fármacos) si existe sospecha clínica de infección aguda por VIH (síndrome mononucleósido tras exposición reciente) o prueba positiva/indeterminada.',
     ],
     references: [
+      {
+        citation:
+          'Ministerio de Salud de Nicaragua (MINSA). Normativa de Atención Integral del VIH/SIDA y Profilaxis Post-Exposición (PPE). Managua: MINSA.',
+        year: 2023,
+      },
       {
         citation:
           'Centers for Disease Control and Prevention (CDC). Antiretroviral Postexposure Prophylaxis Guidelines (oPEP/nPEP) & Preexposure Prophylaxis for HIV Prevention.',
@@ -2358,7 +2378,7 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
       },
       {
         citation:
-          'World Health Organization. Guidelines on long-acting injectable cabotegravir for HIV prevention & Consolidated HIV Guidelines.',
+          'World Health Organization. Consolidated HIV Prevention, Testing and Treatment Guidelines.',
         year: 2022,
       },
     ],
@@ -2520,22 +2540,22 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
       [
         { text: '≥ 38–40 sem SIN factores de riesgo de neurotoxicidad', tone: 'low', emphasize: true },
         '38 sem: 12.3 / 16.0 / 18.8 / 20.7 mg/dL · 40 sem: 13.3 / 17.0 / 19.8 / 21.8 mg/dL',
-        'Exanguino ≥ 38 sem (sin FR): 17.7 / 20.1 / 22.1 / 23.5 mg/dL. Relación B/A corte ≥ 8.0.',
+        'Exanguino ≥ 38 sem (sin FR): 21.4 / 24.0 / 25.9 / 27.0 mg/dL. Relación B/A corte ≥ 8.0.',
       ],
       [
         { text: '35 – 37 sem SIN factores adicionales de neurotoxicidad', tone: 'moderate', emphasize: true },
         '35 sem: 10.6 / 14.2 / 16.8 / 18.6 mg/dL · 36 sem: 11.2 / 14.8 / 17.5 / 19.3 · 37 sem: 11.7 / 15.4 / 18.1 / 20.0 mg/dL',
-        'Exanguino 35 sem (sin FR): 16.1 / 18.5 / 20.1 / 21.1 mg/dL. Relación B/A corte ≥ 7.2.',
+        'Exanguino (sin FR): 35 sem 17.9 / 20.7 / 22.9 / 24.5 · 36 sem 19.1 / 21.9 / 24.1 / 25.5 · 37 sem 20.3 / 23.1 / 25.2 / 26.6 mg/dL. Corte B/A ≥ 7.2.',
       ],
       [
         { text: '≥ 38 sem CON factores de riesgo de neurotoxicidad', tone: 'high', emphasize: true },
         '38–40 sem: 10.5 / 14.0 / 16.6 / 18.2 mg/dL',
-        'FR: hemólisis isoinmune (Coombs+), G6PD, sepsis, inestabilidad < 24 h o albúmina < 3.0 g/dL. Umbral exanguino desciende ~2–4 mg/dL. Corte B/A ≥ 7.2.',
+        'FR: hemólisis isoinmune (Coombs+), G6PD, sepsis, inestabilidad < 24 h o albúmina < 3.0 g/dL. Exanguino ≥ 38 sem (con FR): 17.7 / 20.1 / 22.1 / 23.5 mg/dL. Corte B/A ≥ 7.2.',
       ],
       [
         { text: '35 – 37 sem CON factores de riesgo de neurotoxicidad', tone: 'critical', emphasize: true },
         '35 sem: 8.9 / 12.2 / 14.6 / 16.1 mg/dL · 36 sem: 9.4 / 12.8 / 15.4 / 16.9 · 37 sem: 10.0 / 13.5 / 16.1 / 17.6 mg/dL',
-        'Grupo de máximo riesgo de neurotoxicidad: exanguino más precoz (~2–4 mg/dL bajo curva sin FR) y corte B/A ≥ 6.8.',
+        'Exanguino (con FR): 35 sem 16.1 / 18.5 / 20.1 / 21.1 · 36 sem 16.6 / 19.1 / 20.9 / 22.1 · 37 sem 17.2 / 19.7 / 21.7 / 23.1 mg/dL. Corte B/A ≥ 6.8.',
       ],
       [
         { text: 'Escalada de Cuidados, EBA y Suspensión', tone: 'critical', emphasize: true },
@@ -2583,7 +2603,7 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
       ],
       [
         { text: 'Opioides VO: Morfina · Tramadol · Codeína · Oxicodona · Hidromorfona', tone: 'high', emphasize: true },
-        'Morfina VO: 1.0 · Tramadol VO: 0.1 · Codeína VO: 0.15 · Hidrocodona VO: 1.0 · Oxicodona VO: 1.5 · Hidromorfona VO: 5.0 · Morfina IV/SC: 3.0',
+        'Morfina VO: 1.0 · Tramadol VO: 0.2 · Codeína VO: 0.15 · Hidrocodona VO: 1.0 · Oxicodona VO: 1.5 · Hidromorfona VO: 5.0 · Morfina IV/SC: 3.0',
         'MME/día = Dosis diaria × Factor MME. Tramadol máx 400 mg/día. Alerta CDC: ≥ 50 MME/día duplica riesgo de sobredosis; ≥ 90 MME/día riesgo muy alto.',
       ],
       [
@@ -2605,6 +2625,131 @@ export const CLINICAL_REFERENCE_TABLES: ClinicalReferenceTable[] = [
         citation:
           'Liu D, Ahmet A, Ward L, et al. A practical guide to the monitoring and management of the complications of systemic corticosteroid therapy. Allergy Asthma Clin Immunol. 2013;9(1):30.',
         year: 2013,
+      },
+    ],
+  },
+  {
+    id: 'tuberculosis-oms-cdc-reference-table',
+    title: 'Tuberculosis (MINSA Nicaragua · Normativa 054): SR, BAAR ×3, GeneXpert, 2HRZE/4HR, TAES y TPI',
+    shortTitle: 'Tuberculosis (MINSA Nicaragua · Normativa 054)',
+    specialty: 'infectologia',
+    secondarySpecialties: ['neumologia', 'medicina-interna', 'pediatria', 'urgencias'],
+    setting: 'ambos',
+    guidelineVersion: 'Normativa 054 MINSA Nicaragua · Actualizaciones CNDR / OPS-OMS 2022–2024',
+    summary:
+      'Referencia clínica rápida offline alineada al Programa Nacional de Control de la Tuberculosis (MINSA Nicaragua): captación de Sintomático Respiratorio (SR), seriado BAAR ×3, GeneXpert CNDR, bandas DFC 2HRZE/4HR bajo TAES, control de focos (< 72 h) y quimioprofilaxis/TPI.',
+    columns: [
+      'Componente / Escenario MINSA',
+      'Criterios, muestras o bandas de peso',
+      'Conducta y notas clave de seguridad',
+    ],
+    rows: [
+      [
+        { text: 'Captación de SR y Diagnóstico (BAAR ×3 · GeneXpert CNDR)', tone: 'moderate', emphasize: true },
+        'SR: tos con flema ≥ 15 días (cualquier tos si PVVIH) · Seriado BAAR ×3: 1.ª al momento de consulta, 2.ª en ayunas al día siguiente, 3.ª al entregar la 2.ª · GeneXpert MTB/RIF prioritario (PVVIH, antes tratados, recaídas, privados de libertad, personal de salud, contactos TB-DR, LCR/pediatría)',
+        'LF-LAM en orina si PVVIH con CD4 ≤ 200 o gravedad. Un BAAR negativo NO descarta TB en niños (paucibacilar), PVVIH ni formas extrapulmonares. Mascarilla quirúrgica al SR y N95 para el personal.',
+      ],
+      [
+        { text: 'Control de Focos (< 72 h), PPD / IGRA y Quimioprofilaxis (TPI)', tone: 'low', emphasize: true },
+        'Control de focos obligatorio en < 72 horas · PPD (48–72 h, medir induración): ≥ 5 mm (PVVIH, contacto reciente, inmunosupresión), ≥ 10 mm (personal de salud, < 4–5 a, DM, ERC, área endémica), ≥ 15 mm (sin FR) · TPI MINSA: Isoniacida diaria × 6 meses (10 mg/kg en niños, 5 mg/kg adulto; máx 300 mg)',
+        'Población prioritaria TPI: contactos < 5 años de caso bacilífero y PVVIH. NUNCA iniciar TPI/TPT (o esquemas acortados 3HP/3HR) sin descartar TB activa por clínica y Rx de tórax. Preferir IGRA si vacunado con BCG.',
+      ],
+      [
+        { text: 'Esquema Primario Adulto (≥ 30 kg): 2HRZE / 4HR con DFC y TAES', tone: 'high', emphasize: true },
+        'Fase intensiva 2HRZE (RHZE 150/75/400/275 mg) → Fase continuación 4HR (RH 150/75 mg): 30–37 kg: 2 tab · 38–54 kg: 3 tab · 55–70 kg: 4 tab · > 70 kg: 5 tab',
+        'Administración estricta bajo estrategia TAES (observación directa). Validar modalidad del PNCT en fase de continuación (diaria con DFC o intermitente supervisada). Piridoxina (B6) 25–50 mg/d si PVVIH, embarazo, DM, desnutrición, ERC o alcohol.',
+      ],
+      [
+        { text: 'Pediatría (< 25 kg): DFC Dispersable HRZ + Etambutol', tone: 'high', emphasize: true },
+        'HRZ (50/75/150 mg) + E 100 mg (2 m) → HR (50/75 mg) (4 m; o 2 m en TB no grave 3 m–16 a): 2–2.9 kg: ½ tab · 3–3.9 kg: ¾ tab · 4–7.9 kg: 1 tab · 8–11.9 kg: 2 tab · 12–15.9 kg: 3 tab · 16–24.9 kg: 4 tab',
+        'Metas mg/kg/día: H 10 (7–15), R 15 (10–20), Z 35 (30–40), E 20 (15–25). En ≥ 25 kg pasar a esquemas de adulto. Control mensual de peso y ajuste inmediato de banda.',
+      ],
+      [
+        { text: 'TB Drogarresistente (RR / MDR-TB): BPaLM / Manejo CNDR', tone: 'critical', emphasize: true },
+        'Resistencia a Rifampicina en GeneXpert → notificación inmediata al PNCT/CNDR y prueba rápida a fluoroquinolonas (LPA / Xpert XDR) · Esquema oral OMS BPaLM 6 meses (Bedaquilina + Pretomanid + Linezolid + Moxifloxacino; BPaL si resistencia a FQ)',
+        'EXCLUSIÓN CRÍTICA: BPaLM/BPaL NO está aprobado en meningoencefalitis TB (SNC), TB osteoarticular ni miliar diseminada (requiere régimen individualizado con penetración en LCR). Aislamiento aéreo estricto.',
+      ],
+      [
+        { text: 'Meningoencefalitis TB, Coinfección VIH-TB y Seguimiento', tone: 'critical', emphasize: true },
+        'Meningitis TB / SNC: 2HRZE + 7–10HR (9–12 m total) + Dexametasona Thwaites (0.4→0.1 mg/kg/d en 6–8 sem) · VIH-TB: diferir TAR ≤ 2 sem si CD4 < 50 (no meníngea) o 4–8 sem si meningitis TB',
+        'Con rifampicina duplicar Dolutegravir (DTG 50 mg c/12 h). Controles de BAAR: fin de fase intensiva (2.º mes), 4.º–5.º mes y egreso. Suspender fármacos hepatotóxicos si ictericia o ALT > 3× LSN con síntomas (> 5× asintomática).',
+      ],
+    ],
+    keyManagementPearls: [
+      'Normativa 054 MINSA Nicaragua: la captación oportuna del Sintomático Respiratorio (≥ 15 días de tos con expectoración), la estrategia TAES y el estudio de focos en < 72 horas son las piedras angulares para cortar la cadena de transmisión.',
+      'En meningitis TB, iniciar anti-TB + dexametasona de inmediato reduce la mortalidad ~31 % (Thwaites) y diferir el TAR 4–8 semanas evita el SIRI cerebral grave.',
+    ],
+    cautionNote:
+      'Nunca añadir un único medicamento a un esquema que fracasa. Verificar siempre las pautas operativas vigentes del Componente de Tuberculosis del MINSA Nicaragua y los resultados del CNDR.',
+    references: [
+      {
+        citation:
+          'Ministerio de Salud (MINSA) de Nicaragua. Normativa 054: Normas y Procedimientos para el Abordaje de la Tuberculosis (TAES, SR, BAAR ×3, Esquema 2HRZE/4HR, Control de Focos y Quimioprofilaxis). Managua: MINSA.',
+        year: 2023,
+      },
+      {
+        citation:
+          'Organización Panamericana de la Salud / OMS. Directrices unificadas sobre la tuberculosis: Módulos 1, 3, 4 y 5 (2022–2024).',
+        year: 2024,
+      },
+      {
+        citation:
+          'Thwaites GE, Nguyen DB, Nguyen HD, et al. Dexamethasone for the treatment of tuberculous meningitis in adolescents and adults. N Engl J Med. 2004;351(17):1741-1751.',
+        year: 2004,
+      },
+    ],
+  },
+  {
+    id: 'malaria-leptospirosis-minsa-table',
+    title: 'Malaria (P. vivax / P. falciparum) y Leptospirosis: Esquemas Terapéuticos MINSA Nicaragua',
+    shortTitle: 'Malaria y Leptospirosis (MINSA Nicaragua)',
+    specialty: 'infectologia',
+    secondarySpecialties: ['medicina-interna', 'pediatria', 'urgencias', 'gineco-obstetricia'],
+    setting: 'ambos',
+    guidelineVersion: 'Normativas Nacionales MINSA Nicaragua (Malaria & Leptospirosis) · OPS/OMS',
+    summary:
+      'Esquemas supervisados de Cloroquina + Primaquina (7 d / DU) y Coartem para Malaria (incl. Red Col-Vol y contraindicaciones en embarazo/< 6 m), junto con pautas de Doxiciclina, Amoxicilina y Penicilina cristalina en Leptospirosis.',
+    columns: [
+      'Patología / Escenario clínico',
+      'Esquema terapéutico y dosis exacta (MINSA)',
+      'Contraindicaciones, vigilancia y alertas críticas',
+    ],
+    rows: [
+      [
+        { text: 'Malaria por Plasmodium vivax (Cura radical)', tone: 'moderate', emphasize: true },
+        'Cloroquina base 25 mg/kg total en 3 días (Día 1: 10 mg/kg [máx 600 mg] · Día 2: 10 mg/kg [máx 600 mg] · Día 3: 5 mg/kg [máx 300 mg]) + Primaquina 0.5 mg/kg/día VO × 7 días (máx 30 mg/d)',
+        'Supervisión estricta por personal MINSA o Col-Vol. CONTRAINDICADA Primaquina en embarazo, lactancia y < 6 meses (dar solo Cloroquina y valorar profilaxis semanal con Cloroquina 300 mg base hasta finalizar gestación/lactancia). Vigilar hemólisis (coluria/ictericia).',
+      ],
+      [
+        { text: 'Malaria por P. falciparum sensible vs. resistente/mixta', tone: 'high', emphasize: true },
+        'Sensible: Cloroquina 25 mg/kg (3 días) + Primaquina 0.75 mg/kg (máx 45 mg) dosis única gametocida · Resistente/mixta: Arteméter 20 mg / Lumefantrina 120 mg (Coartem) 6 dosis en 3 días (0, 8, 24, 36, 48, 60 h): 5–14 kg (1 tab), 15–24 kg (2 tab), 25–34 kg (3 tab), ≥ 35 kg (4 tab)',
+        'Administrar Arteméter-Lumefantrina con alimentos grasos/leche para asegurar absorción (evitar toronja). Ante signos de malaria grave (SNC, choque, ictericia, hiperparasitemia), hospitalizar e iniciar Artesunato IV 2.4 mg/kg (3 mg/kg si < 20 kg) a las 0, 12 y 24 h.',
+      ],
+      [
+        { text: 'Leptospirosis Leve / Ambulatoria y Embarazo (MINSA)', tone: 'moderate', emphasize: true },
+        '≥ 10 años y adultos: Doxiciclina 100 mg VO c/12 h × 7 días (profilaxis comunitaria en brotes: 200 mg VO/sem) · Embarazo y < 10 años: Amoxicilina 500 mg VO c/6 h × 7 d (embarazo/adulto) o 30–50 mg/kg/día VO c/8 h (niños)',
+        'Iniciar antibiótico ante sospecha clínica (< 5 días de inicio) SIN esperar ELISA IgM ni MAT. Evitar AINEs/AAS. Derivar a hospital si aparece ictericia, oliguria, disnea/hemoptisis o hipotensión.',
+      ],
+      [
+        { text: 'Leptospirosis Moderada-Grave / Síndrome de Weil', tone: 'critical', emphasize: true },
+        'Adultos/gestantes: Penicilina G sódica cristalina 1.5 millones UI IV c/6 h (hasta 2–4 millones UI c/4–6 h en cuadros críticos) × 7 días · Pediatría: Penicilina G cristalina 250,000 UI/kg/día IV dividida c/4–6 h × 7 días · Alternativa: Ceftriaxona 1–2 g IV c/24 h',
+        'Vigilar reacción de Jarisch-Herxheimer en primeras 2–6 h tras primera dosis de penicilina (fiebre, escalofríos, hipotensión). Control estricto de diuresis, K⁺ sérico, plaquetas y detección temprana de hemorragia alveolar pulmonar.',
+      ],
+    ],
+    keyManagementPearls: [
+      'En Nicaragua, el diagnóstico de gota gruesa y el seguimiento de esquemas supervisados en zonas endémicas se articula con la red comunitaria Col-Vol y las UAF.',
+      'En Leptospirosis grave, la insuficiencia renal aguda suele ser no oligúrica e hipopotasémica inicialmente; la hemorragia pulmonar puede deteriorar rápidamente sin ictericia marcada.',
+    ],
+    references: [
+      {
+        citation:
+          'Ministerio de Salud de Nicaragua (MINSA). Norma y Guía para el Diagnóstico, Tratamiento y Control de la Malaria (Red Col-Vol). Managua: MINSA.',
+        year: 2022,
+      },
+      {
+        citation:
+          'Ministerio de Salud de Nicaragua (MINSA). Normativa de Abordaje y Manejo Clínico de la Leptospirosis Humana. Managua: MINSA.',
+        year: 2020,
       },
     ],
   },

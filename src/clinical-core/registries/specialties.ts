@@ -53,7 +53,7 @@ export const SPECIALTIES: SpecialtyMeta[] = [
     id: 'infectologia',
     name: 'Infectología',
     shortName: 'Infectología',
-    description: 'VIH/SIDA (CD4, TAR, PEP/PrEP, oportunistas), faringoamigdalitis, rinosinusitis, neumonía, dengue y sepsis.',
+    description: 'VIH/SIDA (CD4, TAR, PEP/PrEP, oportunistas), tuberculosis (HRZE, TPT, Xpert), faringoamigdalitis, rinosinusitis, neumonía, dengue y sepsis.',
   },
   {
     id: 'medicina-interna',
@@ -71,7 +71,7 @@ export const SPECIALTIES: SpecialtyMeta[] = [
     id: 'neumologia',
     name: 'Neumología',
     shortName: 'Neumología',
-    description: 'Asma, EPOC GOLD, SAOS (STOP-BANG/Epworth), tabaquismo, oxigenación y neumonía.',
+    description: 'Asma, EPOC GOLD, tuberculosis, SAOS (STOP-BANG/Epworth), tabaquismo, oxigenación y neumonía.',
   },
   {
     id: 'neurologia',

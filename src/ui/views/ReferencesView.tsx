@@ -18,6 +18,7 @@ import {
   ClinicalSearchIcon,
 } from '../icons/clinicalUiIcons.tsx';
 import { ScrollableTableShell } from '../components/ScrollableTableShell.tsx';
+import { AcronymLegend } from '../components/AcronymLegend.tsx';
 import { SPECIALTY_VISUALS } from '../registries/specialtyVisuals.tsx';
 
 interface ReferencesViewProps {
@@ -509,6 +510,22 @@ export const ReferencesView: React.FC<ReferencesViewProps> = ({ onBack }) => {
                         </li>
                       ))}
                     </ul>
+
+                    <AcronymLegend
+                      className="mt-3"
+                      initialLimit={8}
+                      sourceText={[
+                        table.title,
+                        table.guidelineVersion,
+                        table.summary,
+                        ...table.columns,
+                        ...table.rows.flatMap((row) =>
+                          row.map((cell) => (typeof cell === 'string' ? cell : cell.text)),
+                        ),
+                        ...table.keyManagementPearls,
+                        table.cautionNote ?? '',
+                      ].join(' ')}
+                    />
                   </article>
                 );
               })}
@@ -660,6 +677,19 @@ export const ReferencesView: React.FC<ReferencesViewProps> = ({ onBack }) => {
                         </li>
                       ))}
                     </ul>
+
+                    <AcronymLegend
+                      className="mt-3"
+                      initialLimit={8}
+                      sourceText={[
+                        calc.name,
+                        calc.version,
+                        calc.description,
+                        calc.clinicalIndication,
+                        formulaInfo?.formulaUsed ?? '',
+                        ...(formulaInfo?.variables.map((v) => `${v.label} ${v.detail}`) ?? []),
+                      ].join(' ')}
+                    />
                   </article>
                 );
               })}

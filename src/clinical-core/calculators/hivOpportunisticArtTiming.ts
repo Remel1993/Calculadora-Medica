@@ -177,10 +177,10 @@ export const hivOpportunisticArtTimingCalculator: CalculatorDefinition = {
       timingLabel = 'Inicio inmediato (mismo día / ≤ 7 días)';
       timingDays = 1;
       severity = 'low';
-      riskClass = 'Inicio rápido de TAR (OMS / DHHS)';
+      riskClass = 'Inicio rápido de TAR (OMS / DHHS / MINSA)';
       interpretation =
-        'Sin signos de meningitis ni infección oportunista del SNC/micobacteriana que obligue a diferir: iniciar TAR el mismo día o dentro de los ≤ 7 días del diagnóstico (esquema estándar TDF/3TC/DTG o BIC/FTC/TAF).';
-      guidance.push('Extraer carga viral basal, CD4, bioquímica renal/hepática, HBsAg/VHC y tamizaje clínico de TB/CrAg (sin esperar resultados para iniciar si el paciente está clínicamente estable y sin síntomas neurológicos/respiratorios sospechosos).');
+        'Sin signos de meningitis ni infección oportunista del SNC/micobacteriana que obligue a diferir: iniciar TAR el mismo día o dentro de los ≤ 7 días del diagnóstico (1.ª línea MINSA Nicaragua/OMS: TLD [TDF 300 / 3TC 300 / DTG 50 mg] 1 comp VO c/24 h; alternativa BIC/FTC/TAF).';
+      guidance.push('Extraer muestra basal para carga viral / CD4 (referencia CNDR en red pública), bioquímica renal/hepática, HBsAg/VHC y tamizaje clínico de TB/CrAg (sin demorar inicio si está estable).');
     }
 
     if (
@@ -190,7 +190,7 @@ export const hivOpportunisticArtTimingCalculator: CalculatorDefinition = {
         scenario === 'tb_meningitis')
     ) {
       guidance.push(
-        'AJUSTE POR RIFAMPICINA: Si usa Dolutegravir, DUPLICAR dosis a DTG 50 mg cada 12 horas durante todo el tratamiento con rifampicina y hasta 2 semanas después de suspenderla. NO usar Bictegravir (BIC/FTC/TAF) ni TAF estándar ni inhibidores de proteasa potenciados con rifampicina.',
+        'AJUSTE POR RIFAMPICINA (MINSA / OMS): En pacientes con esquema TLD (TDF/3TC/DTG), DUPLICAR Dolutegravir a DTG 50 mg cada 12 horas (añadir 1 tableta de DTG 50 mg a las 12 horas de la dosis fija combinada TLD) durante todo el tratamiento con rifampicina y hasta 2 semanas después de suspenderla. NO usar Bictegravir ni TAF estándar ni IP potenciados con rifampicina.',
       );
     }
 

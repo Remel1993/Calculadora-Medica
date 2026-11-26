@@ -334,8 +334,8 @@ export const preeclampsiaHellpCalculator: CalculatorDefinition = {
       clinicalInterpretation =
         'Presencia de convulsiones de novo en paciente gestante/puérpera. Constituye una emergencia obstétrica vital que requiere estabilización materna inmediata, sulfato de magnesio IV y finalización oportuna del embarazo.';
       guidance.push(
-        'Iniciar esquema de Sulfato de Magnesio IV inmediato (impregnación 4–6 g en 20 min + mantenimiento 1–2 g/h) y asegurar vía aérea/oxigenación.',
-        'Si PA ≥ 160/110 mmHg, administrar antihipertensivo IV de acción rápida (labetalol o hidralazina IV, o nifedipino oral de liberación inmediata).',
+        'Iniciar esquema de Sulfato de Magnesio IV inmediato (impregnación 4–6 g en 20 min [MINSA Normativa 109: 4 g en 200 mL en 5–15 min] + mantenimiento 1–2 g/h) y asegurar vía aérea/oxigenación.',
+        'Si PA ≥ 160/110 mmHg, administrar antihipertensivo de acción rápida (labetalol IV, hidralazina 5 mg IV o nifedipino de liberación inmediata VÍA ORAL únicamente — NUNCA sublingual).',
         'Estabilizar a la madre antes de decidir la vía y momento de interrupción del embarazo.',
       );
     } else if (completeHellp) {
@@ -358,8 +358,8 @@ export const preeclampsiaHellpCalculator: CalculatorDefinition = {
           : 'Preeclampsia con criterios de severidad (ACOG PB 222)';
       clinicalInterpretation = `Hipertensión arterial (${roundClinical(sbp, 0)}/${roundClinical(dbp, 0)} mmHg) acompañada de ${severityFeatures.length} criterio(s) de severidad ACOG (${severityFeatures.join('; ')}).`;
       guidance.push(
-        'Iniciar profilaxis de eclampsia con Sulfato de Magnesio IV (consultar calculadora MgSO₄ Obstétrico).',
-        'Si PA ≥ 160/110 mmHg persistente ≥ 15 min, iniciar terapia antihipertensiva urgente (labetalol IV, hidralazina IV o nifedipino VO) buscando rango 140–150/90–100 mmHg sin descensos bruscos.',
+        'Iniciar profilaxis de eclampsia con Sulfato de Magnesio IV (consultar calculadora MgSO₄ Obstétrico MINSA Normativa 109 / Zuspan).',
+        'Si PA ≥ 160/110 mmHg persistente ≥ 15 min, iniciar terapia antihipertensiva urgente (hidralazina 5 mg IV, labetalol IV o nifedipino VO — nunca sublingual) buscando rango 140–150/90–100 mmHg sin descensos bruscos.',
         'Ingreso hospitalario, balance hídrico estricto (evitar sobrecarga IV), vigilancia fetal continua y valoración de interrupción (≥ 34 sem o antes si inestabilidad materna/fetal).',
       );
     } else if (partialHellp) {

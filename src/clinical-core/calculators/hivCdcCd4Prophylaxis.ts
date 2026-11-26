@@ -86,12 +86,16 @@ export const hivCdcCd4ProphylaxisCalculator: CalculatorDefinition = {
     'mac',
     'oportunistas',
     'tar',
+    'tld',
+    'minsa',
+    'nicaragua',
+    'transmision vertical',
   ],
   description:
-    'Clasificación oficial CDC (Estadios 1, 2 y 3 / SIDA), identificación de Enfermedad Avanzada por VIH (OMS) e indicación exacta de profilaxis primaria y tamizajes según recuento de CD4.',
+    'Clasificación oficial CDC (Estadios 1, 2 y 3 / SIDA), identificación de Enfermedad Avanzada por VIH (OMS), esquema MINSA Nicaragua (TLD y prevención vertical) e indicación exacta de profilaxis primaria y tamizajes según recuento de CD4.',
   clinicalIndication:
-    'Evaluación inicial y seguimiento de personas con VIH confirmado para definir estadio inmunológico, paquete de tamizaje (CrAg, TB-LAM/IGRA) y profilaxis de infecciones oportunistas.',
-  validatedPopulation: 'Adultos y adolescentes ≥ 6 años con infección por VIH confirmada.',
+    'Evaluación inicial y seguimiento de personas con VIH confirmado para definir estadio inmunológico, paquete de tamizaje (CrAg, TB-LAM/IGRA), profilaxis de infecciones oportunistas e inicio de TAR.',
+  validatedPopulation: 'Adultos y adolescentes ≥ 6 años con infección por VIH confirmada (incluye lineamientos del Programa Nacional de ITS/VIH/SIDA del MINSA Nicaragua).',
   contraindications: [
     'No utilizar estos puntos de corte absolutos de CD4 en niños < 6 años (en menores de 5 años la inmunosupresión depende de porcentajes y umbrales específicos por edad).',
     'No iniciar profilaxis primaria sin descartar enfermedad oportunista activa (ej. descartar TB activa antes de terapia preventiva anti-TB; descartar MAC diseminada antes de macrólido).',
@@ -100,7 +104,7 @@ export const hivCdcCd4ProphylaxisCalculator: CalculatorDefinition = {
     'En infección aguda por VIH (seroconversión) el recuento de CD4 puede descender transitoriamente sin reflejar inmunosupresión crónica permanente.',
     'La profilaxis frente a MAC (< 50 cél/µL) ya NO se indica de forma rutinaria si se inicia TAR efectivo inmediatamente.',
   ],
-  version: 'CDC HIV Case Definition 2014 · NIH/DHHS OI Guidelines 2024 · OMS AHD 2021',
+  version: 'CDC HIV Case Definition 2014 · NIH/DHHS 2024 · OMS AHD · MINSA Nicaragua (TLD)',
   references: [
     {
       citation:
@@ -114,8 +118,8 @@ export const hivCdcCd4ProphylaxisCalculator: CalculatorDefinition = {
     },
     {
       citation:
-        'World Health Organization. Consolidated guidelines on HIV prevention, testing, treatment, service delivery and monitoring. Geneva: WHO; 2021.',
-      year: 2021,
+        'World Health Organization & Ministerio de Salud de Nicaragua (MINSA). Consolidated guidelines on HIV (WHO 2021) y Normativa de Atención Integral / Prevención de Transmisión Materno-Infantil de VIH y Sífilis (TLD: TDF/3TC/DTG).',
+      year: 2023,
     },
   ],
   fields: [cd4CountField, cd4PercentField, stage3OiField, sulfaAllergyField, pregnantField],
@@ -202,11 +206,11 @@ export const hivCdcCd4ProphylaxisCalculator: CalculatorDefinition = {
       );
     }
 
-    // 4. Universal TAR & Pregnancy
+    // 4. Universal TAR & Pregnancy (incl. MINSA Nicaragua TLD & vertical transmission)
     guidance.push(
       isPregnant
-        ? 'EMBARAZO: Inicio INMEDIATO (o continuación) de TAR triple independientemente del CD4 (preferente TDF/FTC + Dolutegravir o esquema seguro validado) para prevención de transmisión perinatal (< 1 %) y salud materna. Evitar dosis únicas o combinaciones teratogénicas/tóxicas no recomendadas.'
-        : 'Inicio de TAR recomendado para TODA persona con VIH independientemente del recuento de CD4 (urgencia clínica en Estadio 3 / CD4 < 200 tras descartar meningitis tuberculosa y criptocócica).',
+        ? 'EMBARAZO (MINSA Nicaragua / OMS): Tamizaje universal desde el 1.er control prenatal e inicio INMEDIATO de TAR triple independiente de CD4 con esquema TLD (TDF 300 mg / 3TC 300 mg / DTG 50 mg VO c/24 h) o equivalente. Normativa MINSA de transmisión materno-infantil: valorar cesárea electiva si carga viral > 1,000 copias/mL o desconocida, SUSPENDER lactancia materna (sustitución segura con sucedáneo/fórmula infantil) e iniciar profilaxis ARV al recién nacido en primeras horas de vida.'
+        : 'Inicio de TAR recomendado para TODA persona con VIH independientemente del recuento de CD4 (1.ª línea MINSA Nicaragua/OMS: TLD [Tenofovir 300 mg + Lamivudina 300 mg + Dolutegravir 50 mg] 1 comp VO c/24 h; en Estadio 3 / CD4 < 200 descartar antes meningitis TB y criptocócica).',
     );
 
     const pctNote =

@@ -182,6 +182,8 @@ import { immunizationMinsaNicaraguaCalculator } from '../calculators/immunizatio
 import { pediatricBroselowResuscitationCalculator } from '../calculators/pediatricBroselowResuscitation.ts';
 import { neonatalPhototherapyExchangeAap2022Calculator } from '../calculators/neonatalPhototherapyExchangeAap2022.ts';
 import { dailyDrugConvertersCalculator } from '../calculators/dailyDrugConverters.ts';
+import { tuberculosisClinicalSuiteCalculator } from '../calculators/tuberculosisClinicalSuite.ts';
+import { malariaLeptospirosisMinsaCalculator } from '../calculators/malariaLeptospirosisMinsa.ts';
 import type { CalculatorDefinition, SpecialtyId } from '../types/clinical.ts';
 import { SPECIALTY_MAP } from './specialties.ts';
 
@@ -377,6 +379,8 @@ export const CALCULATOR_CATALOG: CalculatorDefinition[] = [
   pediatricBroselowResuscitationCalculator,
   neonatalPhototherapyExchangeAap2022Calculator,
   dailyDrugConvertersCalculator,
+  tuberculosisClinicalSuiteCalculator,
+  malariaLeptospirosisMinsaCalculator,
 ].sort(compareCalculatorsAlphabetically);
 
 export const CALCULATOR_BY_ID: Record<string, CalculatorDefinition> = CALCULATOR_CATALOG.reduce(

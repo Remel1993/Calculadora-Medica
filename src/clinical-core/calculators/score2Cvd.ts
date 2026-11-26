@@ -124,7 +124,7 @@ const SCORE2_PARAMS = {
   male: {
     s0: 0.9605,
     age: 0.3742,
-    smoking: 0.5888,
+    smoking: 0.6012,
     sbp: 0.2777,
     tchol: 0.1458,
     hdl: -0.2698,
@@ -142,7 +142,7 @@ const SCORE2_PARAMS = {
   female: {
     s0: 0.9776,
     age: 0.4648,
-    smoking: 0.6657,
+    smoking: 0.7744,
     sbp: 0.3131,
     tchol: 0.1002,
     hdl: -0.2606,

@@ -68,7 +68,7 @@ const rrField: NumberFieldDef = {
   min: 2,
   max: 70,
   placeholder: '18',
-  helpText: 'SOS: 12–24 rpm = 0 pts · MEOWS alerta roja si FR ≥ 25 o ≤ 10 rpm.',
+  helpText: 'SOS: 12–24 rpm = 0 pts · 10–11 = +1 · 25–34 o 6–9 = +2 · 35–49 = +3 · ≥ 50 o ≤ 5 = +4. MEOWS alerta roja si FR ≥ 25 o < 10 rpm.',
 };
 
 const spo2Field: NumberFieldDef = {
@@ -82,7 +82,7 @@ const spo2Field: NumberFieldDef = {
   min: 50,
   max: 100,
   placeholder: '98',
-  helpText: 'SOS: ≥ 92 % = 0 pts · 90–91 % = +1 · 85–89 % = +2 · < 85 % = +4.',
+  helpText: 'SOS: ≥ 92 % = 0 pts · 90–91 % = +1 · 85–89 % = +3 · < 85 % = +4.',
 };
 
 const wbcField: NumberFieldDef = {
@@ -99,7 +99,7 @@ const wbcField: NumberFieldDef = {
   min: 0.1,
   max: 100,
   placeholder: '12.5',
-  helpText: 'Rango normal gestacional en SOS: 5.7–16.9 ×10³/µL (0 pts).',
+  helpText: 'SOS: 5.7–16.9 ×10³/µL = 0 pts · 17–24.9 = +2 · 25–39.9 = +3 · ≥ 40 o < 1.0 = +4.',
 };
 
 const bandsField: NumberFieldDef = {
@@ -178,22 +178,23 @@ function scoreHrSos(hr: number): number {
 function scoreRrSos(rr: number): number {
   if (rr >= 50 || rr <= 5) return 4;
   if (rr >= 35) return 3;
-  if (rr < 10) return 2;
-  if (rr >= 25 || rr < 12) return 1;
+  if (rr >= 25 || rr < 10) return 2;
+  if (rr < 12) return 1;
   return 0; // 12–24
 }
 
 function scoreSpo2Sos(spo2: number): number {
   if (spo2 < 85) return 4;
-  if (spo2 <= 89) return 2;
+  if (spo2 <= 89) return 3;
   if (spo2 <= 91) return 1;
   return 0;
 }
 
 function scoreWbcSos(wbc: number): number {
   if (wbc >= 40 || wbc < 1) return 4;
-  if (wbc >= 25 || wbc < 3) return 2;
-  if (wbc >= 17 || wbc < 5.7) return 1;
+  if (wbc >= 25) return 3;
+  if (wbc >= 17 || wbc < 3) return 2;
+  if (wbc < 5.7) return 1;
   return 0; // 5.7–16.9
 }
 

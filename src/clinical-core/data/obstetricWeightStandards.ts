@@ -354,6 +354,8 @@ export function evaluateFetalWeight(
   let severity: SeverityLevel;
   let explanation: string;
 
+  const hasClinicalMacrosomia = efwGrams >= 4000;
+
   if (efwGrams < bands.p3 || percentile < 3) {
     classification = `Peso fetal < P3 — Sospecha de RCIU / PEG severo (${percentileFormatted})`;
     severity = 'high';
@@ -365,23 +367,28 @@ export function evaluateFetalWeight(
     explanation =
       'Peso fetal estimado entre el percentil 3 y 10. Diferenciar pequeño constitucional vs. restricción de crecimiento mediante Doppler uterino/umbilical, volumen de líquido amniótico y curva de crecimiento seriada.';
   } else if (efwGrams <= bands.p90 && percentile <= 90) {
-    classification = `Peso fetal adecuado para la edad gestacional — AEG (${percentileFormatted})`;
-    severity = 'normal';
-    explanation =
-      'Peso fetal estimado dentro del rango normal P10–P90 para la edad gestacional según estándar sonográfico de Hadlock (1991).';
-  } else if (efwGrams <= bands.p97 && percentile <= 97 && efwGrams < 4000) {
-    classification = `Grande para la edad gestacional — GEG P90–P97 (${percentileFormatted})`;
-    severity = 'low';
-    explanation =
-      'Peso fetal estimado por encima del percentil 90. Valorar tamizaje/control glucémico materno, ganancia ponderal gestacional y seguimiento biométrico.';
+    classification = hasClinicalMacrosomia
+      ? `Peso fetal AEG (${percentileFormatted}) · Macrosomía clínica (≥ 4,000 g)`
+      : `Peso fetal adecuado para la edad gestacional — AEG (${percentileFormatted})`;
+    severity = efwGrams >= 4500 ? 'high' : hasClinicalMacrosomia ? 'moderate' : 'normal';
+    explanation = hasClinicalMacrosomia
+      ? `Aunque el percentil (${percentileFormatted}) se mantiene ≤ P90 para ${weeks} semanas en el estándar de Hadlock (1991), el peso estimado absoluto alcanza ≥ 4,000 g (macrosomía fetal clínica). Descartar diabetes gestacional y planificar vía del parto.`
+      : 'Peso fetal estimado dentro del rango normal P10–P90 para la edad gestacional según estándar sonográfico de Hadlock (1991).';
+  } else if (efwGrams <= bands.p97 && percentile <= 97) {
+    classification = hasClinicalMacrosomia
+      ? `Grande para la edad gestacional — GEG P90–P97 (${percentileFormatted}) · Macrosomía (≥ 4,000 g)`
+      : `Grande para la edad gestacional — GEG P90–P97 (${percentileFormatted})`;
+    severity = efwGrams >= 4500 ? 'high' : hasClinicalMacrosomia ? 'moderate' : 'low';
+    explanation = hasClinicalMacrosomia
+      ? `Peso fetal estimado en rango GEG (${percentileFormatted}) con peso absoluto ≥ 4,000 g (macrosomía fetal). Descartar diabetes gestacional o pregestacional y planificar vía del parto.`
+      : 'Peso fetal estimado por encima del percentil 90. Valorar tamizaje/control glucémico materno, ganancia ponderal gestacional y seguimiento biométrico.';
   } else {
-    classification =
-      efwGrams >= 4000
-        ? `Macrosomía / Peso fetal > P97 (${percentileFormatted}, ${efwGrams} g)`
-        : `Peso fetal > P97 — GEG marcado (${percentileFormatted})`;
+    classification = hasClinicalMacrosomia
+      ? `Macrosomía / Peso fetal > P97 (${percentileFormatted}, ${roundClinical(efwGrams, 0)} g)`
+      : `Peso fetal > P97 — GEG marcado (${percentileFormatted})`;
     severity = efwGrams >= 4500 ? 'high' : 'moderate';
     explanation =
-      'Peso fetal estimado superior al percentil 97 o ≥ 4,000 g. Descartar diabetes gestacional o pregestacional y planificar vía del parto valorando biometría clínica y pélvica.';
+      'Peso fetal estimado superior al percentil 97 para la edad gestacional. Descartar diabetes gestacional o pregestacional y planificar vía del parto valorando biometría clínica y pélvica.';
   }
 
   return {

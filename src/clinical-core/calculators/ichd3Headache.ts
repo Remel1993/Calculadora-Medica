@@ -797,7 +797,18 @@ export const ichd3HeadacheCalculator: CalculatorDefinition = {
             'Evitar triptanes y derivados ergóticos (contraindicación clásica en migraña hemipléjica); emplear AINEs, antieméticos o antagonistas CGRP según criterio especializado.',
             'Si aparece un déficit motor nuevo, más prolongado (> 72 h) o diferente al patrón habitual, reevaluar inmediatamente con neuroimagen.',
           );
-        } else if (hasBrainstem && !hasRetinal) {
+        } else if (hasBrainstem && hasRetinal) {
+          code = 'ICHD-3 1.2.2 + 1.2.4';
+          primaryUnit = '(Mixto: Tronco + Retiniano)';
+          title = 'Aura del tronco encefálico (1.2.2) con síntoma retiniano simultáneo (1.2.4)';
+          severity = 'high';
+          clinicalInterpretation =
+            'Coexisten síntomas de fosa posterior/tronco encefálico con alteración visual monocular; ICHD-3 1.2.2 excluye síntomas retinianos puros y 1.2.4 exige confirmación estrictamente monocular, por lo que esta combinación obliga a descartar patología isquémica vertebrobasilar, carotídea u ocular antes de diagnosticar migraña.';
+          guidance.push(
+            'CONTRAINDICADO administrar triptanes o derivados ergóticos por el componente de aura troncoencefálica.',
+            'Confirmar si el déficit visual fue estrictamente monocular vs. hemianopsia homónima y realizar valoración neurovascular/oftalmológica urgente si es de inicio reciente.',
+          );
+        } else if (hasBrainstem) {
           code = 'ICHD-3 1.2.2';
           primaryUnit = '(Troncoencéfalo)';
           title = 'Migraña con aura del tronco encefálico (ICHD-3 1.2.2)';

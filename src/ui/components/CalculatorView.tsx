@@ -35,6 +35,7 @@ import {
 import { MocaInteractiveGuide } from './MocaInteractiveGuide.tsx';
 import { ObstetricGrowthPanel } from './ObstetricGrowthPanel.tsx';
 import { PediatricGrowthPanel } from './PediatricGrowthPanel.tsx';
+import { AcronymLegend } from './AcronymLegend.tsx';
 
 interface CalculatorViewProps {
   calculator: CalculatorDefinition;
@@ -921,6 +922,38 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
           </div>
         )}
       </div>
+
+      <AcronymLegend
+        sourceText={[
+          calculator.name,
+          calculator.description,
+          calculator.clinicalIndication,
+          calculator.validatedPopulation,
+          calculator.version,
+          ...calculator.contraindications,
+          ...calculator.limitations,
+          ...calculator.fields.flatMap((f) => [
+            f.label,
+            f.helpText ?? '',
+            ...(f.type === 'select' ? f.options.map((o) => `${o.label} ${o.description ?? ''}`) : []),
+          ]),
+          ...(output
+            ? [
+                output.primaryResult.label,
+                output.primaryResult.formattedValue,
+                output.primaryResult.unit,
+                output.riskClassification,
+                output.clinicalInterpretation,
+                output.formulaUsed,
+                output.guidanceDisclaimer ?? '',
+                ...(output.guidance ?? []),
+                ...(output.secondaryResults?.map(
+                  (r) => `${r.label} ${r.formattedValue} ${r.unit} ${r.note ?? ''}`,
+                ) ?? []),
+              ]
+            : []),
+        ].join(' ')}
+      />
     </div>
   );
 };

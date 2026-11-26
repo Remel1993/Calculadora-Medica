@@ -209,8 +209,8 @@ export const PediatricGrowthPanel: React.FC<PediatricGrowthPanelProps> = ({
       ? evaluateWhoIndicator('lhfa', sex, ageMonths, validHeight)
       : null;
   const bmiEval =
-    ageMonths !== null && bmiExact !== null && bmiExact > 0
-      ? evaluateWhoIndicator('bmifa', sex, ageMonths, bmiExact)
+    ageMonths !== null && bmi !== null && bmi > 0
+      ? evaluateWhoIndicator('bmifa', sex, ageMonths, bmi)
       : null;
   const hcfaEval =
     ageMonths !== null && ageMonths <= 60 && validHeadCirc !== null

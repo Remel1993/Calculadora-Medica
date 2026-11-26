@@ -92,7 +92,7 @@ interface OpioidAgent {
 const OPIOID_AGENTS: Record<string, OpioidAgent> = {
   morphine_po: { id: 'morphine_po', label: 'Morfina oral (VO)', mmeFactor: 1.0 },
   morphine_iv: { id: 'morphine_iv', label: 'Morfina IV / SC (equivalencia 3:1 frente a VO)', mmeFactor: 3.0 },
-  tramadol_po: { id: 'tramadol_po', label: 'Tramadol oral (VO)', mmeFactor: 0.1, maxDailyNote: 'Tope máximo diario: 400 mg/día' },
+  tramadol_po: { id: 'tramadol_po', label: 'Tramadol oral (VO)', mmeFactor: 0.2, maxDailyNote: 'Tope máximo diario: 400 mg/día (factor CDC 2022: 0.2)' },
   codeine_po: { id: 'codeine_po', label: 'Codeína oral (VO)', mmeFactor: 0.15 },
   oxycodone_po: { id: 'oxycodone_po', label: 'Oxicodona oral (VO)', mmeFactor: 1.5 },
   hydrocodone_po: { id: 'hydrocodone_po', label: 'Hidrocodona oral (VO)', mmeFactor: 1.0 },

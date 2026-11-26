@@ -195,7 +195,7 @@ const lengthField: NumberFieldDef = {
   label: 'Talla / Longitud corporal (vértice a talón)',
   type: 'number',
   canonicalUnit: 'cm',
-  units: [{ id: 'cm', label: 'cm', toCanonical: (v) => v, min: 46, max: 146, step: 1 }],
+  units: [{ id: 'cm', label: 'cm', toCanonical: (v) => v, min: 46, max: 146, step: 0.5 }],
   defaultUnitId: 'cm',
   defaultValue: '88',
   min: 46,
@@ -232,12 +232,12 @@ const colorZoneField: SelectFieldDef = {
 };
 
 function findZoneByLength(cm: number): BroselowZone {
-  return (
-    BROSELOW_ZONES.find((z) => cm >= z.lengthMinCm && cm <= z.lengthMaxCm) ??
-    (cm < BROSELOW_ZONES[0].lengthMinCm
-      ? BROSELOW_ZONES[0]
-      : BROSELOW_ZONES[BROSELOW_ZONES.length - 1])
-  );
+  if (cm < BROSELOW_ZONES[0].lengthMinCm) return BROSELOW_ZONES[0];
+  for (let i = 0; i < BROSELOW_ZONES.length - 1; i += 1) {
+    const boundary = (BROSELOW_ZONES[i].lengthMaxCm + BROSELOW_ZONES[i + 1].lengthMinCm) / 2;
+    if (cm < boundary) return BROSELOW_ZONES[i];
+  }
+  return BROSELOW_ZONES[BROSELOW_ZONES.length - 1];
 }
 
 function findZoneByWeight(kg: number): BroselowZone {
@@ -308,7 +308,7 @@ export const pediatricBroselowResuscitationCalculator: CalculatorDefinition = {
       const lengthCm = getCanonicalNumberValue(lengthField, inputs.lengthCm as NumberInputValue).canonicalValue!;
       zone = findZoneByLength(lengthCm);
       workingWeightKg = zone.midpointWeightKg;
-      sourceDesc = `Talla ${roundClinical(lengthCm, 0)} cm → Peso de trabajo ${workingWeightKg} kg`;
+      sourceDesc = `Talla ${formatClinicalNumber(lengthCm, 1)} cm → Peso de trabajo ${workingWeightKg} kg`;
     } else if (method === 'by_weight') {
       const weightKg = getCanonicalNumberValue(weightField, inputs.weightKg as NumberInputValue).canonicalValue!;
       zone = findZoneByWeight(weightKg);
@@ -323,7 +323,7 @@ export const pediatricBroselowResuscitationCalculator: CalculatorDefinition = {
     const epiMg = Math.min(1, roundClinical(workingWeightKg * 0.01, 3));
     const epiMl = Math.min(10, roundClinical(workingWeightKg * 0.1, 2));
     const defib2J = Math.min(200, Math.round(workingWeightKg * 2));
-    const defib4J = Math.min(360, Math.round(workingWeightKg * 4));
+    const defib4J = Math.min(200, Math.round(workingWeightKg * 4));
     const cardioversion1J = Math.max(2, Math.round(workingWeightKg * 1));
     const amiodaroneMg = Math.min(300, roundClinical(workingWeightKg * 5, 0));
     const adenosine1Mg = Math.min(6, roundClinical(workingWeightKg * 0.1, 2));
@@ -369,6 +369,7 @@ export const pediatricBroselowResuscitationCalculator: CalculatorDefinition = {
         label: 'Atropina / Dextrosa 10% (hipoglucemia)',
         formattedValue: `Atropina: ${atropineMg} mg`,
         unit: `DAD 10%: ${d10wMlLow}–${d10wMlHigh} mL`,
+        note: workingWeightKg < 5 ? 'Precaución < 5 kg: aunque AHA PALS mantiene dosis mínima de 0.1 mg, vigilar toxicidad anticolinérgica en neonatos/lactantes pequeños.' : undefined,
       },
     ];
 

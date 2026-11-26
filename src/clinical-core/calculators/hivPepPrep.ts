@@ -117,21 +117,25 @@ export const hivPepPrepCalculator: CalculatorDefinition = {
     'dolutegravir',
     'indetectable',
     'violencia sexual',
+    'ppe',
+    'minsa',
+    'nicaragua',
+    'tld',
   ],
   description:
-    'Evaluación de elegibilidad, ventana crítica de 72 horas, esquemas antirretrovirales recomendados y ajuste renal para PEP (ocupacional/no ocupacional) y PrEP.',
+    'Evaluación de elegibilidad, ventana crítica de 72 horas, esquemas antirretrovirales (incluyendo PPE MINSA Nicaragua con TDF/3TC + DTG) y ajuste renal para PEP/PPE y PrEP.',
   clinicalIndication:
-    'Atención urgente de accidentes biológicos ocupacionales, exposiciones sexuales sin preservativo/agresión sexual (PEP) e indicación preventiva en consulta externa (PrEP).',
+    'Atención urgente de accidentes biológicos ocupacionales, exposiciones sexuales sin preservativo/violencia sexual (PEP/PPE ≤ 72 h) e indicación preventiva en consulta externa (PrEP).',
   validatedPopulation: 'Adultos y adolescentes ≥ 35 kg VIH negativos.',
   contraindications: [
     'NUNCA iniciar PrEP (bitherapia TDF/FTC o TAF/FTC) sin descartar infección aguda o crónica por VIH, por alto riesgo de seleccionar mutaciones de resistencia (M184V/K65R).',
     'Evitar Tenofovir disoproxil fumarato (TDF) si ClCr < 60 mL/min; en insuficiencia renal usar TAF/FTC (ClCr ≥ 30 mL/min) o régimen alternativo con Infectología.',
   ],
   limitations: [
-    'En exposición laboral percutánea con fuente VIH+ en TAR indetectable, aunque el riesgo es extremadamente bajo, muchas guías laborales mantienen valoración individualizada de PEP.',
-    'En embarazo, TDF/FTC + Dolutegravir o Raltegravir son esquemas aceptados para PEP (y TDF/FTC para PrEP diaria).',
+    'En exposición laboral percutánea con fuente VIH+ en TAR indetectable, aunque el riesgo es extremadamente bajo, los protocolos laborales (incl. MINSA) contemplan valoración individualizada de PPE.',
+    'En embarazo, TDF/3TC (o TDF/FTC) + Dolutegravir o Raltegravir son esquemas aceptados para PPE (y TDF/FTC para PrEP diaria).',
   ],
-  version: 'CDC nPEP / oPEP · CDC PrEP Guidelines · WHO Consolidated Guidelines 2024',
+  version: 'CDC nPEP/oPEP · CDC PrEP · WHO Consolidated Guidelines · MINSA Nicaragua PPE',
   references: [
     {
       citation:
@@ -142,6 +146,11 @@ export const hivPepPrepCalculator: CalculatorDefinition = {
       citation:
         'Centers for Disease Control and Prevention (CDC). US Public Health Service: Preexposure Prophylaxis for the Prevention of HIV Infection in the United States — 2021 Update.',
       year: 2021,
+    },
+    {
+      citation:
+        'Ministerio de Salud de Nicaragua (MINSA). Normativa de Atención Integral del VIH/SIDA y Profilaxis Post-Exposición (PPE ocupacional y por violencia sexual). Managua: MINSA.',
+      year: 2023,
     },
   ],
   fields: [modeField, hoursField, exposureRiskField, prepProfileField, prepHivNegField, crclField],
@@ -222,7 +231,7 @@ export const hivPepPrepCalculator: CalculatorDefinition = {
         ? crcl >= 30
           ? 'TAF/FTC 25/200 mg + Dolutegravir 50 mg VO c/24 h (o BIC/FTC/TAF c/24 h) × 28 días'
           : 'ClCr < 30 mL/min: ajustar NRTI con Infectología (ej. AZT/3TC ajustados a TFG + Dolutegravir 50 mg/d) × 28 días'
-        : 'TDF/FTC 300/200 mg VO c/24 h + Dolutegravir 50 mg VO c/24 h (alternativa BIC/FTC/TAF o TDF/FTC + RAL 400 mg c/12 h) × 28 días';
+        : 'TDF/3TC 300/300 mg (esquema TLD MINSA) o TDF/FTC 300/200 mg VO c/24 h + Dolutegravir 50 mg VO c/24 h (alternativa BIC/FTC/TAF o TDF/FTC + RAL 400 mg c/12 h) × 28 días';
 
       return {
         primaryResult: {
@@ -236,15 +245,15 @@ export const hivPepPrepCalculator: CalculatorDefinition = {
           { label: 'Ajuste renal', formattedValue: renalAlt ? `Evitar TDF (ClCr ${crcl} mL/min)` : `Estándar (ClCr ${crcl} mL/min)`, unit: '' },
         ],
         severity: 'critical',
-        riskClassification: `PEP INDICADA · Iniciar 1.ª dosis inmediatamente (${formatClinicalNumber(hours, 1)} h)`,
-        clinicalInterpretation: `Exposición de riesgo dentro de la ventana de 72 horas (${formatClinicalNumber(hours, 1)} h). Iniciar primera dosis DE INMEDIATO sin esperar resultados basales de laboratorio (salvo prueba rápida VIH inmediata disponible en el punto de atención) y completar 28 días.`,
+        riskClassification: `PEP / PPE INDICADA · Iniciar 1.ª dosis inmediatamente (${formatClinicalNumber(hours, 1)} h)`,
+        clinicalInterpretation: `Exposición de riesgo dentro de la ventana de 72 horas (${formatClinicalNumber(hours, 1)} h). Iniciar primera dosis DE INMEDIATO (ideal < 2 h) sin esperar resultados basales de laboratorio (salvo prueba rápida VIH inmediata en punto de atención) y completar 28 días.`,
         guidance: [
           `Esquema recomendado: ${regimen}.`,
-          'Laboratorios basales obligatorios: VIH 4.ª generación, HBsAg/anti-HBs, VHC, sífilis, creatinina/transaminasas y prueba de embarazo en mujer en edad fértil.',
-          'Si exposición sexual/agresión sexual: añadir profilaxis de ITS (ej. Ceftriaxona + Doxiciclina/Azitromicina) y anticoncepción de emergencia si procede; en accidente laboral evaluar además vacuna/Ig VHB.',
-          'Seguimiento VIH: repetir a las 4–6 semanas y a los 3 meses (y a los 6 meses si hubo coinfección con VHC de fuente positiva).',
+          'Laboratorios basales obligatorios: VIH (prueba rápida / 4.ª generación), HBsAg/anti-HBs, VHC, sífilis, creatinina/transaminasas y prueba de embarazo en mujer en edad fértil.',
+          'Si exposición sexual/violencia sexual: añadir profilaxis de ITS (ej. Ceftriaxona + Doxiciclina/Azitromicina) y anticoncepción de emergencia si procede; en accidente laboral evaluar vacuna/Ig VHB (HBIG).',
+          'Seguimiento serológico VIH: control a las 6 semanas, 3 meses (12 sem) y 6 meses según normativa institucional MINSA (especialmente si fuente VHC+ o duda de seroconversión tardía).',
         ],
-        formulaUsed: 'PEP CDC/OMS: 3 fármacos activos ≤ 72 h × 28 días con ajuste por ClCr',
+        formulaUsed: 'PEP/PPE CDC · OMS · MINSA Nicaragua: 3 fármacos activos ≤ 72 h × 28 días con ajuste por ClCr',
         inputsSummary: `Modo=PEP, Horas=${formatClinicalNumber(hours, 1)} h, ClCr=${crcl} mL/min`,
       };
     }

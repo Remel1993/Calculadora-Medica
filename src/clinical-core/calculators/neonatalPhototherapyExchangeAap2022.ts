@@ -116,10 +116,20 @@ const PHOTO_WITH_RISK: Record<GaKey, readonly [number, number, number, number]> 
   '40': [10.5, 14.0, 16.6, 18.2],
 };
 
-// Published AAP 2022 exchange transfusion anchor points without extra neurotoxicity risk factors (35w vs >=38w)
-const EXCHANGE_NO_RISK: Record<'35' | '36_37' | '38_plus', readonly [number, number, number, number]> = {
+// Published AAP 2022 (Kemper et al., Pediatrics 2022) exchange transfusion anchor points (mg/dL) at 24, 48, 72, 96 h
+// Supplemental Table 3 (Figure 5): WITHOUT additional neurotoxicity risk factors
+const EXCHANGE_NO_RISK: Record<'35' | '36' | '37' | '38_plus', readonly [number, number, number, number]> = {
+  '35': [17.9, 20.7, 22.9, 24.5],
+  '36': [19.1, 21.9, 24.1, 25.5],
+  '37': [20.3, 23.1, 25.2, 26.6],
+  '38_plus': [21.4, 24.0, 25.9, 27.0],
+};
+
+// Supplemental Table 4 (Figure 7): WITH >= 1 neurotoxicity risk factor
+const EXCHANGE_WITH_RISK: Record<'35' | '36' | '37' | '38_plus', readonly [number, number, number, number]> = {
   '35': [16.1, 18.5, 20.1, 21.1],
-  '36_37': [16.9, 19.3, 21.1, 22.3],
+  '36': [16.6, 19.1, 20.9, 22.1],
+  '37': [17.2, 19.7, 21.7, 23.1],
   '38_plus': [17.7, 20.1, 22.1, 23.5],
 };
 
@@ -165,8 +175,8 @@ export const neonatalPhototherapyExchangeAap2022Calculator: CalculatorDefinition
     'Nunca basar la decisión en bilirrubina transcutánea (TcB) una vez iniciada la fototerapia ni restar la bilirrubina directa.',
   ],
   limitations: [
-    'Para edades entre 24 y 96 h se interpolan linealmente los puntos publicados de AAP 2022; antes de 24 h toda ictericia significativa es patológica y exige manejo urgente y verificación en la curva oficial horaria.',
-    'Cuando existen factores de riesgo de neurotoxicidad adicionales, los umbrales de exanguinotransfusión descienden ~2–4 mg/dL respecto a la curva sin riesgo.',
+    'Para edades entre 24 y 96 h se interpolan linealmente los puntos publicados de las Tablas Suplementarias AAP 2022; antes de 24 h toda ictericia significativa es patológica y exige manejo urgente y verificación en la curva oficial horaria.',
+    'Cuando existen factores de riesgo de neurotoxicidad adicionales (Tabla Suplementaria 4), los umbrales de exanguinotransfusión descienden respecto a la curva sin riesgo (Tabla Suplementaria 3).',
   ],
   version: 'AAP Hyperbilirubinemia CPG (Kemper et al., Pediatrics 2022)',
   references: [
@@ -199,10 +209,12 @@ export const neonatalPhototherapyExchangeAap2022Calculator: CalculatorDefinition
     const photoThreshold = interpolateAtHours(photoAnchors, hours);
     const stopPhotoThreshold = roundClinical(Math.max(0, photoThreshold - 2.0), 1);
 
-    const exchGroup = gaNum === 35 ? '35' : gaNum <= 37 ? '36_37' : '38_plus';
+    const exchGroup: '35' | '36' | '37' | '38_plus' =
+      gaNum === 35 ? '35' : gaNum === 36 ? '36' : gaNum === 37 ? '37' : '38_plus';
     const baseExchangeThreshold = interpolateAtHours(EXCHANGE_NO_RISK[exchGroup], hours);
-    // AAP 2022 lowers exchange curves by ~2.5 mg/dL (range 2-4 mg/dL) when neurotoxicity risk factors are present
-    const effectiveExchangeRef = hasRisk ? roundClinical(baseExchangeThreshold - 2.5, 1) : baseExchangeThreshold;
+    const effectiveExchangeRef = hasRisk
+      ? interpolateAtHours(EXCHANGE_WITH_RISK[exchGroup], hours)
+      : baseExchangeThreshold;
     const escalationThreshold = roundClinical(effectiveExchangeRef - 2.0, 1);
 
     // Bilirubin / Albumin (B/A) ratio check
@@ -289,8 +301,8 @@ export const neonatalPhototherapyExchangeAap2022Calculator: CalculatorDefinition
       },
       {
         label: hasRisk
-          ? 'Referencia Exanguinotransfusión (con FR orientativa)'
-          : 'Umbral de Exanguinotransfusión (sin FR)',
+          ? 'Umbral de Exanguinotransfusión (con FR · AAP Tabla Supl. 4)'
+          : 'Umbral de Exanguinotransfusión (sin FR · AAP Tabla Supl. 3)',
         formattedValue: `${formatClinicalNumber(effectiveExchangeRef, 1)} mg/dL`,
         unit: hasRisk ? `(sin FR: ${formatClinicalNumber(baseExchangeThreshold, 1)} mg/dL)` : '',
       },

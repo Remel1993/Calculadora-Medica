@@ -99,6 +99,7 @@ export const hba1cEagCalculator: CalculatorDefinition = {
     }
 
     const a1cRounded = roundClinical(a1cPct, 1);
+    const evalA1c = toA1c ? a1cRounded : roundClinical(a1cPct, 1);
     const eagMgRounded = roundClinical(eagMgDl, 0);
     const eagMmolRounded = roundClinical(eagMgDl / 18.0182, 1);
     const ifccMmolMol = roundClinical((a1cPct - 2.152) / 0.09148, 0);
@@ -107,24 +108,24 @@ export const hba1cEagCalculator: CalculatorDefinition = {
     let riskClassification = '';
     let clinicalInterpretation = '';
 
-    if (a1cPct < 5.7) {
+    if (evalA1c < 5.7) {
       severity = 'normal';
       riskClassification = `Rango normoglucémico (< 5.7 % · eAG ${eagMgRounded} mg/dL)`;
       clinicalInterpretation = 'Corresponde a exposición glucémica promedio dentro de rangos no diabéticos (confirmar diagnóstico siempre con pruebas estandarizadas).';
-    } else if (a1cPct < 6.5) {
+    } else if (evalA1c < 6.5) {
       severity = 'low';
       riskClassification = `Rango de prediabetes / riesgo aumentado (5.7 – 6.4 % · eAG ${eagMgRounded} mg/dL)`;
       clinicalInterpretation = 'En pacientes sin diabetes previa sugiere prediabetes según criterios ADA; en diabetes tratada refleja control glucémico estricto.';
-    } else if (a1cPct <= 7.0) {
+    } else if (evalA1c <= 7.0) {
       severity = 'low';
-      riskClassification = `Control en meta general ADA (< 7.0 % · eAG ${eagMgRounded} mg/dL)`;
-      clinicalInterpretation = 'Alcanza el objetivo general (< 7.0 %) para la mayoría de adultos con diabetes no gestacional.';
-    } else if (a1cPct <= 8.5) {
+      riskClassification = `Control en meta general ADA (6.5 – 7.0 % · eAG ${eagMgRounded} mg/dL)`;
+      clinicalInterpretation = 'Dentro del objetivo general (< 7.0 % / ≤ 7.0 %) para la mayoría de adultos con diabetes no gestacional.';
+    } else if (evalA1c <= 8.5) {
       severity = 'moderate';
       riskClassification = `Control glucémico subóptimo (7.1 – 8.5 % · eAG ${eagMgRounded} mg/dL)`;
       clinicalInterpretation = 'Exposición hiperglucémica sostenida; valorar intensificación o adherencia terapéutica salvo metas individualizadas menos estrictas.';
     } else {
-      severity = a1cPct >= 10 ? 'critical' : 'high';
+      severity = evalA1c >= 10 ? 'critical' : 'high';
       riskClassification = `Descontrol glucémico marcado (> 8.5 % · eAG ${eagMgRounded} mg/dL)`;
       clinicalInterpretation = 'Hiperglucemia crónica significativa con riesgo elevado de complicaciones micro y macrovasculares.';
     }

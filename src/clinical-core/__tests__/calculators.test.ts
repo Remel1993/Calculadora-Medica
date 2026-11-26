@@ -2564,15 +2564,15 @@ test('Obstetrics expansion: IOM/Hadlock weight gain & fetal curves, Preeclampsia
     temperature: { value: '39.4', unitId: 'c' }, // +3
     sbp: { value: '86', unitId: 'mmhg' }, // +2
     heartRate: { value: '132', unitId: 'bpm' }, // +2
-    respiratoryRate: { value: '26', unitId: 'rpm' }, // +1
+    respiratoryRate: { value: '26', unitId: 'rpm' }, // +2 (Albright 2014: 25–34)
     spo2: { value: '95', unitId: 'pct' }, // 0
-    wbc: { value: '19.2', unitId: 'k_ul' }, // +1
+    wbc: { value: '19.2', unitId: 'k_ul' }, // +2 (Albright 2014: 17.0–24.9)
     immatureNeutrophilsPct: { value: '14', unitId: 'pct' }, // +2
     lactate: { value: '2.5', unitId: 'mmol_l' }, // 0
     neuroAltered: false,
     oliguria: false,
   });
-  assert.equal(sosHigh.primaryResult.value, 11);
+  assert.equal(sosHigh.primaryResult.value, 13);
   assert.equal(sosHigh.severity, 'critical');
 });
 
@@ -3006,8 +3006,8 @@ test('Consulta Externa Expansion (18 tools): Geriatrics, Cardio/Lipids, Hepato/G
   assert.equal(mchatMod.severity, 'moderate');
 });
 
-test('Catalog: 184 deduplicated tools, cross-specialty tagging, and accent-insensitive search', () => {
-  assert.equal(CALCULATOR_CATALOG.length, 184);
+test('Catalog: 185 deduplicated tools, cross-specialty tagging, and accent-insensitive search', () => {
+  assert.equal(CALCULATOR_CATALOG.length, 186);
 
   const oncoCalcs = getCalculatorsBySpecialty('oncologia');
   assert.ok(oncoCalcs.some((c) => c.id === 'acr-tirads-thyroid'));
@@ -4168,18 +4168,10 @@ test('MINSA Nicaragua Immunization, Broselow PALS, AAP 2022 Phototherapy/Exchang
   assert.ok(broselowYellow.secondaryResults?.some((r) => r.formattedValue.includes('4.0 mm')));
   assert.ok(broselowYellow.secondaryResults?.some((r) => r.formattedValue.includes('1.3 mL')));
 
-  // 3. AAP 2022 Neonatal Hyperbilirubinemia: 38w @ 48h TSB 16.5 >= 16.0 -> Phototherapy; TSB 19.0 -> Escalation of Care (within 2 mg/dL of 20.1); ABE -> Exchange
+  // 3. AAP 2022 Neonatal Hyperbilirubinemia: 38w @ 48h
+  // No risk: photo = 16.0, exchange = 24.0 (escalation >= 22.0)
+  // With risk: photo = 14.0, exchange = 20.1 (escalation >= 18.1)
   const photoYes = neonatalPhototherapyExchangeAap2022Calculator.calculate({
-    gestationalAgeWeeks: '38',
-    hoursOfLife: { value: '48', unitId: 'h' },
-    tsb: { value: '16.5', unitId: 'mg_dl' },
-    albumin: { value: '3.5', unitId: 'g_dl' },
-    hasNeuroRiskFactors: false,
-    hasAbeSigns: false,
-  });
-  assert.ok(photoYes.riskClassification.includes('FOTOTERAPIA INDICADA'));
-
-  const escalationZone = neonatalPhototherapyExchangeAap2022Calculator.calculate({
     gestationalAgeWeeks: '38',
     hoursOfLife: { value: '48', unitId: 'h' },
     tsb: { value: '19.0', unitId: 'mg_dl' },
@@ -4187,8 +4179,29 @@ test('MINSA Nicaragua Immunization, Broselow PALS, AAP 2022 Phototherapy/Exchang
     hasNeuroRiskFactors: false,
     hasAbeSigns: false,
   });
-  assert.ok(escalationZone.riskClassification.includes('ESCALADA DE CUIDADOS'));
-  assert.equal(escalationZone.severity, 'critical');
+  assert.ok(photoYes.riskClassification.includes('FOTOTERAPIA INDICADA'));
+
+  const escalationNoRisk = neonatalPhototherapyExchangeAap2022Calculator.calculate({
+    gestationalAgeWeeks: '38',
+    hoursOfLife: { value: '48', unitId: 'h' },
+    tsb: { value: '22.5', unitId: 'mg_dl' },
+    albumin: { value: '3.5', unitId: 'g_dl' },
+    hasNeuroRiskFactors: false,
+    hasAbeSigns: false,
+  });
+  assert.ok(escalationNoRisk.riskClassification.includes('ESCALADA DE CUIDADOS'));
+  assert.equal(escalationNoRisk.severity, 'critical');
+
+  const escalationWithRisk = neonatalPhototherapyExchangeAap2022Calculator.calculate({
+    gestationalAgeWeeks: '38',
+    hoursOfLife: { value: '48', unitId: 'h' },
+    tsb: { value: '19.0', unitId: 'mg_dl' },
+    albumin: { value: '3.5', unitId: 'g_dl' },
+    hasNeuroRiskFactors: true,
+    hasAbeSigns: false,
+  });
+  assert.ok(escalationWithRisk.riskClassification.includes('ESCALADA DE CUIDADOS'));
+  assert.equal(escalationWithRisk.severity, 'critical');
 
   const abeEmergency = neonatalPhototherapyExchangeAap2022Calculator.calculate({
     gestationalAgeWeeks: '38',
@@ -4200,7 +4213,7 @@ test('MINSA Nicaragua Immunization, Broselow PALS, AAP 2022 Phototherapy/Exchang
   });
   assert.ok(abeEmergency.riskClassification.includes('EXANGUINOTRANSFUSIÓN INMEDIATA'));
 
-  // 4. Daily Drug Converters: 40 mg Prednisone -> 6 mg Dexamethasone; 200 mg Tramadol -> 20 MME -> 14 mg Morphine (-30%)
+  // 4. Daily Drug Converters: 40 mg Prednisone -> 6 mg Dexamethasone; 200 mg Tramadol -> 40 MME (CDC 2022 0.2) -> 28 mg Morphine (-30%)
   const steroidConv = dailyDrugConvertersCalculator.calculate({
     ...createInitialInputs(dailyDrugConvertersCalculator),
     converterMode: 'corticoides',
@@ -4218,7 +4231,8 @@ test('MINSA Nicaragua Immunization, Broselow PALS, AAP 2022 Phototherapy/Exchang
     targetOpioid: 'morphine_po',
     crossTolerancePct: '30',
   });
-  assert.equal(opioidConv.primaryResult.value, 14);
+  assert.equal(opioidConv.primaryResult.value, 28);
+  assert.ok(opioidConv.secondaryResults?.some((r) => r.formattedValue.includes('40.0 MME')));
 
   // 5. All 4 new reference tables registered (44 total)
   const newTableIds = [
@@ -4233,7 +4247,376 @@ test('MINSA Nicaragua Immunization, Broselow PALS, AAP 2022 Phototherapy/Exchang
       `Falta tabla clínica nueva: ${id}`,
     );
   }
-  assert.equal(CLINICAL_REFERENCE_TABLES.length, 44);
+  assert.equal(CLINICAL_REFERENCE_TABLES.length, 46);
+});
+
+test('Regression audit fixes: SOS Table 1, SCORE2 smoking, SVS WIfI IVb, HbA1c rounding, Broselow decimals, ICHD-3 mixed aura, Hadlock 4000 g', async () => {
+  const { obstetricSepsisMeowsCalculator } = await import('../calculators/obstetricSepsisMeows.ts');
+  const { score2CvdCalculator } = await import('../calculators/score2Cvd.ts');
+  const { diabeticFootScalesCalculator } = await import('../calculators/diabeticFootScales.ts');
+  const { hba1cEagCalculator } = await import('../calculators/hba1cEag.ts');
+  const { ichd3HeadacheCalculator } = await import('../calculators/ichd3Headache.ts');
+  const { evaluateFetalWeight } = await import('../data/obstetricWeightStandards.ts');
+
+  // 1. Obstetric SOS (Albright 2014 Table 1): RR 28 (+2), SpO2 88% (+3), WBC 26 (+3) => total 8
+  const sos = obstetricSepsisMeowsCalculator.calculate({
+    ...createInitialInputs(obstetricSepsisMeowsCalculator),
+    respiratoryRate: { value: '28', unitId: 'rpm' },
+    spo2: { value: '88', unitId: 'pct' },
+    wbc: { value: '26', unitId: 'k_ul' },
+  });
+  assert.equal(sos.primaryResult.value, 8);
+  assert.equal(sos.secondaryResults?.[0].formattedValue, '0 / 0 / 0 / 2 / 3 / 3 / 0 / 0');
+
+  // WBC 19 => +2 (total 2)
+  const sosWbc19 = obstetricSepsisMeowsCalculator.calculate({
+    ...createInitialInputs(obstetricSepsisMeowsCalculator),
+    wbc: { value: '19', unitId: 'k_ul' },
+  });
+  assert.equal(sosWbc19.primaryResult.value, 2);
+
+  // 2. SCORE2 smoking beta (0.6012 male, 0.7744 female) at 60y (cage=0), SBP 120 (csbp=0), CT 6 mmol/L (~232 mg/dL), HDL 1.3 mmol/L (~50.3 mg/dL)
+  // Male moderate region: uncal = 1 - 0.9605^exp(0.6012); cal = 1 - exp(-exp(-0.1565 + 0.8009 * ln(-ln(1 - uncal))))
+  const score2MaleSmoker = score2CvdCalculator.calculate({
+    region: 'moderate',
+    sex: 'male',
+    age: { value: '60', unitId: 'years' },
+    smoker: true,
+    sbp: { value: '120', unitId: 'mmhg' },
+    totalChol: { value: String(6 * 38.67), unitId: 'mg_dl' },
+    hdlChol: { value: String(1.3 * 38.67), unitId: 'mg_dl' },
+  });
+  // Exact exp(0.6012) = 1.824306 => uncal = 0.07089 => cal = 10.03% -> 10.0%
+  assert.equal(score2MaleSmoker.primaryResult.value, 10.0);
+
+  const score2FemaleSmoker = score2CvdCalculator.calculate({
+    region: 'moderate',
+    sex: 'female',
+    age: { value: '60', unitId: 'years' },
+    smoker: true,
+    sbp: { value: '120', unitId: 'mmhg' },
+    totalChol: { value: String(6 * 38.67), unitId: 'mg_dl' },
+    hdlChol: { value: String(1.3 * 38.67), unitId: 'mg_dl' },
+  });
+  // Exact exp(0.7744) = 2.16929 => uncal = 0.04796 => cal = 6.92% -> 6.9%
+  assert.equal(score2FemaleSmoker.primaryResult.value, 6.9);
+
+  // 3. SVS WIfI Table IVb: W2-I1-fI0 -> Moderate; W3-I1-fI0 -> High
+  const wifiW2I1 = diabeticFootScalesCalculator.calculate({
+    ...createInitialInputs(diabeticFootScalesCalculator),
+    scaleMode: 'wifi',
+    wifiWound: '2',
+    wifiIschemia: '1',
+    wifiInfection: '0',
+  });
+  assert.ok(wifiW2I1.secondaryResults?.some((r) => r.formattedValue === 'Beneficio moderado'));
+
+  const wifiW3I1 = diabeticFootScalesCalculator.calculate({
+    ...createInitialInputs(diabeticFootScalesCalculator),
+    scaleMode: 'wifi',
+    wifiWound: '3',
+    wifiIschemia: '1',
+    wifiInfection: '0',
+  });
+  assert.ok(wifiW3I1.secondaryResults?.some((r) => r.formattedValue.includes('Alto beneficio')));
+
+  // 4. HbA1c ↔ eAG rounding alignment: eAG 139 -> 6.5% -> 6.5–7.0% category (not 5.7–6.4%)
+  const eag139 = hba1cEagCalculator.calculate({
+    mode: 'eag_to_a1c',
+    eag: { value: '139', unitId: 'mg_dl' },
+  });
+  assert.equal(eag139.primaryResult.value, 6.5);
+  assert.ok(eag139.riskClassification.includes('6.5 – 7.0 %'));
+
+  const eag116 = hba1cEagCalculator.calculate({
+    mode: 'eag_to_a1c',
+    eag: { value: '116', unitId: 'mg_dl' },
+  });
+  assert.equal(eag116.primaryResult.value, 5.7);
+  assert.ok(eag116.riskClassification.includes('5.7 – 6.4 %'));
+
+  // 5. Broselow decimal lengths never jump to Green (33 kg)
+  const broselow594 = pediatricBroselowResuscitationCalculator.calculate({
+    ...createInitialInputs(pediatricBroselowResuscitationCalculator),
+    method: 'by_length',
+    lengthCm: { value: '59.4', unitId: 'cm' },
+  });
+  assert.ok(broselow594.primaryResult.formattedValue.includes('Gris'));
+  assert.equal(broselow594.primaryResult.value, 4);
+
+  const broselow595 = pediatricBroselowResuscitationCalculator.calculate({
+    ...createInitialInputs(pediatricBroselowResuscitationCalculator),
+    method: 'by_length',
+    lengthCm: { value: '59.5', unitId: 'cm' },
+  });
+  assert.ok(broselow595.primaryResult.formattedValue.includes('Rosa'));
+  assert.equal(broselow595.primaryResult.value, 6.5);
+
+  // 6. ICHD-3 simultaneous brainstem + retinal aura preserves triptan contraindication
+  const ichdMixed = ichd3HeadacheCalculator.calculate({
+    ...createInitialInputs(ichd3HeadacheCalculator),
+    syndrome: 'migraine_with_aura',
+    auraAttacks: 'ge2',
+    auraBrainstem: true,
+    auraRetinal: true,
+    acGradual5: true,
+    acSuccession: true,
+    acDuration60: true,
+  });
+  assert.equal(ichdMixed.primaryResult.formattedValue, 'ICHD-3 1.2.2 + 1.2.4');
+  assert.ok(ichdMixed.guidance?.some((g) => g.toUpperCase().includes('CONTRAINDICADO')));
+
+  // 7. Hadlock 1991: 4000 g at 40 weeks is P79 (AEG) + clinical macrosomia, NOT "> P97"
+  const hadlock40w = evaluateFetalWeight(4000, 40);
+  assert.ok(hadlock40w);
+  assert.ok(hadlock40w.percentile <= 90);
+  assert.ok(!hadlock40w.classification.includes('> P97'));
+  assert.ok(hadlock40w.classification.includes('Macrosomía'));
+});
+
+test('Tuberculosis clinical suite: WHO HRZE adult/pediatric weight bands, CDC PPD/TPT & Xpert/BPaLM', async () => {
+  const { tuberculosisClinicalSuiteCalculator } = await import(
+    '../calculators/tuberculosisClinicalSuite.ts'
+  );
+
+  // 1. Adult 60 kg (55-70 kg band -> 4 tablets/day RHZE 150/75/400/275 mg)
+  const adult60 = tuberculosisClinicalSuiteCalculator.calculate({
+    ...createInitialInputs(tuberculosisClinicalSuiteCalculator),
+    tbMode: 'tb_active_dosing',
+    weightKg: { value: '60', unitId: 'kg' },
+    activeSite: 'pulmonary_standard',
+    b6Risk: true,
+  });
+  assert.equal(adult60.primaryResult.value, 4);
+  assert.ok(adult60.primaryResult.formattedValue.includes('4 tabletas/día'));
+  assert.ok(adult60.secondaryResults?.some((r) => r.formattedValue.includes('Piridoxina')));
+
+  // 2. Pediatric 10 kg (8.0-11.9 kg band -> 2 dispersible HRZ tablets + 2 E 100 mg)
+  const ped10 = tuberculosisClinicalSuiteCalculator.calculate({
+    ...createInitialInputs(tuberculosisClinicalSuiteCalculator),
+    tbMode: 'tb_active_dosing',
+    weightKg: { value: '10', unitId: 'kg' },
+    activeSite: 'pediatric_nonsevere',
+  });
+  assert.equal(ped10.primaryResult.value, 2);
+  assert.ok(ped10.secondaryResults?.some((r) => r.formattedValue.includes('H 100 / R 150 / Z 300 mg')));
+  assert.ok(ped10.secondaryResults?.some((r) => r.formattedValue.includes('H 100 · R 150 · Z 350 · E 200 mg')));
+
+  // 3. Meningeal TB -> critical + Thwaites dexamethasone
+  const tbMeningitis = tuberculosisClinicalSuiteCalculator.calculate({
+    ...createInitialInputs(tuberculosisClinicalSuiteCalculator),
+    tbMode: 'tb_active_dosing',
+    weightKg: { value: '62', unitId: 'kg' },
+    activeSite: 'cns_meningeal',
+  });
+  assert.equal(tbMeningitis.severity, 'critical');
+  assert.ok(tbMeningitis.guidance?.some((g) => g.includes('Thwaites')));
+
+  // 4. LTBI / PPD cutoffs: 7 mm is positive in >=5 mm group (HIV/contact) and negative in >=10 mm group
+  const ppd7In5mm = tuberculosisClinicalSuiteCalculator.calculate({
+    ...createInitialInputs(tuberculosisClinicalSuiteCalculator),
+    tbMode: 'ltbi_tst_tpt',
+    tstRiskGroup: 'cutoff_5mm',
+    ppdMm: { value: '7', unitId: 'mm' },
+    activeTbExcluded: true,
+  });
+  assert.equal(ppd7In5mm.severity, 'high');
+  assert.ok(ppd7In5mm.primaryResult.formattedValue.includes('Positivo'));
+
+  const ppd7In10mm = tuberculosisClinicalSuiteCalculator.calculate({
+    ...createInitialInputs(tuberculosisClinicalSuiteCalculator),
+    tbMode: 'ltbi_tst_tpt',
+    tstRiskGroup: 'cutoff_10mm',
+    ppdMm: { value: '7', unitId: 'mm' },
+    activeTbExcluded: true,
+  });
+  assert.equal(ppd7In10mm.severity, 'normal');
+  assert.ok(ppd7In10mm.primaryResult.formattedValue.includes('Negativo'));
+
+  // Must block TPT if active TB not excluded
+  const ppdUnexcluded = tuberculosisClinicalSuiteCalculator.calculate({
+    ...createInitialInputs(tuberculosisClinicalSuiteCalculator),
+    tbMode: 'ltbi_tst_tpt',
+    tstRiskGroup: 'cutoff_5mm',
+    ppdMm: { value: '8', unitId: 'mm' },
+    activeTbExcluded: false,
+  });
+  assert.equal(ppdUnexcluded.severity, 'critical');
+
+  // 5. Diagnostic mode: SR (Sintomático Respiratorio) -> BAAR x3 + GeneXpert CNDR; Xpert RR-TB + CNS exclusion of BPaLM
+  const srDx = tuberculosisClinicalSuiteCalculator.calculate({
+    ...createInitialInputs(tuberculosisClinicalSuiteCalculator),
+    tbMode: 'tb_dx_isolation',
+    fourSymptomsPositive: true,
+    xpertResult: 'pending',
+  });
+  assert.ok(srDx.primaryResult.formattedValue.includes('Sintomático Respiratorio'));
+  assert.ok(srDx.guidance?.some((g) => g.includes('BAAR × 3')));
+
+  const rrCns = tuberculosisClinicalSuiteCalculator.calculate({
+    ...createInitialInputs(tuberculosisClinicalSuiteCalculator),
+    tbMode: 'tb_dx_isolation',
+    xpertResult: 'mtb_r_resistant',
+    cnsOrDisseminated: true,
+  });
+  assert.equal(rrCns.severity, 'critical');
+  assert.ok(rrCns.guidance?.some((g) => g.includes('NO está aprobado')));
+
+  // 6. Reference table registered and searchable (MINSA Nicaragua Normativa 054)
+  const tbTable = CLINICAL_REFERENCE_TABLES.find((t) => t.id === 'tuberculosis-oms-cdc-reference-table');
+  assert.ok(tbTable);
+  assert.ok(tbTable.title.includes('MINSA Nicaragua'));
+  assert.ok(searchCalculators('normativa 054').some((c) => c.id === 'tuberculosis-clinical-suite'));
+
+  // 7. Acronym glossary extraction matches exact clinical acronyms without false positives
+  const { extractAcronymsFromText } = await import('../registries/clinicalGlossary.ts');
+  const extracted = extractAcronymsFromText(
+    'Paciente SR con BAAR (+) inicia esquema 2HRZE/4HR con DFC bajo TAES; no confundir con normal.',
+  );
+  const siglas = extracted.map((e) => e.sigla);
+  assert.ok(siglas.includes('SR'));
+  assert.ok(siglas.includes('BAAR'));
+  assert.ok(siglas.includes('HRZE'));
+  assert.ok(siglas.includes('DFC'));
+  assert.ok(siglas.includes('TAES'));
+  assert.ok(!siglas.includes('SpO₂'));
+});
+
+test('MINSA Nicaragua schemes: VIH (TLD/PPE/vertical), Dengue Normativa 147, MgSO4 Normativa 109, Malaria & Leptospirosis', async () => {
+  const { malariaLeptospirosisMinsaCalculator } = await import(
+    '../calculators/malariaLeptospirosisMinsa.ts'
+  );
+  const { extractAcronymsFromText } = await import('../registries/clinicalGlossary.ts');
+
+  // 1. VIH MINSA: TLD + vertical transmission breastfeeding suspension + PPE 6 sem / 3 meses / 6 meses
+  const hivPreg = hivCdcCd4ProphylaxisCalculator.calculate({
+    cd4Count: { value: '420', unitId: 'cells_ul' },
+    cd4Percent: { value: '', unitId: 'pct' },
+    hasStage3Oi: false,
+    sulfaAllergy: false,
+    isPregnant: true,
+  });
+  assert.ok(hivPreg.guidance?.some((g) => g.includes('TLD') && g.includes('SUSPENDER lactancia materna')));
+
+  const hivPepMinsa = hivPepPrepCalculator.calculate({
+    mode: 'pep',
+    hoursSinceExposure: { value: '10', unitId: 'h' },
+    exposureRisk: 'high',
+    prepProfile: 'daily_general',
+    prepHivNegConfirmed: true,
+    renalCrCl: { value: '100', unitId: 'ml_min' },
+  });
+  assert.ok(hivPepMinsa.guidance?.some((g) => g.includes('TDF/3TC')));
+  assert.ok(hivPepMinsa.guidance?.some((g) => g.includes('6 semanas, 3 meses')));
+
+  // 2. Dengue Normativa 147 MINSA: B2 = 7 mL/kg (60 kg -> 420 mL); C = 10 mL/kg (60 kg -> 600 mL)
+  const dengueB2 = dengueOmsCalculator.calculate({
+    ...createInitialInputs(dengueOmsCalculator),
+    weightKg: { value: '60', unitId: 'kg' },
+    ws_pain: true,
+  });
+  assert.equal(dengueB2.primaryResult.value, 2);
+  assert.ok(dengueB2.secondaryResults?.some((r) => r.formattedValue === '420 mL'));
+
+  const dengueC = dengueOmsCalculator.calculate({
+    ...createInitialInputs(dengueOmsCalculator),
+    weightKg: { value: '60', unitId: 'kg' },
+    sev_plasma: true,
+  });
+  assert.equal(dengueC.primaryResult.value, 3);
+  assert.ok(dengueC.secondaryResults?.some((r) => r.formattedValue === '600 mL'));
+
+  // 3. MgSO4 Normativa 109 MINSA: 8 g in 420 mL SSN (= 500 mL -> 16 mg/mL -> 62.5 mL/h for 1 g/h) + 200 mL load
+  const mgso4Minsa = obstetricMgso4Calculator.calculate({
+    loadingGrams: '4',
+    loadingMinutes: '20',
+    loadingPrep: '200ml',
+    maintGramsHour: '1',
+    bagPrep: '8g_420ml',
+  });
+  assert.equal(mgso4Minsa.primaryResult.value, 62.5);
+  assert.equal(mgso4Minsa.secondaryResults?.[0].formattedValue, '600 mL/h');
+  assert.ok(mgso4Minsa.guidance?.some((g) => g.includes('FR < 13 rpm')));
+
+  // 4. Malaria P. vivax adult (60 kg -> 1500 mg CQ + 30 mg/d PQ x7d) vs child (20 kg -> 500 mg CQ + 10 mg/d PQ)
+  const vivaxAdult = malariaLeptospirosisMinsaCalculator.calculate({
+    ...createInitialInputs(malariaLeptospirosisMinsaCalculator),
+    protocolMode: 'malaria_vivax',
+    weightKg: { value: '60', unitId: 'kg' },
+    patientGroup: 'adult_adolescent',
+  });
+  assert.equal(vivaxAdult.primaryResult.value, 1500);
+  assert.ok(vivaxAdult.primaryResult.formattedValue.includes('30.0 mg/d PQ'));
+
+  const vivaxChild = malariaLeptospirosisMinsaCalculator.calculate({
+    ...createInitialInputs(malariaLeptospirosisMinsaCalculator),
+    protocolMode: 'malaria_vivax',
+    weightKg: { value: '20', unitId: 'kg' },
+    patientGroup: 'pediatric_ge6m',
+  });
+  assert.equal(vivaxChild.primaryResult.value, 500);
+  assert.ok(vivaxChild.primaryResult.formattedValue.includes('10.0 mg/d PQ'));
+
+  // Pregnancy blocks Primaquine
+  const vivaxPreg = malariaLeptospirosisMinsaCalculator.calculate({
+    ...createInitialInputs(malariaLeptospirosisMinsaCalculator),
+    protocolMode: 'malaria_vivax',
+    weightKg: { value: '65', unitId: 'kg' },
+    patientGroup: 'pregnant_lactating',
+  });
+  assert.equal(vivaxPreg.severity, 'high');
+  assert.ok(vivaxPreg.secondaryResults?.some((r) => r.formattedValue === 'CONTRAINDICADA'));
+
+  // P. falciparum resistant Coartem 20 kg -> 2 tab/dose (12 tabs total)
+  const coartem20 = malariaLeptospirosisMinsaCalculator.calculate({
+    ...createInitialInputs(malariaLeptospirosisMinsaCalculator),
+    protocolMode: 'malaria_falciparum_resistente',
+    weightKg: { value: '20', unitId: 'kg' },
+    patientGroup: 'pediatric_ge6m',
+  });
+  assert.equal(coartem20.primaryResult.value, 2);
+  assert.ok(coartem20.primaryResult.unit.includes('12 tabletas'));
+
+  // 5. Leptospirosis mild & severe
+  const leptoAdult = malariaLeptospirosisMinsaCalculator.calculate({
+    ...createInitialInputs(malariaLeptospirosisMinsaCalculator),
+    protocolMode: 'leptospirosis_leve',
+    weightKg: { value: '70', unitId: 'kg' },
+    patientGroup: 'adult_adolescent',
+    doxyContraindicated: false,
+  });
+  assert.ok(leptoAdult.primaryResult.formattedValue.includes('Doxiciclina 100 mg'));
+
+  const leptoChild = malariaLeptospirosisMinsaCalculator.calculate({
+    ...createInitialInputs(malariaLeptospirosisMinsaCalculator),
+    protocolMode: 'leptospirosis_leve',
+    weightKg: { value: '15', unitId: 'kg' },
+    patientGroup: 'pediatric_ge6m',
+  });
+  assert.equal(leptoChild.primaryResult.value, 450);
+  assert.ok(leptoChild.primaryResult.formattedValue.includes('150 mg'));
+
+  const leptoSevereChild = malariaLeptospirosisMinsaCalculator.calculate({
+    ...createInitialInputs(malariaLeptospirosisMinsaCalculator),
+    protocolMode: 'leptospirosis_grave',
+    weightKg: { value: '20', unitId: 'kg' },
+    patientGroup: 'pediatric_ge6m',
+    penicillinAllergy: false,
+  });
+  assert.equal(leptoSevereChild.primaryResult.value, 5_000_000);
+  assert.ok(leptoSevereChild.primaryResult.formattedValue.includes('1.25 M UI'));
+
+  // 6. Reference table & new MINSA acronyms
+  assert.ok(CLINICAL_REFERENCE_TABLES.some((t) => t.id === 'malaria-leptospirosis-minsa-table'));
+  const minsaSiglas = extractAcronymsFromText(
+    'Esquema TLD y PPE en UAF con RL supervisado por Col-Vol tras MgSO₄.',
+  ).map((e) => e.sigla);
+  assert.ok(minsaSiglas.includes('TLD'));
+  assert.ok(minsaSiglas.includes('PPE'));
+  assert.ok(minsaSiglas.includes('UAF'));
+  assert.ok(minsaSiglas.includes('RL'));
+  assert.ok(minsaSiglas.includes('Col-Vol'));
+  assert.ok(minsaSiglas.includes('MgSO₄'));
 });
 
 

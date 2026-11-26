@@ -147,8 +147,8 @@ const WIFI_REVASC_BENEFIT: Record<number, Record<number, [WifiTier, WifiTier, Wi
   1: {
     0: ['VL', 'VL', 'L', 'L'],
     1: ['VL', 'L', 'M', 'M'],
-    2: ['VL', 'VL', 'M', 'H'],
-    3: ['VL', 'VL', 'M', 'H'],
+    2: ['M', 'M', 'H', 'H'],
+    3: ['H', 'H', 'H', 'H'],
   },
   2: {
     0: ['L', 'L', 'M', 'H'],
